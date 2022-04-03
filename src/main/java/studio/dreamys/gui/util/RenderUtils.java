@@ -62,4 +62,56 @@ public class RenderUtils {
     public static float getScaledStringWidth(String text, float scale) {
         return Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale;
     }
+
+    public static float getScaledStringHeight(String text, float scale) {
+        return Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * scale;
+    }
+
+    public static void drawGroupWithString(double width, double height, double x, double y, String label) {
+        GL11.glPushMatrix();
+        GL11.glScalef(0.5f, 0.5f, 1f);
+
+        x /= 0.5f;
+        y /= 0.5f;
+        width /= 0.5f;
+        height /= 0.5f;
+        double offset = 2 / 0.5f;
+
+        drawRect(x, y, x + 1, y + height, Color.DARK_GRAY); //LEFT
+        drawRect(x, y + height, x + width, y + height + 1, Color.DARK_GRAY); //BOTTOM
+        drawRect(x + width, y, x + width + 1, y + height + 1, Color.DARK_GRAY); //RIGHT
+
+        drawRect(x, y, x + width / 9 - offset, y + 1, Color.DARK_GRAY); //TOP LEFT
+        drawRect(x + width / 9 + offset * 5 + getScaledStringWidth(label, 0.5f), y, x + width, y + 1, Color.DARK_GRAY); //TOP RIGHT
+
+        GL11.glPopMatrix();
+
+        x *= 0.5f;
+        y *= 0.5f;
+        width *= 0.5f;
+
+        //label
+        RenderUtils.drawScaledString(label, (int) (x + width / 9), (int) y - 1, 0.5f,  Color.WHITE);
+    }
+
+    public static void drawOutline(double width, double height, double x, double y) {
+        GL11.glPushMatrix();
+        GL11.glScalef(0.5f, 0.5f, 1f);
+
+        x /= 0.5f;
+        y /= 0.5f;
+        width /= 0.5f;
+        height /= 0.5f;
+
+        drawRect(x, y, x + 1, y + height, Color.DARK_GRAY); //LEFT
+        drawRect(x, y + height, x + width, y + height + 1, Color.DARK_GRAY); //BOTTOM
+        drawRect(x + width, y, x + width + 1, y + height + 1, Color.DARK_GRAY); //RIGHT
+        drawRect(x, y, x + width, y + 1, Color.DARK_GRAY); //TOP
+
+        GL11.glPopMatrix();
+    }
+
+    public static void drawRect(double width, double height, double x, double y, Color color) {
+        Gui.drawRect((int) width, (int) height, (int) x, (int) y, color.getRGB());
+    }
 }

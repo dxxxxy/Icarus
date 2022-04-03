@@ -43,7 +43,8 @@ public class Field {
 
         //the component itself + the text written
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), java.awt.Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledString(text, (int) x + 4, (int) (y + height / 4), 0.5f,  java.awt.Color.WHITE);
+        RenderUtils.drawScaledString(text, (int) x + 4, (int) (y + height / 3), 0.5f,  java.awt.Color.WHITE);
+        RenderUtils.drawOutline(width, height, x, y);
 
         //label
         RenderUtils.drawScaledString(label, (int) x, (int) (y - height / 1.75), 0.5f,  java.awt.Color.WHITE);

@@ -46,7 +46,7 @@ public class Choice {
 
         //the component itself + the chosen option
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledString(selected, (int) x + 4, (int) (y + height / 4), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString(selected, (int) x + 4, (int) (y + height / 3), 0.5f,  Color.WHITE);
 
         //dropdown symbol
         RenderUtils.drawScaledString("v", (int) (x + width - 8), (int) (y + height / 3.5), 0.5f,  Color.WHITE);
@@ -63,7 +63,7 @@ public class Choice {
             options.forEach(option -> {
                 Color color = option.equals(selected) ? this.color : Color.WHITE;
                 Gui.drawRect((int) x, (int) currentY.get().doubleValue(), (int) (x + width), (int) (currentY.get() + height), Color.DARK_GRAY.darker().darker().getRGB());
-                RenderUtils.drawScaledString(option, (int) x + 4, (int) (currentY.get() + height / 4), 0.5f,  color);
+                RenderUtils.drawScaledString(option, (int) x + 4, (int) (currentY.get() + height / 3), 0.5f,  color);
                 currentY.updateAndGet(v -> v + height);
             });
         }

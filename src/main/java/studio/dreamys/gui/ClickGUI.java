@@ -20,6 +20,7 @@ public class ClickGUI extends GuiScreen {
     public Combo combo;
     public Choice choice;
     public Field field;
+    public Group group;
 
     public void initGui() {
         ScaledResolution res = new ScaledResolution(mc);
@@ -36,12 +37,15 @@ public class ClickGUI extends GuiScreen {
         combo = new Combo(window, 80, 10, 60, 60, new Color(29, 122, 215), "Failsafes", new ArrayList<>(Arrays.asList("warp if admin", "warp if in range", "warp if in front")));
         choice = new Choice(window, 80, 10, 60, 80, new Color(29, 122, 215), "Mode", new ArrayList<>(Arrays.asList("nuke", "legit", "auto")));
         field = new Field(window, 80, 10, 60, 100, "Nick");
+        group = new Group(window, 150, 200, 50, 10, "Group 1");
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
 
         window.render(mouseX, mouseY);
+        group.render();
+
         checkbox.render();
         slider.render(mouseX, mouseY);
 
