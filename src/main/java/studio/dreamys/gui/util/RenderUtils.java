@@ -94,7 +94,7 @@ public class RenderUtils {
         RenderUtils.drawScaledString(label, (int) (x + width / 9), (int) y - 1, 0.5f,  Color.WHITE);
     }
 
-    public static void drawOutline(double width, double height, double x, double y) {
+    public static void drawOutline(double width, double height, double x, double y, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(0.5f, 0.5f, 1f);
 
@@ -103,10 +103,10 @@ public class RenderUtils {
         width /= 0.5f;
         height /= 0.5f;
 
-        drawRect(x, y, x + 1, y + height, Color.DARK_GRAY); //LEFT
-        drawRect(x, y + height, x + width, y + height + 1, Color.DARK_GRAY); //BOTTOM
-        drawRect(x + width, y, x + width + 1, y + height + 1, Color.DARK_GRAY); //RIGHT
-        drawRect(x, y, x + width, y + 1, Color.DARK_GRAY); //TOP
+        drawRect(x, y, x + 1, y + height, color); //LEFT
+        drawRect(x, y + height, x + width, y + height + 1, color); //BOTTOM
+        drawRect(x + width, y, x + width + 1, y + height + 1, color); //RIGHT
+        drawRect(x, y, x + width, y + 1, color); //TOP
 
         GL11.glPopMatrix();
     }

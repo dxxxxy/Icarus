@@ -1,21 +1,20 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.gui.component.sub;
 
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
+import studio.dreamys.gui.component.Component;
+import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
-
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+
 import java.util.regex.Pattern;
 
-public class Field {
+public class Field extends Component {
     private Window window;
     private double width;
     private double height;
     private double x;
     private double y;
-    private java.awt.Color color;
     private String label;
 
     //relative to window, aka x,y passed in constructor
@@ -44,12 +43,13 @@ public class Field {
         //the component itself + the text written
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), java.awt.Color.DARK_GRAY.darker().darker().getRGB());
         RenderUtils.drawScaledString(focused ? text + "_" : text, (int) x + 4, (int) (y + height / 3), 0.5f,  java.awt.Color.WHITE);
-        RenderUtils.drawOutline(width, height, x, y);
+        RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
 
         //label
         RenderUtils.drawScaledString(label, (int) x, (int) (y - height / 1.75), 0.5f,  java.awt.Color.WHITE);
     }
 
+    @Override
     public void keyTyped(char typedChar, int keyCode) {
         if (focused) {
             if (keyCode == Keyboard.KEY_BACK) {
@@ -61,6 +61,7 @@ public class Field {
         }
     }
 
+    @Override
     public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }

@@ -1,5 +1,6 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.gui.component.sub;
 
+import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
 import java.awt.Color;

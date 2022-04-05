@@ -1,13 +1,15 @@
 package studio.dreamys.gui.component;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import studio.dreamys.gui.util.RenderUtils;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.util.ArrayList;
 
-public class Window {
+public class Window extends GuiScreen {
     public double width;
     public double height;
     public double x;
@@ -19,6 +21,8 @@ public class Window {
     public double dragY;
     public boolean isDragging;
 
+    public ArrayList<Component> children = new ArrayList<>();
+
     public Window(double width, double height, double x, double y, Color color) {
         this.width = width;
         this.height = height;
@@ -27,9 +31,12 @@ public class Window {
         this.color = color;
     }
 
-    public void render(int mouseX, int mouseY) {
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        drawDefaultBackground();
+
         //draw our professional skeet background
-        Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("etsy", "skeet bg.png"));
+        mc.getTextureManager().bindTexture(new ResourceLocation("etsy", "skeet bg.png"));
         Gui.drawModalRectWithCustomSizedTexture((int) x, (int)y, 0, 0, (int) width, (int) height, (int) width, (int) height);
 
         //draw them sexy bottom strings
@@ -38,6 +45,45 @@ public class Window {
         RenderUtils.drawScaledString("dxxxxy#0776", (int) ((int) x + width - 3 - RenderUtils.getScaledStringWidth("dxxxxy#0776", 0.5f)), (int) (y + height - 7), 0.5f, Color.WHITE.darker());
 
         update(mouseX, mouseY);
+
+        //draw and update children
+        for (Component child : children) {
+            child.render(mouseX, mouseY);
+        }
+    }
+
+    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (hovered(mouseX, mouseY) && mouseButton == 0) {
+            isDragging = true;
+            dragX = mouseX - x;
+            dragY = mouseY - y;
+        }
+
+        //call for children
+        for (Component child : children) {
+            child.mouseClicked(mouseX, mouseY, mouseButton);
+        }
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        super.keyTyped(typedChar, keyCode);
+
+        //call for children
+        for (Component child : children) {
+            child.keyTyped(typedChar, keyCode);
+        }
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+        isDragging = false;
+
+        //call for children
+        for (Component child : children) {
+            child.mouseReleased(mouseX, mouseY, state);
+        }
     }
 
     public boolean hovered(double x, double y) {
@@ -51,35 +97,7 @@ public class Window {
         }
     }
 
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public double getDragX() {
-        return dragX;
-    }
-
-    public double getDragY() {
-        return dragY;
-    }
-
-    public boolean isDragging() {
-        return isDragging;
+    public void addChild(Component child) {
+        children.add(child);
     }
 }

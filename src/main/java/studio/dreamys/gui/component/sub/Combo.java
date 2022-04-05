@@ -1,13 +1,17 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.gui.component.sub;
 
 import net.minecraft.client.gui.Gui;
+import org.lwjgl.opengl.GL11;
+import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Choice {
+public class Combo {
     private Window window;
     private double width;
     private double height;
@@ -21,10 +25,9 @@ public class Choice {
     private double relativeY;
 
     private boolean opened;
-    private ArrayList<String> options;
-    private String selected;
+    private HashMap<String, Boolean> options = new HashMap<>();
 
-    public Choice(Window window, double width, double height, double x, double y, Color color, String label, ArrayList<String> options) {
+    public Combo(Window window, double width, double height, double x, double y, Color color, String label, ArrayList<String> options) {
         this.window = window;
         this.width = width;
         this.height = height;
@@ -35,8 +38,9 @@ public class Choice {
         this.color = color;
         this.label = label;
 
-        this.options = options;
-        selected = this.options.get(0);
+        options.forEach(option -> {
+            this.options.put(option, false);
+        });
     }
 
     public void render() {
@@ -44,9 +48,9 @@ public class Choice {
         x = window.x + relativeX;
         y = window.y + relativeY;
 
-        //the component itself + the chosen option
+        //the component itself + the active options displayed
         Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledString(selected, (int) x + 4, (int) (y + height / 3), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString(activeOptions(), (int) x + 4, (int) (y + height / 3), 0.5f,  Color.WHITE);
 
         //dropdown symbol
         RenderUtils.drawScaledString("v", (int) (x + width - 8), (int) (y + height / 3.5), 0.5f,  Color.WHITE);
@@ -60,8 +64,8 @@ public class Choice {
 
         //open dropdown menu
         if (opened) {
-            options.forEach(option -> {
-                Color color = option.equals(selected) ? this.color : Color.WHITE;
+            options.forEach((option, active) -> {
+                Color color = active ? this.color : Color.WHITE;
                 Gui.drawRect((int) x, (int) currentY.get().doubleValue(), (int) (x + width), (int) (currentY.get() + height), Color.DARK_GRAY.darker().darker().getRGB());
                 RenderUtils.drawScaledString(option, (int) x + 4, (int) (currentY.get() + height / 3), 0.5f,  color);
                 currentY.updateAndGet(v -> v + height);
@@ -71,6 +75,24 @@ public class Choice {
 
     public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+    }
+
+    //display active options
+    public String activeOptions() {
+        String formatted = "";
+        for (Map.Entry<String, Boolean> option : options.entrySet()) {
+            if (option.getValue()) {
+                formatted += option.getKey() + ", ";
+            }
+        }
+
+        //if active string reaches the "v" dropdown symbol, replace it by three little dots
+        if (x + RenderUtils.getScaledStringWidth(formatted, 0.5f) > (x + width - 6)) formatted = "...";
+
+        //if none active
+        if (formatted.equals("")) formatted = "None";
+
+        return formatted;
     }
 
     public void open() {
@@ -117,15 +139,7 @@ public class Choice {
         return opened;
     }
 
-    public ArrayList<String> getOptions() {
+    public HashMap<String, Boolean> getOptions() {
         return options;
-    }
-
-    public String getSelected() {
-        return selected;
-    }
-
-    public void setSelected(String selected) {
-        this.selected = selected;
     }
 }

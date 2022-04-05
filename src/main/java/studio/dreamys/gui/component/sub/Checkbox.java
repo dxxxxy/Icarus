@@ -1,10 +1,12 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.gui.component.sub;
 
+import studio.dreamys.gui.component.Component;
+import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
 import java.awt.Color;
 
-public class Checkbox {
+public class Checkbox extends Component {
     private Window window;
     private double width;
     private double height;
@@ -31,7 +33,7 @@ public class Checkbox {
         this.label = label;
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
         y = window.y + relativeY;
@@ -45,51 +47,17 @@ public class Checkbox {
         RenderUtils.drawScaledString(label, (int) (x + width * 2), (int) y, 0.5f,  Color.WHITE);
     }
 
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (hovered(mouseX, mouseY) && mouseButton == 0) {
+            toggle();
+        }
+    }
+
     public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
     public void toggle() {
         toggled = !toggled;
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public double getRelativeX() {
-        return relativeX;
-    }
-
-    public double getRelativeY() {
-        return relativeY;
-    }
-
-    public boolean isToggled() {
-        return toggled;
     }
 }
