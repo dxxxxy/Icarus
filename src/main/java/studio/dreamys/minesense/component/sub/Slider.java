@@ -1,8 +1,8 @@
-package studio.dreamys.gui.component.sub;
+package studio.dreamys.minesense.component.sub;
 
-import studio.dreamys.gui.component.Component;
-import studio.dreamys.gui.component.Window;
-import studio.dreamys.gui.util.RenderUtils;
+import studio.dreamys.minesense.component.Component;
+import studio.dreamys.minesense.component.Window;
+import studio.dreamys.minesense.util.RenderUtils;
 
 import java.awt.Color;
 import java.math.BigDecimal;

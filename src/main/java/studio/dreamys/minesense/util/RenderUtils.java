@@ -1,4 +1,4 @@
-package studio.dreamys.gui.util;
+package studio.dreamys.minesense.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

@@ -1,9 +1,9 @@
-package studio.dreamys.gui.component.sub;
+package studio.dreamys.minesense.component.sub;
 
 import net.minecraft.client.gui.Gui;
-import studio.dreamys.gui.component.Component;
-import studio.dreamys.gui.component.Window;
-import studio.dreamys.gui.util.RenderUtils;
+import studio.dreamys.minesense.component.Component;
+import studio.dreamys.minesense.component.Window;
+import studio.dreamys.minesense.util.RenderUtils;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -38,9 +38,7 @@ public class Combo extends Component {
         this.color = color;
         this.label = label;
 
-        options.forEach(option -> {
-            this.options.put(option, false);
-        });
+        options.forEach(option -> this.options.put(option, false));
     }
 
     public void render(int mouseX, int mouseY) {
@@ -99,20 +97,20 @@ public class Combo extends Component {
 
     //display active options
     private String activeOptions() {
-        String formatted = "";
+        StringBuilder formatted = new StringBuilder();
         for (Map.Entry<String, Boolean> option : options.entrySet()) {
             if (option.getValue()) {
-                formatted += option.getKey() + ", ";
+                formatted.append(option.getKey()).append(", ");
             }
         }
 
         //if active string reaches the "v" dropdown symbol, replace it by three little dots
-        if (x + RenderUtils.getScaledStringWidth(formatted, 0.5f) > (x + width - 6)) formatted = "...";
+        if (x + RenderUtils.getScaledStringWidth(formatted.toString(), 0.5f) > (x + width - 6)) formatted = new StringBuilder("...");
 
         //if none active
-        if (formatted.equals("")) formatted = "None";
+        if (formatted.toString().equals("")) formatted = new StringBuilder("None");
 
-        return formatted;
+        return formatted.toString();
     }
 
     private void toggle() {

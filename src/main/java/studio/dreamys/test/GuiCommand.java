@@ -1,22 +1,20 @@
-package studio.dreamys;
+package studio.dreamys.test;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import studio.dreamys.gui.component.Window;
-import studio.dreamys.gui.component.sub.Checkbox;
-import studio.dreamys.gui.component.sub.Choice;
-import studio.dreamys.gui.component.sub.*;
+import studio.dreamys.minesense.component.Window;
+import studio.dreamys.minesense.component.sub.*;
 
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ExampleCommand extends CommandBase {
+public class GuiCommand extends CommandBase {
     @Override
     public String getCommandName() {
-        return "minesense";
+        return "gui";
     }
 
     @Override

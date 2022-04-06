@@ -1,4 +1,4 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.minesense.component;
 
 public class Component {
     public void render(int mouseX, int mouseY) {

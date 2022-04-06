@@ -10,14 +10,13 @@ buildscript {
 
 plugins {
     id "java"
-    id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
 
-version = "1.0"
+version = "1.0.0"
 group = "dreamys.studio" //http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "examplemod" //name of the output jar
+archivesBaseName = "minesense" //name of the output jar
 
 sourceCompatibility = targetCompatibility = 1.8 //using java 8
 
@@ -28,71 +27,13 @@ minecraft {
     makeObfSourceJar = false //disable creation of sources jar
 }
 
-configurations {
-    shade
-    compile.extendsFrom(shade)
-}
-
-repositories {
-    //repos for libraries (not gradle plugins)
-    //example:
-    maven { url "https://repo.dreamys.studio/" }
-    maven {
-        url = "https://repo.sk1er.club/repository/maven-public"
-    }
-    //maven { url "https://repo.hypixel.net/repository/Hypixel" }
-}
-
-dependencies {
-    //shade will bundle your library to the output jar
-    //your libraries will be accessible outside of intellij
-    //example:
-    //shade "net.hypixel:hypixel-api-transport-apache:4.1"
-//    shade "studio.dreamys:libSkyblock:1.0.1"
-//    shade ("gg.essential:vigilance-1.8.9-forge:203") {
-//        exclude module: "asm"
-//        exclude module: "asm-common"
-//        exclude module: "asm-tree"
-//        exclude module: "gson"
+//jar {
+//    sourceSets {
+//        main {
+//            java {
+//                exclude "**/test/**"
+//                exclude "**/test/"
+//            }
+//        }
 //    }
-    shade "gg.essential:elementa-1.8.9-forge:440"
-    //compile will make your library available only in this dev environment
-    //your libraries wont be accessible outside of intellij
-    //example:
-    //compile "net.hypixel:hypixel-api-transport-apache:4.1"
-}
-
-processResources {
-    //this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    //replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"
-
-        //replace version and mcversion
-        expand "version":project.version, "mcversion":project.minecraft.version
-    }
-
-    //copy everything else, that"s not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
-    }
-
-
-}
-
-shadowJar {
-    exclude 'META-INF/versions/**'
-    configurations = [project.configurations.shade]
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE //prevent duplicates
-    classifier "" //prevent creation of unshadowed jar
-}
-
-reobf {
-    //reobfuscate the shadowed jar
-    shadowJar {}
-}
-
-tasks.reobfJar.dependsOn(shadowJar)
+//}

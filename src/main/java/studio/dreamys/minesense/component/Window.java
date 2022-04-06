@@ -1,11 +1,11 @@
-package studio.dreamys.gui.component;
+package studio.dreamys.minesense.component;
 
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
-import studio.dreamys.gui.util.RenderUtils;
+import studio.dreamys.minesense.util.RenderUtils;
 
-import java.awt.Color;
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,7 +42,7 @@ public class Window extends GuiScreen {
         drawDefaultBackground();
 
         //draw our professional skeet background
-        mc.getTextureManager().bindTexture(new ResourceLocation("etsy", "skeet bg.png"));
+        mc.getTextureManager().bindTexture(new ResourceLocation("minesense", "bg.png"));
         Gui.drawModalRectWithCustomSizedTexture((int) x, (int)y, 0, 0, (int) width, (int) height, (int) width, (int) height);
 
         //draw them sexy bottom strings
