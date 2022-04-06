@@ -1,6 +1,7 @@
 package studio.dreamys.gui.component.sub;
 
 import net.minecraft.client.gui.Gui;
+import studio.dreamys.gui.component.Component;
 import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
@@ -8,7 +9,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Choice {
+public class Choice extends Component {
     private Window window;
     private double width;
     private double height;
@@ -21,7 +22,7 @@ public class Choice {
     private double relativeX;
     private double relativeY;
 
-    private boolean opened;
+    private boolean open;
     private ArrayList<String> options;
     private String selected;
 
@@ -40,7 +41,7 @@ public class Choice {
         selected = this.options.get(0);
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
         y = window.y + relativeY;
@@ -60,7 +61,7 @@ public class Choice {
         currentY.updateAndGet(v -> v + (int) (height));
 
         //open dropdown menu
-        if (opened) {
+        if (open) {
             options.forEach(option -> {
                 Color color = option.equals(selected) ? this.color : Color.WHITE;
                 Gui.drawRect((int) x, (int) currentY.get().doubleValue(), (int) (x + width), (int) (currentY.get() + height), Color.DARK_GRAY.darker().darker().getRGB());
@@ -70,63 +71,26 @@ public class Choice {
         }
     }
 
+
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (open && mouseButton == 0) {
+            if (mouseX > x && mouseX < x + width && mouseY > y + height && mouseY < y + height * (options.size() + 1)) {
+                double posY = mouseY - y - height;
+                int index = (int) (posY / height);
+                selected = options.get(index);
+            }
+        }
+
+        if (hovered(mouseX, mouseY) && mouseButton == 0) {
+            toggle();
+        }
+    }
+
     public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
-    public void open() {
-        opened = !opened;
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public double getRelativeX() {
-        return relativeX;
-    }
-
-    public double getRelativeY() {
-        return relativeY;
-    }
-
-    public boolean isOpened() {
-        return opened;
-    }
-
-    public ArrayList<String> getOptions() {
-        return options;
-    }
-
-    public String getSelected() {
-        return selected;
-    }
-
-    public void setSelected(String selected) {
-        this.selected = selected;
+    public void toggle() {
+        open = !open;
     }
 }

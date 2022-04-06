@@ -7,8 +7,11 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import studio.dreamys.gui.component.sub.Checkbox;
 import studio.dreamys.gui.component.Window;
+import studio.dreamys.gui.component.sub.Choice;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ExampleCommand extends CommandBase {
     @Override
@@ -31,6 +34,7 @@ public class ExampleCommand extends CommandBase {
 
         Window window = new Window(731 / 2.0, 617 / 2.0, width / 4, height / 4, new Color(20, 20, 20));
         window.addChild(new Checkbox(window, 5, 5, 60, 20, new Color(29, 122, 215), "Stonk Only"));
+        window.addChild(new Choice(window, 80, 10, 60, 80, new Color(29, 122, 215), "Mode", new ArrayList<>(Arrays.asList("nuke", "legit", "auto"))));
         ExampleMod.gui = window;
     }
 
