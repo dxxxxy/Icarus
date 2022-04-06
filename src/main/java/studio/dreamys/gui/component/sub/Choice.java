@@ -86,11 +86,11 @@ public class Choice extends Component {
         }
     }
 
-    public boolean hovered(double x, double y) {
+    private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
-    public void toggle() {
+    private void toggle() {
         open = !open;
     }
 }

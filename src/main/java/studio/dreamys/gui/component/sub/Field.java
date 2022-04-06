@@ -5,8 +5,8 @@ import org.lwjgl.input.Keyboard;
 import studio.dreamys.gui.component.Component;
 import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
-import java.awt.Color;
 
+import java.awt.Color;
 import java.util.regex.Pattern;
 
 public class Field extends Component {
@@ -64,7 +64,7 @@ public class Field extends Component {
         }
     }
 
-    public boolean hovered(double x, double y) {
+    private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 }

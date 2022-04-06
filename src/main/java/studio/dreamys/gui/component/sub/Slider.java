@@ -1,5 +1,6 @@
 package studio.dreamys.gui.component.sub;
 
+import studio.dreamys.gui.component.Component;
 import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
@@ -7,7 +8,7 @@ import java.awt.Color;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
-public class Slider {
+public class Slider extends Component {
     private Window window;
     private double width;
     private double height;
@@ -27,7 +28,7 @@ public class Slider {
     private double value;
 
     //dragging stuff
-    public boolean isDragging;
+    public boolean dragging;
 
     public Slider(Window window, double width, double height, double x, double y, Color color, String label, double max, double min, boolean onlyInt) {
         this.window = window;
@@ -61,10 +62,21 @@ public class Slider {
         //value
         RenderUtils.drawScaledString(String.valueOf(value), (int) (x + width * percent), (int) (y + height), 0.5f,  Color.WHITE);
 
-        update(mouseX, mouseY);
+        update(mouseX);
     }
 
-    public boolean hovered(double x, double y) {
+
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (hovered(mouseX, mouseY) && mouseButton == 0) {
+            dragging = true;
+        }
+    }
+
+    public void mouseReleased(int mouseX, int mouseY, int state) {
+        dragging = false;
+    }
+
+    private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
@@ -74,75 +86,15 @@ public class Slider {
         return bd.doubleValue();
     }
 
-    public void update(int mouseX, int mouseY) {
-        if (isDragging) {
+    private void update(int mouseX) {
+        if (dragging) {
             double value = (mouseX - x) / (width);
             if (value <= 0) value = 0;
             if (value >= 1) value = 1;
 
             percent = value;
 
-            this.value = roundToPlace(min + (max - min) * percent);
+            this.value = onlyInt ? Math.round(min + (max - min) * percent) : roundToPlace(min + (max - min) * percent);
         }
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public double getMax() {
-        return max;
-    }
-
-    public double getMin() {
-        return min;
-    }
-
-    public boolean isOnlyInt() {
-        return onlyInt;
-    }
-
-    public double getRelativeX() {
-        return relativeX;
-    }
-
-    public double getRelativeY() {
-        return relativeY;
-    }
-
-    public double getPercent() {
-        return percent;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public boolean isDragging() {
-        return isDragging;
     }
 }

@@ -93,12 +93,12 @@ public class Combo extends Component {
         }
     }
 
-    public boolean hovered(double x, double y) {
+    private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
     //display active options
-    public String activeOptions() {
+    private String activeOptions() {
         String formatted = "";
         for (Map.Entry<String, Boolean> option : options.entrySet()) {
             if (option.getValue()) {
@@ -115,7 +115,7 @@ public class Combo extends Component {
         return formatted;
     }
 
-    public void toggle() {
+    private void toggle() {
         open = !open;
     }
 }

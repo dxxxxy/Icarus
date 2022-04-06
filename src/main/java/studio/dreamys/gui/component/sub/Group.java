@@ -1,11 +1,10 @@
 package studio.dreamys.gui.component.sub;
 
+import studio.dreamys.gui.component.Component;
 import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
-import java.awt.Color;
-
-public class Group {
+public class Group extends Component {
     private Window window;
     private double width;
     private double height;
@@ -28,7 +27,7 @@ public class Group {
         this.label = label;
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
         y = window.y + relativeY;
