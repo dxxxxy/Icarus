@@ -1,7 +1,7 @@
 package studio.dreamys.gui.component.sub;
 
 import net.minecraft.client.gui.Gui;
-import org.lwjgl.opengl.GL11;
+import studio.dreamys.gui.component.Component;
 import studio.dreamys.gui.component.Window;
 import studio.dreamys.gui.util.RenderUtils;
 
@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class Combo {
+public class Combo extends Component {
     private Window window;
     private double width;
     private double height;
@@ -24,7 +24,7 @@ public class Combo {
     private double relativeX;
     private double relativeY;
 
-    private boolean opened;
+    private boolean open;
     private HashMap<String, Boolean> options = new HashMap<>();
 
     public Combo(Window window, double width, double height, double x, double y, Color color, String label, ArrayList<String> options) {
@@ -43,7 +43,7 @@ public class Combo {
         });
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
         y = window.y + relativeY;
@@ -63,13 +63,33 @@ public class Combo {
         currentY.updateAndGet(v -> v + (int) (height));
 
         //open dropdown menu
-        if (opened) {
+        if (open) {
             options.forEach((option, active) -> {
                 Color color = active ? this.color : Color.WHITE;
                 Gui.drawRect((int) x, (int) currentY.get().doubleValue(), (int) (x + width), (int) (currentY.get() + height), Color.DARK_GRAY.darker().darker().getRGB());
                 RenderUtils.drawScaledString(option, (int) x + 4, (int) (currentY.get() + height / 3), 0.5f,  color);
                 currentY.updateAndGet(v -> v + height);
             });
+        }
+    }
+
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        if (open && mouseButton == 0) {
+            if (mouseX > x && mouseX < x + width && mouseY > y + height && mouseY < y + height * (options.size() + 1)) {
+                double posY = mouseY - y - height;
+                int index = (int) (posY / height);
+                int i = 0;
+                for (Map.Entry<String, Boolean> entry : options.entrySet()) {
+                    if (i == index) {
+                        options.put(entry.getKey(), !entry.getValue());
+                    }
+                    i++;
+                }
+            }
+        }
+
+        if (hovered(mouseX, mouseY) && mouseButton == 0) {
+            toggle();
         }
     }
 
@@ -95,51 +115,7 @@ public class Combo {
         return formatted;
     }
 
-    public void open() {
-        opened = !opened;
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    public double getWidth() {
-        return width;
-    }
-
-    public double getHeight() {
-        return height;
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public double getRelativeX() {
-        return relativeX;
-    }
-
-    public double getRelativeY() {
-        return relativeY;
-    }
-
-    public boolean isOpened() {
-        return opened;
-    }
-
-    public HashMap<String, Boolean> getOptions() {
-        return options;
+    public void toggle() {
+        open = !open;
     }
 }

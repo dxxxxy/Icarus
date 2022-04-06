@@ -35,7 +35,7 @@ public class Field extends Component {
         this.label = label;
     }
 
-    public void render() {
+    public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
         y = window.y + relativeY;
@@ -49,7 +49,10 @@ public class Field extends Component {
         RenderUtils.drawScaledString(label, (int) x, (int) (y - height / 1.75), 0.5f,  java.awt.Color.WHITE);
     }
 
-    @Override
+    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+        focused = hovered(mouseX, mouseY) && mouseButton == 0;
+    }
+
     public void keyTyped(char typedChar, int keyCode) {
         if (focused) {
             if (keyCode == Keyboard.KEY_BACK) {
@@ -61,12 +64,7 @@ public class Field extends Component {
         }
     }
 
-    @Override
     public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
-    }
-
-    public void setFocused(boolean focused) {
-        this.focused = focused;
     }
 }

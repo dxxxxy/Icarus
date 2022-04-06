@@ -8,6 +8,7 @@ import studio.dreamys.gui.util.RenderUtils;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Window extends GuiScreen {
     public double width;
@@ -29,6 +30,11 @@ public class Window extends GuiScreen {
         this.x = x;
         this.y = y;
         this.color = color;
+    }
+
+    @Override
+    public void initGui() {
+        Collections.reverse(children);
     }
 
     @Override

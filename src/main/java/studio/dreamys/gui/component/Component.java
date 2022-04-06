@@ -16,8 +16,4 @@ public class Component {
     public void mouseReleased(int mouseX, int mouseY, int state) {
 
     }
-
-    public boolean hovered(double x, double y) {
-        return false;
-    }
 }
