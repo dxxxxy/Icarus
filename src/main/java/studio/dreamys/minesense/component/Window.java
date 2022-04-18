@@ -92,11 +92,11 @@ public class Window extends GuiScreen {
         }
     }
 
-    public boolean hovered(double x, double y) {
+    private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height / 25; //only 1/25 from the top is draggable
     }
 
-    public void update(int mouseX, int mouseY) {
+    private void update(int mouseX, int mouseY) {
         if (isDragging) {
             x = mouseX - dragX;
             y = mouseY - dragY;
