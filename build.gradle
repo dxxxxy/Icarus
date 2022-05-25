@@ -26,3 +26,15 @@ minecraft {
     mappings = "stable_22" //mappings for 1.8.9
     makeObfSourceJar = false //disable creation of sources jar
 }
+
+//exclude test files in jar build
+jar {
+    sourceSets {
+        main {
+            java {
+                exclude "**/test/**"
+                exclude "**/test/"
+            }
+        }
+    }
+}

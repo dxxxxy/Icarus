@@ -1,2 +1,2 @@
-# skeet_menu_java
-just a backup
+# MineSense
+Skeet menu for forge? Very early development.
