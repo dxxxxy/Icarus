@@ -1,6 +1,5 @@
 package studio.dreamys.minesense.component.sub;
 
-import net.minecraft.client.gui.Gui;
 import studio.dreamys.minesense.component.Component;
 import studio.dreamys.minesense.component.Window;
 import studio.dreamys.minesense.util.RenderUtils;
@@ -21,14 +20,11 @@ public class Button extends Component {
 
     private Runnable onClick;
 
-    public Button(Window window, double width, double height, double x, double y, String label, Runnable onClick) {
-        this.window = window;
+    public Button(double width, double height, double x, double y, String label, Runnable onClick) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
+        this.x = x;
+        this.y = y;
         this.label = label;
 
         this.onClick = onClick;
@@ -40,9 +36,9 @@ public class Button extends Component {
         y = window.y + relativeY;
 
         //the component itself + the text written
-        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledCenteredString(label, (int) ((int) x + width / 2), (int) (y + height / 3), 0.5f,  Color.WHITE);
-//        RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
+        RenderUtils.drawGradientRect(x, y, x + width, y + height, Color.DARK_GRAY.darker(), Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
+        RenderUtils.drawScaledCenteredString(label, x + width / 2, y + height / 3, 0.5f,  Color.WHITE);
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -53,5 +49,11 @@ public class Button extends Component {
 
     private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

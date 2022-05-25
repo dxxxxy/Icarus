@@ -14,7 +14,6 @@ public class Slider extends Component {
     private double height;
     private double x;
     private double y;
-    private Color color;
     private String label;
     private double max;
     private double min;
@@ -30,16 +29,13 @@ public class Slider extends Component {
     //dragging stuff
     public boolean dragging;
 
-    public Slider(Window window, double width, double height, double x, double y, Color color, String label, double max, double min, boolean onlyInt) {
-        this.window = window;
+    public Slider(double width, double height, double x, double y, String label, double max, double min, boolean onlyInt) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
-        this.color = color;
+        this.x = x;
+        this.y = y;
         this.label = label;
+
         this.max = max;
         this.min = min;
         this.onlyInt = onlyInt;
@@ -51,16 +47,16 @@ public class Slider extends Component {
         y = window.y + relativeY;
 
         //unfilled
-        RenderUtils.drawGradientRect((int) x, (int) y, (int) (x + width), (int) (y + height), Color.DARK_GRAY.getRGB(), Color.DARK_GRAY.darker().darker().getRGB());
+        RenderUtils.drawGradientRect(x, y, x + width, y + height, Color.DARK_GRAY, Color.DARK_GRAY.darker().darker());
 
         //filled
-        RenderUtils.drawGradientRect((int) x, (int) y, (int) (x + width * percent), (int) (y + height), color.getRGB(), color.darker().darker().getRGB());
+        RenderUtils.drawGradientRect(x, y, x + width * percent, y + height, window.color, window.color.darker().darker());
 
         //label
-        RenderUtils.drawScaledString(label, (int) x, (int) (y - height * 2), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString(label, x, y - height * 2, 0.5f,  Color.WHITE);
 
         //value
-        RenderUtils.drawScaledString(String.valueOf(value), (int) (x + width * percent), (int) (y + height), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString(String.valueOf(value), x + width * percent, y + height, 0.5f,  Color.WHITE);
 
         update(mouseX);
     }
@@ -96,5 +92,11 @@ public class Slider extends Component {
 
             this.value = onlyInt ? Math.round(min + (max - min) * percent) : roundToPlace(min + (max - min) * percent);
         }
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

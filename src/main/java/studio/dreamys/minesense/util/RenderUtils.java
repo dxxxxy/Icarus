@@ -14,18 +14,18 @@ public class RenderUtils {
     public static final int FONT_HEIGHT = Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT;
 
     /**
-     * Taken from: {@link Gui#drawGradientRect(int, int, int, int, int, int)}
+     * Modified and taken from: {@link Gui#drawGradientRect(int, int, int, int, int, int)}
      * */
-    public static void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor) {
+    public static void drawGradientRect(double left, double top, double right, double bottom, Color startColor, Color endColor) {
         double zLevel = 0;
-        float f = (float)(startColor >> 24 & 255) / 255.0F;
-        float f1 = (float)(startColor >> 16 & 255) / 255.0F;
-        float f2 = (float)(startColor >> 8 & 255) / 255.0F;
-        float f3 = (float)(startColor & 255) / 255.0F;
-        float f4 = (float)(endColor >> 24 & 255) / 255.0F;
-        float f5 = (float)(endColor >> 16 & 255) / 255.0F;
-        float f6 = (float)(endColor >> 8 & 255) / 255.0F;
-        float f7 = (float)(endColor & 255) / 255.0F;
+        float f = (float)(startColor.getRGB() >> 24 & 255) / 255.0F;
+        float f1 = (float)(startColor.getRGB() >> 16 & 255) / 255.0F;
+        float f2 = (float)(startColor.getRGB() >> 8 & 255) / 255.0F;
+        float f3 = (float)(startColor.getRGB() & 255) / 255.0F;
+        float f4 = (float)(endColor.getRGB() >> 24 & 255) / 255.0F;
+        float f5 = (float)(endColor.getRGB() >> 16 & 255) / 255.0F;
+        float f6 = (float)(endColor.getRGB() >> 8 & 255) / 255.0F;
+        float f7 = (float)(endColor.getRGB() & 255) / 255.0F;
         GlStateManager.disableTexture2D();
         GlStateManager.enableBlend();
         GlStateManager.disableAlpha();
@@ -45,14 +45,14 @@ public class RenderUtils {
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawScaledString(String text, int x, int y, float scale, Color color) {
+    public static void drawScaledString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
         Minecraft.getMinecraft().fontRendererObj.drawString(text, (int) (x / scale), (int) (y / scale), color.getRGB());
         GL11.glPopMatrix();
     }
 
-    public static void drawScaledCenteredString(String text, int x, int y, float scale, Color color) {
+    public static void drawScaledCenteredString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
         Minecraft.getMinecraft().fontRendererObj.drawString(text, (int) (x  / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2, (int) (y / scale), color.getRGB());
@@ -63,7 +63,7 @@ public class RenderUtils {
         return Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale;
     }
 
-    public static float getScaledStringHeight(String text, float scale) {
+    public static float getScaledStringHeight(float scale) {
         return Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * scale;
     }
 

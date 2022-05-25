@@ -107,6 +107,7 @@ public class Window extends GuiScreen {
     }
 
     public void addChild(Component child) {
+        child.setWindow(this);
         children.add(child);
     }
 }

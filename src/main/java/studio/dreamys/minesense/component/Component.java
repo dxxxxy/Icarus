@@ -17,6 +17,10 @@ public class Component {
 
     }
 
+    public void setWindow(Window window) {
+
+    }
+
     public boolean open() {
         return false;
     }

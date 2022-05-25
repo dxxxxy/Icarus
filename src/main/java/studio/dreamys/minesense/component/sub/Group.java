@@ -16,14 +16,11 @@ public class Group extends Component {
     private double relativeX;
     private double relativeY;
 
-    public Group(Window window, double width, double height, double x, double y, String label) {
-        this.window = window;
+    public Group(double width, double height, double x, double y, String label) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
+        this.x = x;
+        this.y = y;
         this.label = label;
     }
 
@@ -34,5 +31,11 @@ public class Group extends Component {
 
         //the box itself
         RenderUtils.drawGroupWithString(width, height, x, y, label);
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

@@ -1,6 +1,5 @@
 package studio.dreamys.minesense.component.sub;
 
-import net.minecraft.client.gui.Gui;
 import studio.dreamys.minesense.component.Component;
 import studio.dreamys.minesense.component.Window;
 import studio.dreamys.minesense.util.RenderUtils;
@@ -17,7 +16,6 @@ public class Combo extends Component {
     private double height;
     private double x;
     private double y;
-    private Color color;
     private String label;
 
     //relative to window, aka x,y passed in constructor
@@ -27,15 +25,11 @@ public class Combo extends Component {
     private boolean open;
     private HashMap<String, Boolean> options = new HashMap<>();
 
-    public Combo(Window window, double width, double height, double x, double y, Color color, String label, ArrayList<String> options) {
-        this.window = window;
+    public Combo(double width, double height, double x, double y, String label, ArrayList<String> options) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
-        this.color = color;
+        this.x = x;
+        this.y = y;
         this.label = label;
 
         options.forEach(option -> this.options.put(option, false));
@@ -47,30 +41,31 @@ public class Combo extends Component {
         y = window.y + relativeY;
 
         //the component itself + the active options displayed
-        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledString(activeOptions(), (int) x + 4, (int) (y + height / 3), 0.5f,  Color.WHITE);
+        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawScaledString(activeOptions(), x + 4, y + height / 3, 0.5f,  Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawScaledString("v", (int) (x + width - 8), (int) (y + height / 3.5), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString("v", x + width - 8, y + height / 3.5, 0.5f,  Color.WHITE);
 
         //label
-        RenderUtils.drawScaledString(label, (int) x, (int) (y - height / 1.75), 0.5f,  Color.WHITE);
+        RenderUtils.drawScaledString(label, x, y - height / 1.75, 0.5f,  Color.WHITE);
 
         //lambda stacking stuff
         AtomicReference<Double> currentY = new AtomicReference<>(y);
-        currentY.updateAndGet(v -> v + (int) (height));
+        currentY.updateAndGet(v -> v + height);
 
         //open dropdown menu
         if (open) {
             options.forEach((option, active) -> {
-                Color color = active ? this.color : Color.WHITE;
-                Gui.drawRect((int) x, (int) currentY.get().doubleValue(), (int) (x + width), (int) (currentY.get() + height), Color.DARK_GRAY.darker().darker().getRGB());
-                RenderUtils.drawScaledString(option, (int) x + 4, (int) (currentY.get() + height / 3), 0.5f,  color);
+                Color color = active ? window.color : Color.WHITE;
+                RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
+                RenderUtils.drawScaledString(option, x + 4, currentY.get() + height / 3, 0.5f,  color);
                 currentY.updateAndGet(v -> v + height);
             });
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (open && mouseButton == 0) {
             if (mouseX > x && mouseX < x + width && mouseY > y + height && mouseY < y + height * (options.size() + 1)) {
@@ -83,12 +78,12 @@ public class Combo extends Component {
                     }
                     i++;
                 }
-            } else toggle();
+            } else open = !open;
             return;
         }
 
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
-            toggle();
+            open = !open;
         }
     }
 
@@ -114,11 +109,13 @@ public class Combo extends Component {
         return formatted.toString();
     }
 
-    private void toggle() {
-        open = !open;
-    }
-
     public boolean open() {
         return open;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

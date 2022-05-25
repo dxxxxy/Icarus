@@ -1,6 +1,5 @@
 package studio.dreamys.minesense.component.sub;
 
-import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.minesense.component.Component;
 import studio.dreamys.minesense.component.Window;
@@ -24,14 +23,11 @@ public class Field extends Component {
     private String text = "";
     private boolean focused;
 
-    public Field(Window window, double width, double height, double x, double y, String label) {
-        this.window = window;
+    public Field(double width, double height, double x, double y, String label) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
+        this.x = x;
+        this.y = y;
         this.label = label;
     }
 
@@ -41,12 +37,12 @@ public class Field extends Component {
         y = window.y + relativeY;
 
         //the component itself + the text written
-        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), java.awt.Color.DARK_GRAY.darker().darker().getRGB());
-        RenderUtils.drawScaledString(focused ? text + "_" : text, (int) x + 4, (int) (y + height / 3), 0.5f,  java.awt.Color.WHITE);
+        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
         RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
+        RenderUtils.drawScaledString(focused ? text + "_" : text, x + 4, y + height / 3, 0.5f,  Color.WHITE);
 
         //label
-        RenderUtils.drawScaledString(label, (int) x, (int) (y - height / 1.75), 0.5f,  java.awt.Color.WHITE);
+        RenderUtils.drawScaledString(label, x, y - height / 1.75, 0.5f, Color.WHITE);
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -66,5 +62,11 @@ public class Field extends Component {
 
     private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+    }
+
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

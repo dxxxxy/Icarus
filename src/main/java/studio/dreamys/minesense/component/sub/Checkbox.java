@@ -12,7 +12,6 @@ public class Checkbox extends Component {
     private double height;
     private double x;
     private double y;
-    private Color color;
     private String label;
 
     //relative to window, aka x,y passed in constructor
@@ -21,15 +20,11 @@ public class Checkbox extends Component {
 
     private boolean toggled;
 
-    public Checkbox(Window window, double width, double height, double x, double y, Color color, String label) {
-        this.window = window;
+    public Checkbox(double width, double height, double x, double y, String label) {
         this.width = width;
         this.height = height;
-        this.x = window.x + x;
-        this.y = window.y + y;
-        relativeX = x;
-        relativeY = y;
-        this.color = color;
+        this.x = x;
+        this.y = y;
         this.label = label;
     }
 
@@ -38,18 +33,16 @@ public class Checkbox extends Component {
         x = window.x + relativeX;
         y = window.y + relativeY;
 
-        Color color = toggled ? this.color : Color.DARK_GRAY;
+        Color color = toggled ? window.color : Color.DARK_GRAY;
 
-        //the box itself
-        RenderUtils.drawGradientRect((int) x, (int) y, (int) (x + width), (int) (y + height), color.getRGB(), color.darker().darker().getRGB());
-
-        //label
-        RenderUtils.drawScaledString(label, (int) (x + width * 2), (int) y, 0.5f,  Color.WHITE);
+        //the box itself + label next to it
+        RenderUtils.drawGradientRect(x, y, x + width, y + height, color, color.darker().darker());
+        RenderUtils.drawScaledString(label, x + width * 2, y, 0.5f,  Color.WHITE);
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
-            toggle();
+            toggled = !toggled;
         }
     }
 
@@ -57,7 +50,9 @@ public class Checkbox extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
-    private void toggle() {
-        toggled = !toggled;
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 }

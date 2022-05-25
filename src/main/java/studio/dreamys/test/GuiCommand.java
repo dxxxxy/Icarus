@@ -34,15 +34,16 @@ public class GuiCommand extends CommandBase {
         double width = res.getScaledWidth_double();
         double height = res.getScaledHeight_double();
 
-        window = new Window(731 / 2.0, 617 / 2.0, width / 4, height / 4, new Color(20, 20, 20));
-        window.addChild(new Checkbox(window, 5, 5, 60, 20, new Color(29, 122, 215), "Checkbox"));
-        window.addChild(new Slider(window, 80, 3, 60, 40, new Color(29, 122, 215), "Slider", 10, 1, false));
-        window.addChild(new Combo(window, 80, 10, 60, 60, new Color(29, 122, 215), "Combo", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))));
-        window.addChild(new Choice(window, 80, 10, 60, 80, new Color(29, 122, 215), "Choice", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))));
-        window.addChild(new Field(window, 80, 10, 60, 100, "Field"));
-        window.addChild(new Button(window, 80, 12, 60, 120, "Crash server", () -> System.out.println("yo")));
+        window = new Window(731 / 2.0, 617 / 2.0, width / 4, height / 4, new Color(29, 122, 215));
+        window.addChild(new Checkbox(5, 5, 60, 20, "Checkbox"));
+        window.addChild(new Slider(80, 3, 60, 40, "Slider", 10, 1, false));
+        window.addChild(new Combo(80, 10, 60, 60, "Combo", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))));
+        window.addChild(new Choice(80, 10, 60, 80, "Choice", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))));
+        window.addChild(new Field(80, 10, 60, 100, "Field"));
+        window.addChild(new Button(80, 12, 60, 120, "Crash server", () -> System.out.println("yo")));
+        window.addChild(new Slider(80, 3, 60, 140, "Slider", 10, 1, true));
 
-        window.addChild(new Group(window, 150, 200, 50, 10, "Group 1"));
+        window.addChild(new Group(150, 200, 50, 10, "Group 1"));
 
         MinecraftForge.EVENT_BUS.register(this);
     }
