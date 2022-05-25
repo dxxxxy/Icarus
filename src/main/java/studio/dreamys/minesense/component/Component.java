@@ -16,4 +16,8 @@ public class Component {
     public void mouseReleased(int mouseX, int mouseY, int state) {
 
     }
+
+    public boolean open() {
+        return false;
+    }
 }

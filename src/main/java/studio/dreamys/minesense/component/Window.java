@@ -23,6 +23,7 @@ public class Window extends GuiScreen {
     public boolean isDragging;
 
     public ArrayList<Component> children = new ArrayList<>();
+    public ArrayList<Component> reversedChildren;
 
     public Window(double width, double height, double x, double y, Color color) {
         this.width = width;
@@ -34,7 +35,8 @@ public class Window extends GuiScreen {
 
     @Override
     public void initGui() {
-        Collections.reverse(children);
+        reversedChildren = new ArrayList<>(children);
+        Collections.reverse(reversedChildren);
     }
 
     @Override
@@ -53,7 +55,7 @@ public class Window extends GuiScreen {
         update(mouseX, mouseY);
 
         //draw and update children
-        for (Component child : children) {
+        for (Component child : reversedChildren) {
             child.render(mouseX, mouseY);
         }
     }
@@ -69,6 +71,7 @@ public class Window extends GuiScreen {
         //call for children
         for (Component child : children) {
             child.mouseClicked(mouseX, mouseY, mouseButton);
+            if (child.open()) break;
         }
     }
 

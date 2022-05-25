@@ -83,7 +83,8 @@ public class Combo extends Component {
                     }
                     i++;
                 }
-            }
+            } else toggle();
+            return;
         }
 
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
@@ -105,7 +106,7 @@ public class Combo extends Component {
         }
 
         //if active string reaches the "v" dropdown symbol, replace it by three little dots
-        if (x + RenderUtils.getScaledStringWidth(formatted.toString(), 0.5f) > (x + width - 6)) formatted = new StringBuilder("...");
+        if (x + RenderUtils.getScaledStringWidth(formatted.toString(), 0.5f) > (x + width - 10)) formatted = new StringBuilder("...");
 
         //if none active
         if (formatted.toString().equals("")) formatted = new StringBuilder("None");
@@ -115,5 +116,9 @@ public class Combo extends Component {
 
     private void toggle() {
         open = !open;
+    }
+
+    public boolean open() {
+        return open;
     }
 }

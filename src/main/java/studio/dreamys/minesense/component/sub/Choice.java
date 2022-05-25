@@ -78,7 +78,8 @@ public class Choice extends Component {
                 double posY = mouseY - y - height;
                 int index = (int) (posY / height);
                 selected = options.get(index);
-            }
+            } else toggle();
+            return;
         }
 
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
@@ -92,5 +93,9 @@ public class Choice extends Component {
 
     private void toggle() {
         open = !open;
+    }
+
+    public boolean open() {
+        return open;
     }
 }
