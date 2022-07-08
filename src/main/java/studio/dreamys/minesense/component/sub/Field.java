@@ -10,8 +10,10 @@ import java.util.regex.Pattern;
 
 public class Field extends Component {
     private Window window;
-    private double width;
-    private double height;
+    private Group group;
+    private double width = 80;
+    private double height = 12;
+    private double clearance = 50;
     private double x;
     private double y;
     private String label;
@@ -22,6 +24,10 @@ public class Field extends Component {
 
     private String text = "";
     private boolean focused;
+
+    public Field(String label) {
+        this.label = label;
+    }
 
     public Field(double width, double height, double x, double y, String label) {
         this.width = width;
@@ -39,10 +45,10 @@ public class Field extends Component {
         //the component itself + the text written
         RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
         RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
-        RenderUtils.drawScaledString(focused ? text + "_" : text, x + 4, y + height / 3, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(focused ? text + "_" : text, x + 4, y + height / 10, Color.WHITE);
 
         //label
-        RenderUtils.drawScaledString(label, x, y - height / 1.75, 0.5f, Color.WHITE);
+        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -68,5 +74,48 @@ public class Field extends Component {
         this.window = window;
         relativeX = x;
         relativeY = y;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public void setX(double x) {
+        relativeX = x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public void setY(double y) {
+        relativeY = y;
+    }
+
+    @Override
+    public double getClearance() {
+        return 10;
     }
 }

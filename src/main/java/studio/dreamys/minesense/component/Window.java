@@ -1,6 +1,5 @@
 package studio.dreamys.minesense.component;
 
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import studio.dreamys.minesense.util.RenderUtils;
@@ -11,11 +10,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 public class Window extends GuiScreen {
-    public double width;
-    public double height;
     public double x;
     public double y;
+    public double width;
+    public double height;
     public Color color;
+    public Page active;
 
     //dragging stuff
     public double dragX;
@@ -26,15 +26,16 @@ public class Window extends GuiScreen {
     public ArrayList<Component> reversedChildren;
 
     public Window(double width, double height, double x, double y, Color color) {
-        this.width = width;
-        this.height = height;
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.color = color;
     }
 
     @Override
     public void initGui() {
+        //reverse children to draw from end to beginning
         reversedChildren = new ArrayList<>(children);
         Collections.reverse(reversedChildren);
     }
@@ -43,14 +44,14 @@ public class Window extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
 
-        //draw our professional skeet background
+        //draw our very professional skeet background
         mc.getTextureManager().bindTexture(new ResourceLocation("minesense", "bg.png"));
-        Gui.drawModalRectWithCustomSizedTexture((int) x, (int)y, 0, 0, (int) width, (int) height, (int) width, (int) height);
+        RenderUtils.drawTexture(x, y, width, height);
 
         //draw them sexy bottom strings
-        RenderUtils.drawScaledString("uid: 001", (int) x + 3, (int) (y + height - 7), 0.5f, Color.WHITE.darker());
-        RenderUtils.drawScaledCenteredString("Aphrodite", (int) (x + (width / 2)), (int) (y + height - 7), 0.5f, Color.WHITE.darker());
-        RenderUtils.drawScaledString("dxxxxy#0776", (int) ((int) x + width - 3 - RenderUtils.getScaledStringWidth("dxxxxy#0776", 0.5f)), (int) (y + height - 7), 0.5f, Color.WHITE.darker());
+        RenderUtils.drawString("uid: 001", x + 3, y + height - 7, Color.WHITE);
+        RenderUtils.drawCenteredString("Aphrodite", x + width / 2, y + height - 7, 0.5f, Color.WHITE.darker());
+        RenderUtils.drawString("dxxxxy#0776", x + width - 3 - RenderUtils.getStringWidth("dxxxxy#0776"), y + height - 7, Color.WHITE.darker());
 
         update(mouseX, mouseY);
 
@@ -71,7 +72,7 @@ public class Window extends GuiScreen {
         //call for children
         for (Component child : children) {
             child.mouseClicked(mouseX, mouseY, mouseButton);
-            if (child.open()) break;
+            if (child.open()) break; //avoid clicking underlying elements when something is open
         }
     }
 
@@ -106,8 +107,13 @@ public class Window extends GuiScreen {
         }
     }
 
-    public void addChild(Component child) {
+    public Component addChild(Component child) {
         child.setWindow(this);
         children.add(child);
+        return child;
+    }
+
+    public void setActive(Page page) {
+        active = page;
     }
 }

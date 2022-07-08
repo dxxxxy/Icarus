@@ -10,10 +10,14 @@ import java.math.RoundingMode;
 
 public class Slider extends Component {
     private Window window;
-    private double width;
-    private double height;
+    private Group group;
+
     private double x;
     private double y;
+    private double width = 80;
+    private double height = 3;
+    private double clearance = 50;
+
     private String label;
     private double max;
     private double min;
@@ -28,6 +32,13 @@ public class Slider extends Component {
 
     //dragging stuff
     public boolean dragging;
+
+    public Slider(String label, double min, double max, boolean onlyInt) {
+        this.label = label;
+        this.min = min;
+        this.max = max;
+        this.onlyInt = onlyInt;
+    }
 
     public Slider(double width, double height, double x, double y, String label, double max, double min, boolean onlyInt) {
         this.width = width;
@@ -53,10 +64,10 @@ public class Slider extends Component {
         RenderUtils.drawGradientRect(x, y, x + width * percent, y + height, window.color, window.color.darker().darker());
 
         //label
-        RenderUtils.drawScaledString(label, x, y - height * 2, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(label, x - 1, y - height * 2.5, Color.WHITE);
 
         //value
-        RenderUtils.drawScaledString(String.valueOf(value), x + width * percent, y + height, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(onlyInt ? Integer.toString((int) value) : String.valueOf(value), x - 1 + width * percent, y + height - 1, Color.WHITE);
 
         update(mouseX);
     }
@@ -98,5 +109,48 @@ public class Slider extends Component {
         this.window = window;
         relativeX = x;
         relativeY = y;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public void setX(double x) {
+        relativeX = x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public void setY(double y) {
+        relativeY = y;
+    }
+
+    @Override
+    public double getClearance() {
+        return 15;
     }
 }

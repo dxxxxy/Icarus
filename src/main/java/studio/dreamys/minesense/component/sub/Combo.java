@@ -12,8 +12,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Combo extends Component {
     private Window window;
-    private double width;
-    private double height;
+    private Group group;
+    private double width = 80;
+    private double height = 12;
+    private double clearance = 50;
     private double x;
     private double y;
     private String label;
@@ -24,6 +26,12 @@ public class Combo extends Component {
 
     private boolean open;
     private HashMap<String, Boolean> options = new HashMap<>();
+
+    public Combo(String label, ArrayList<String> options) {
+        this.label = label;
+
+        options.forEach(option -> this.options.put(option, false));
+    }
 
     public Combo(double width, double height, double x, double y, String label, ArrayList<String> options) {
         this.width = width;
@@ -42,13 +50,13 @@ public class Combo extends Component {
 
         //the component itself + the active options displayed
         RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
-        RenderUtils.drawScaledString(activeOptions(), x + 4, y + height / 3, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(activeOptions(), x + 4, y + height / 10,  Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawScaledString("v", x + width - 8, y + height / 3.5, 0.5f,  Color.WHITE);
+        RenderUtils.drawString("v", x + width - 8, y, Color.WHITE);
 
         //label
-        RenderUtils.drawScaledString(label, x, y - height / 1.75, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
 
         //lambda stacking stuff
         AtomicReference<Double> currentY = new AtomicReference<>(y);
@@ -59,7 +67,7 @@ public class Combo extends Component {
             options.forEach((option, active) -> {
                 Color color = active ? window.color : Color.WHITE;
                 RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
-                RenderUtils.drawScaledString(option, x + 4, currentY.get() + height / 3, 0.5f,  color);
+                RenderUtils.drawString(option, x + 4, currentY.get() + height / 10,  color);
                 currentY.updateAndGet(v -> v + height);
             });
         }
@@ -100,11 +108,16 @@ public class Combo extends Component {
             }
         }
 
+        //remove last comma
+        if (formatted.length() > 0) {
+            formatted.delete(formatted.length() - 2, formatted.length() - 1);
+        }
+
         //if active string reaches the "v" dropdown symbol, replace it by three little dots
-        if (x + RenderUtils.getScaledStringWidth(formatted.toString(), 0.5f) > (x + width - 10)) formatted = new StringBuilder("...");
+        if (x + RenderUtils.getStringWidth(formatted.toString()) > (x + width - 10)) formatted = new StringBuilder("...");
 
         //if none active
-        if (formatted.toString().equals("")) formatted = new StringBuilder("None");
+        if (formatted.toString().equals("")) formatted = new StringBuilder("-");
 
         return formatted.toString();
     }
@@ -117,5 +130,48 @@ public class Combo extends Component {
         this.window = window;
         relativeX = x;
         relativeY = y;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public void setX(double x) {
+        relativeX = x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public void setY(double y) {
+        relativeY = y;
+    }
+
+    @Override
+    public double getClearance() {
+        return 10;
     }
 }

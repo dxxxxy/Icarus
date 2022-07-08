@@ -10,8 +10,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Choice extends Component {
     private Window window;
-    private double width;
-    private double height;
+    private Group group;
+    private double width = 80;
+    private double height = 12;
+    private double clearance = 50;
     private double x;
     private double y;
     private String label;
@@ -23,6 +25,13 @@ public class Choice extends Component {
     private boolean open;
     private ArrayList<String> options;
     private String selected;
+
+    public Choice(String label, ArrayList<String> options) {
+        this.label = label;
+
+        this.options = options;
+        selected = this.options.get(0);
+    }
 
     public Choice(double width, double height, double x, double y, String label, ArrayList<String> options) {
         this.width = width;
@@ -42,13 +51,13 @@ public class Choice extends Component {
 
         //the component itself + the chosen option
         RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
-        RenderUtils.drawScaledString(selected, x + 4, y + height / 3, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(selected, x + 4, y + height / 10, Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawScaledString("v", x + width - 8, y + height / 3.5, 0.5f,  Color.WHITE);
+        RenderUtils.drawString("v", x + width - 8, y, Color.WHITE);
 
         //label
-        RenderUtils.drawScaledString(label, x, y - height / 1.75, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
 
         //lambda stacking stuff
         AtomicReference<Double> currentY = new AtomicReference<>(y);
@@ -59,7 +68,7 @@ public class Choice extends Component {
             options.forEach(option -> {
                 Color color = option.equals(selected) ? window.color : Color.WHITE;
                 RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
-                RenderUtils.drawScaledString(option, x + 4, currentY.get() + height / 3, 0.5f,  color);
+                RenderUtils.drawString(option, x + 4, currentY.get() + height / 10,  color);
                 currentY.updateAndGet(v -> v + height);
             });
         }
@@ -94,5 +103,48 @@ public class Choice extends Component {
         this.window = window;
         relativeX = x;
         relativeY = y;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Window getWindow() {
+        return window;
+    }
+
+    @Override
+    public double getWidth() {
+        return width;
+    }
+
+    @Override
+    public double getHeight() {
+        return height;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public void setX(double x) {
+        relativeX = x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
+    }
+
+    @Override
+    public void setY(double y) {
+        relativeY = y;
+    }
+
+    @Override
+    public double getClearance() {
+        return 10;
     }
 }

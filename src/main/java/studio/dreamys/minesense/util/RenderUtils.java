@@ -9,9 +9,25 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.io.IOException;
+import java.util.Objects;
 
 public class RenderUtils {
-    public static final int FONT_HEIGHT = Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT;
+    public static GlyphPageFontRenderer iconRenderer;
+    public static GlyphPageFontRenderer fontRenderer;
+
+    public static void loadFonts() {
+        //register font in jvm
+        try {
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderUtils.class.getResourceAsStream("/assets/minesense/undefeated.ttf"))));
+        } catch (FontFormatException | IOException e) {
+            e.printStackTrace();
+        }
+
+        //initialize font renderer
+        iconRenderer = GlyphPageFontRenderer.create("undefeated", 50, false, false, false);
+        fontRenderer = GlyphPageFontRenderer.create("Verdana", 11, false, false, false);
+    }
 
     /**
      * Modified and taken from: {@link Gui#drawGradientRect(int, int, int, int, int, int)}
@@ -45,26 +61,64 @@ public class RenderUtils {
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawScaledString(String text, double x, double y, float scale, Color color) {
+    public static void drawIcon(char character, double x, double y, Color color) {
+        iconRenderer.drawString(String.valueOf(character), (float) x, (float) y, color.getRGB(), false);
+    }
+
+    public static void drawIcon(char character, double x, double y, Color color, boolean shadow) {
+        iconRenderer.drawString(String.valueOf(character), (float) x, (float) y, color.getRGB(), shadow);
+    }
+
+    public static void drawString(String text, double x, double y, Color color) {
+        fontRenderer.drawString(text, (float) x, (float) y, color.getRGB(), false);
+    }
+
+    public static void drawString(String text, double x, double y, Color color, boolean shadow) {
+        fontRenderer.drawString(text, (float) x, (float) y, color.getRGB(), shadow);
+    }
+
+    public static void drawString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        Minecraft.getMinecraft().fontRendererObj.drawString(text, (int) (x / scale), (int) (y / scale), color.getRGB());
+        fontRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), false);
         GL11.glPopMatrix();
     }
 
-    public static void drawScaledCenteredString(String text, double x, double y, float scale, Color color) {
+    public static void drawString(String text, double x, double y, float scale, Color color, boolean shadow) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        Minecraft.getMinecraft().fontRendererObj.drawString(text, (int) (x  / scale) - Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) / 2, (int) (y / scale), color.getRGB());
+        fontRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), shadow);
         GL11.glPopMatrix();
     }
 
-    public static float getScaledStringWidth(String text, float scale) {
-        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(text) * scale;
+    public static void drawCenteredString(String text, double x, double y, Color color) {
+       fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
     }
 
-    public static float getScaledStringHeight(float scale) {
-        return Minecraft.getMinecraft().fontRendererObj.FONT_HEIGHT  * scale;
+    public static void drawCenteredString(String text, double x, double y, Color color, boolean shadow) {
+        fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), shadow);
+    }
+
+    public static void drawCenteredString(String text, double x, double y, float scale, Color color) {
+        GL11.glPushMatrix();
+        GL11.glScalef(scale, scale, 1);
+        fontRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), false);
+        GL11.glPopMatrix();
+    }
+
+    public static void drawCenteredString(String text, double x, double y, float scale, Color color, boolean shadow) {
+        GL11.glPushMatrix();
+        GL11.glScalef(scale, scale, 1);
+        fontRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), shadow);
+        GL11.glPopMatrix();
+    }
+
+    public static float getStringWidth(String text) {
+        return fontRenderer.getStringWidth(text);
+    }
+
+    public static float getStringWidth(String text, float scale) {
+        return fontRenderer.getStringWidth(text) * scale;
     }
 
     public static void drawGroupWithString(double width, double height, double x, double y, String label) {
@@ -81,8 +135,8 @@ public class RenderUtils {
         drawRect(x, y + height, x + width, y + height + 1, Color.DARK_GRAY); //BOTTOM
         drawRect(x + width, y, x + width + 1, y + height + 1, Color.DARK_GRAY); //RIGHT
 
-        drawRect(x, y, x + width / 9 - offset, y + 1, Color.DARK_GRAY); //TOP LEFT
-        drawRect(x + width / 9 + offset * 5 + getScaledStringWidth(label, 0.5f), y, x + width, y + 1, Color.DARK_GRAY); //TOP RIGHT
+        drawRect(x, y, x + width / 10, y + 1, Color.DARK_GRAY); //TOP LEFT
+        drawRect(x + width / 10 + getStringWidth(label, 2) + offset, y, x + width, y + 1, Color.DARK_GRAY); //TOP RIGHT
 
         GL11.glPopMatrix();
 
@@ -91,17 +145,24 @@ public class RenderUtils {
         width *= 0.5f;
 
         //label
-        RenderUtils.drawScaledString(label, (int) (x + width / 9), (int) y - 1, 0.5f,  Color.WHITE);
+        RenderUtils.drawString(label, x + width / 10, y - 3.5,  Color.WHITE);
     }
 
     public static void drawOutline(double width, double height, double x, double y, Color color) {
-        GL11.glPushMatrix();
-        GL11.glScalef(0.5f, 0.5f, 1f);
+        drawRect(x, y, x + 1, y + height, color); //LEFT
+        drawRect(x, y + height, x + width, y + height + 1, color); //BOTTOM
+        drawRect(x + width, y, x + width + 1, y + height + 1, color); //RIGHT
+        drawRect(x, y, x + width, y + 1, color); //TOP
+    }
 
-        x /= 0.5f;
-        y /= 0.5f;
-        width /= 0.5f;
-        height /= 0.5f;
+    public static void drawOutline(double width, double height, double x, double y, float scale, Color color) {
+        GL11.glPushMatrix();
+        GL11.glScalef(scale, scale, 1f);
+
+        x /= scale;
+        y /= scale;
+        width /= scale;
+        height /= scale;
 
         drawRect(x, y, x + 1, y + height, color); //LEFT
         drawRect(x, y + height, x + width, y + height + 1, color); //BOTTOM
@@ -111,7 +172,11 @@ public class RenderUtils {
         GL11.glPopMatrix();
     }
 
-    public static void drawRect(double width, double height, double x, double y, Color color) {
-        Gui.drawRect((int) width, (int) height, (int) x, (int) y, color.getRGB());
+    public static void drawRect(double x, double y, double width, double height, Color color) {
+        Gui.drawRect((int) x, (int) y, (int) width, (int) height, color.getRGB());
+    }
+
+    public static void drawTexture(double x, double y, double width, double height) {
+        Gui.drawModalRectWithCustomSizedTexture((int) x, (int) y, 0, 0, (int) width, (int) height, (int) width, (int) height);
     }
 }
