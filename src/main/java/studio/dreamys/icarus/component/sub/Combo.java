@@ -174,4 +174,33 @@ public class Combo extends Component {
     public double getClearance() {
         return 10;
     }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public String getActiveOptions() {
+        StringBuilder formatted = new StringBuilder();
+        for (Map.Entry<String, Boolean> option : options.entrySet()) {
+            if (option.getValue()) {
+                formatted.append(option.getKey()).append(",");
+            }
+        }
+
+        //remove last comma
+        if (formatted.length() > 0) {
+            formatted.deleteCharAt(formatted.length() - 1);
+        }
+
+        return formatted.length() > 0 ? formatted.toString() : "null";
+    }
+
+    public void setActiveOptions(String activeOptions) {
+        if (activeOptions.equals("null")) return;
+        String[] options = activeOptions.split(",");
+        for (String option : options) {
+            this.options.put(option, true);
+        }
+    }
 }

@@ -150,4 +150,18 @@ public class Slider extends Component {
     public double getClearance() {
         return 15;
     }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+        percent = (value - min) / (max - min);
+    }
 }

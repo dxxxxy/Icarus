@@ -60,4 +60,8 @@ public class Component {
     public double getClearance() {
         return 5;
     }
+
+    public String getLabel() {
+        return "null";
+    }
 }

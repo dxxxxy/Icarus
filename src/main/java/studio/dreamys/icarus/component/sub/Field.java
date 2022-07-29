@@ -6,6 +6,7 @@ import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Field extends Component {
@@ -117,5 +118,18 @@ public class Field extends Component {
     @Override
     public double getClearance() {
         return 10;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public String getText() {
+        return text.equals("") ? "null" : text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 }

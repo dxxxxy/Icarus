@@ -98,4 +98,17 @@ public class Checkbox extends Component {
     public void setY(double y) {
         relativeY = y;
     }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public boolean isToggled() {
+        return toggled;
+    }
+
+    public void setToggled(boolean toggled) {
+        this.toggled = toggled;
+    }
 }

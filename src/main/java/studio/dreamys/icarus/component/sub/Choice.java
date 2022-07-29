@@ -147,4 +147,17 @@ public class Choice extends Component {
     public double getClearance() {
         return 10;
     }
+
+    @Override
+    public String getLabel() {
+        return label;
+    }
+
+    public String getSelected() {
+        return selected;
+    }
+
+    public void setSelected(String selected) {
+        this.selected = selected;
+    }
 }

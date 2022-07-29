@@ -2,6 +2,7 @@ package studio.dreamys.icarus.component;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
+import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -12,6 +13,8 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class Window extends GuiScreen {
+    public static Window instance;
+
     public double x;
     public double y;
     public double width;
@@ -28,17 +31,20 @@ public class Window extends GuiScreen {
     public double dragY;
     public boolean isDragging;
 
-    public Window(double x, double y, double width, double height,  Color color) {
+    public Window(double x, double y, double width, double height, Color color) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.color = color;
+
+        instance = this;
     }
 
     @Override
     public void initGui() {
         setActivePage(pages.get(pageIndex));
+        Icarus.config.load();
     }
 
     @Override
@@ -80,6 +86,8 @@ public class Window extends GuiScreen {
             component.mouseClicked(mouseX, mouseY, mouseButton);
             if (component.open()) break; //avoid clicking underlying elements when something is open
         }
+
+        Icarus.config.save();
     }
 
     @Override
@@ -90,6 +98,8 @@ public class Window extends GuiScreen {
         for (Component component : components) {
             component.keyTyped(typedChar, keyCode);
         }
+
+        Icarus.config.save();
     }
 
     @Override
@@ -100,6 +110,8 @@ public class Window extends GuiScreen {
         for (Component component : components) {
             component.mouseReleased(mouseX, mouseY, state);
         }
+
+        Icarus.config.save();
     }
 
     private boolean hovered(double x, double y) {
