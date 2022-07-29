@@ -18,17 +18,17 @@ public class Window extends GuiScreen {
     public double height;
     public Color color;
 
-    //dragging stuff
-    public double dragX;
-    public double dragY;
-    public boolean isDragging;
-
     public static Page active;
     public static int pageIndex;
     public ArrayList<Page> pages = new ArrayList<>();
     public ArrayList<Component> components = new ArrayList<>();
 
-    public Window(double width, double height, double x, double y, Color color) {
+    //dragging stuff
+    public double dragX;
+    public double dragY;
+    public boolean isDragging;
+
+    public Window(double x, double y, double width, double height,  Color color) {
         this.x = x;
         this.y = y;
         this.width = width;

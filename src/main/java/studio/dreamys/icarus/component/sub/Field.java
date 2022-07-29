@@ -10,33 +10,33 @@ import java.util.regex.Pattern;
 
 public class Field extends Component {
     private Window window;
-    private Group group;
-    private double width = 80;
-    private double height = 12;
-    private double clearance = 50;
+
     private double x;
     private double y;
+    private double width = 80;
+    private double height = 12;
     private String label;
+
+    private String text = "";
+    private boolean focused;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
 
-    private String text = "";
-    private boolean focused;
-
     public Field(String label) {
         this.label = label;
     }
 
-    public Field(double width, double height, double x, double y, String label) {
-        this.width = width;
-        this.height = height;
+    public Field(double x, double y, double width, double height, String label) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -51,10 +51,12 @@ public class Field extends Component {
         RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
     }
 
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         focused = hovered(mouseX, mouseY) && mouseButton == 0;
     }
 
+    @Override
     public void keyTyped(char typedChar, int keyCode) {
         if (focused) {
             if (keyCode == Keyboard.KEY_BACK) {
@@ -70,16 +72,14 @@ public class Field extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
         relativeY = y;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
+    @Override
     public Window getWindow() {
         return window;
     }

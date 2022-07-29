@@ -1,4 +1,4 @@
-package studio.dreamys.icarus.util;
+package studio.dreamys.icarus.util.font;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

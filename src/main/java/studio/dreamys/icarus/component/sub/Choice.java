@@ -10,21 +10,20 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class Choice extends Component {
     private Window window;
-    private Group group;
-    private double width = 80;
-    private double height = 12;
-    private double clearance = 50;
+
     private double x;
     private double y;
+    private double width = 80;
+    private double height = 12;
     private String label;
-
-    //relative to window, aka x,y passed in constructor
-    private double relativeX;
-    private double relativeY;
 
     private boolean open;
     private ArrayList<String> options;
     private String selected;
+
+    //relative to window, aka x,y passed in constructor
+    private double relativeX;
+    private double relativeY;
 
     public Choice(String label, ArrayList<String> options) {
         this.label = label;
@@ -33,17 +32,18 @@ public class Choice extends Component {
         selected = this.options.get(0);
     }
 
-    public Choice(double width, double height, double x, double y, String label, ArrayList<String> options) {
-        this.width = width;
-        this.height = height;
+    public Choice(double x, double y, double width, double height, String label, ArrayList<String> options) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
 
         this.options = options;
         selected = this.options.get(0);
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -76,6 +76,7 @@ public class Choice extends Component {
 
 
     @SuppressWarnings("ConstantConditions")
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (open && mouseButton == 0) {
             if (mouseX > x && mouseX < x + width && mouseY > y + height && mouseY < y + height * (options.size() + 1)) {
@@ -95,20 +96,19 @@ public class Choice extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    @Override
     public boolean open() {
         return open;
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
         relativeY = y;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
+    @Override
     public Window getWindow() {
         return window;
     }

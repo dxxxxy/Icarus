@@ -8,20 +8,19 @@ import java.awt.Color;
 
 public class Button extends Component {
     private Window window;
-    private Group group;
-    private double width = 80;
-    private double height = 12;
-    private double clearance = 10;
+
     private double x;
     private double y;
+    private double width = 80;
+    private double height = 12;
     private String label;
+
+    private Runnable onClick;
+    private boolean held;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
-
-    private Runnable onClick;
-    private boolean held;
 
     public Button(String label, Runnable onClick) {
         this.label = label;
@@ -29,16 +28,17 @@ public class Button extends Component {
         this.onClick = onClick;
     }
 
-    public Button(double width, double height, double x, double y, String label, Runnable onClick) {
-        this.width = width;
-        this.height = height;
+    public Button(double x, double y, double width, double height, String label, Runnable onClick) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
 
         this.onClick = onClick;
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -50,6 +50,7 @@ public class Button extends Component {
         RenderUtils.drawCenteredString(label, x + width / 2, y + height / 5,  Color.WHITE);
     }
 
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             onClick.run();
@@ -57,6 +58,7 @@ public class Button extends Component {
         }
     }
 
+    @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
         held = false;
     }
@@ -65,16 +67,14 @@ public class Button extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
         relativeY = y;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
+    @Override
     public Window getWindow() {
         return window;
     }

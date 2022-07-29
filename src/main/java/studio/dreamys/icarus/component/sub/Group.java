@@ -1,7 +1,6 @@
 package studio.dreamys.icarus.component.sub;
 
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -9,15 +8,14 @@ import java.util.ArrayList;
 
 public class Group extends Component {
     private Window window;
-    private Page page;
-    private ArrayList<Component> children = new ArrayList<>();
 
     private double x;
     private double y;
     private double width = 150;
     private double height = 10;
-
     private String label;
+
+    private ArrayList<Component> children = new ArrayList<>();
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
@@ -34,13 +32,14 @@ public class Group extends Component {
     }
 
     public Group(double x, double y, double width, double height, String label) {
-        this.width = width;
-        this.height = height;
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -50,6 +49,7 @@ public class Group extends Component {
         RenderUtils.drawGroupWithString(width, height + 10, x, y, label);
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
@@ -57,8 +57,6 @@ public class Group extends Component {
     }
 
     public Group addChild(Component child) {
-        child.setGroup(this);
-//        window.addChild(child);
         child.setWindow(window);
         children.add(child);
         child.setX(x + 12.5);
@@ -69,13 +67,5 @@ public class Group extends Component {
 
     public ArrayList<Component> getChildren() {
         return children;
-    }
-
-    public Page getPage() {
-        return page;
-    }
-
-    public void setPage(Page page) {
-        this.page = page;
     }
 }

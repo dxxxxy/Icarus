@@ -15,12 +15,12 @@ public class Page extends Component {
     private double width = 37.5;
     private double height = 35;
 
+    private char icon;
+    private ArrayList<Group> groups = new ArrayList<>();
+
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
-
-    private char icon;
-    private ArrayList<Group> groups = new ArrayList<>();
 
     public Page(char icon) {
         this.icon = icon;

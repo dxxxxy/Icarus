@@ -36,7 +36,7 @@ public class GuiCommand extends CommandBase {
         double width = res.getScaledWidth_double();
         double height = res.getScaledHeight_double();
 
-        window = new Window(731 / 2.0, 617 / 2.0, width / 4, height / 4, new java.awt.Color(29, 122, 215));
+        window = new Window(width / 4, height / 4, 731 / 2.0, 617 / 2.0, new java.awt.Color(29, 122, 215));
 
         window.addPage(new Page('t'));
         window.addPage(new Page('u'));

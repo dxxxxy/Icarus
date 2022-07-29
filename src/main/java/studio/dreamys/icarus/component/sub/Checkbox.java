@@ -8,31 +8,32 @@ import java.awt.Color;
 
 public class Checkbox extends Component {
     private Window window;
-    private Group group;
-    private double width = 5;
-    private double height = 5;
+
     private double x;
     private double y;
+    private double width = 5;
+    private double height = 5;
     private String label;
+
+    private boolean toggled;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
 
-    private boolean toggled;
-
     public Checkbox(String label) {
         this.label = label;
     }
 
-    public Checkbox(double width, double height, double x, double y, String label) {
-        this.width = width;
-        this.height = height;
+    public Checkbox(double x, double y, double width, double height, String label) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -45,6 +46,7 @@ public class Checkbox extends Component {
         RenderUtils.drawString(label, x + width * 2 - 1, y - height / 2 + 0.75,  Color.WHITE);
     }
 
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             toggled = !toggled;
@@ -55,16 +57,14 @@ public class Checkbox extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
         relativeY = y;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
+    @Override
     public Window getWindow() {
         return window;
     }

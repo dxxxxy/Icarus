@@ -10,25 +10,22 @@ import java.math.RoundingMode;
 
 public class Slider extends Component {
     private Window window;
-    private Group group;
 
     private double x;
     private double y;
     private double width = 80;
     private double height = 3;
-    private double clearance = 50;
-
     private String label;
+
     private double max;
     private double min;
     private boolean onlyInt;
+    private double percent;
+    private double value;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
-
-    private double percent;
-    private double value;
 
     //dragging stuff
     public boolean dragging;
@@ -40,11 +37,11 @@ public class Slider extends Component {
         this.onlyInt = onlyInt;
     }
 
-    public Slider(double width, double height, double x, double y, String label, double max, double min, boolean onlyInt) {
-        this.width = width;
-        this.height = height;
+    public Slider(double x, double y, double width, double height, String label, double max, double min, boolean onlyInt) {
         this.x = x;
         this.y = y;
+        this.width = width;
+        this.height = height;
         this.label = label;
 
         this.max = max;
@@ -52,6 +49,7 @@ public class Slider extends Component {
         this.onlyInt = onlyInt;
     }
 
+    @Override
     public void render(int mouseX, int mouseY) {
         //update position
         x = window.x + relativeX;
@@ -72,13 +70,14 @@ public class Slider extends Component {
         update(mouseX);
     }
 
-
+    @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             dragging = true;
         }
     }
 
+    @Override
     public void mouseReleased(int mouseX, int mouseY, int state) {
         dragging = false;
     }
@@ -105,16 +104,14 @@ public class Slider extends Component {
         }
     }
 
+    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
         relativeY = y;
     }
 
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
+    @Override
     public Window getWindow() {
         return window;
     }
