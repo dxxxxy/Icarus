@@ -1,6 +1,6 @@
-package studio.dreamys.minesense.component;
+package studio.dreamys.icarus.component;
 
-import studio.dreamys.minesense.component.sub.Group;
+import studio.dreamys.icarus.component.sub.Group;
 
 public class Component {
     public void render(int mouseX, int mouseY) {

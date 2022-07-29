@@ -1,6 +1,5 @@
-package studio.dreamys.minesense.util;
+package studio.dreamys.icarus.util;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -19,7 +18,7 @@ public class RenderUtils {
     public static void loadFonts() {
         //register font in jvm
         try {
-            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderUtils.class.getResourceAsStream("/assets/minesense/undefeated.ttf"))));
+            GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT, Objects.requireNonNull(RenderUtils.class.getResourceAsStream("/assets/icarus/undefeated.ttf"))));
         } catch (FontFormatException | IOException e) {
             e.printStackTrace();
         }
@@ -119,6 +118,10 @@ public class RenderUtils {
 
     public static float getStringWidth(String text, float scale) {
         return fontRenderer.getStringWidth(text) * scale;
+    }
+
+    public static float getFontHeight() {
+        return fontRenderer.getFontHeight();
     }
 
     public static void drawGroupWithString(double width, double height, double x, double y, String label) {

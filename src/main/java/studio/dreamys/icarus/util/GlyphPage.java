@@ -1,4 +1,4 @@
-package studio.dreamys.minesense.util;
+package studio.dreamys.icarus.util;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.DynamicTexture;

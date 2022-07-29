@@ -1,9 +1,9 @@
-package studio.dreamys.minesense.component.sub;
+package studio.dreamys.icarus.component.sub;
 
-import studio.dreamys.minesense.component.Component;
-import studio.dreamys.minesense.component.Page;
-import studio.dreamys.minesense.component.Window;
-import studio.dreamys.minesense.util.RenderUtils;
+import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Page;
+import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.util.RenderUtils;
 
 import java.util.ArrayList;
 
@@ -16,7 +16,6 @@ public class Group extends Component {
     private double y;
     private double width = 150;
     private double height = 10;
-    private double lastClearance;
 
     private String label;
 
@@ -59,11 +58,24 @@ public class Group extends Component {
 
     public Group addChild(Component child) {
         child.setGroup(this);
-        window.addChild(child);
+//        window.addChild(child);
+        child.setWindow(window);
         children.add(child);
         child.setX(x + 12.5);
         child.setY(y + height + (children.size() == 1 ? 0 : child.getClearance()));
         height += child.getHeight() + (children.size() == 1 ? 0 : child.getClearance());
         return this;
+    }
+
+    public ArrayList<Component> getChildren() {
+        return children;
+    }
+
+    public Page getPage() {
+        return page;
+    }
+
+    public void setPage(Page page) {
+        this.page = page;
     }
 }

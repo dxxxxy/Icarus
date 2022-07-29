@@ -3,13 +3,13 @@ package studio.dreamys.test;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import studio.dreamys.minesense.Minesense;
+import studio.dreamys.icarus.Icarus;
 
 @Mod(modid = "")
 public class TestMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        Minesense.init();
+        Icarus.init();
         ClientCommandHandler.instance.registerCommand(new GuiCommand());
     }
 }

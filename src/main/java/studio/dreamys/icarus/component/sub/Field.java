@@ -1,9 +1,9 @@
-package studio.dreamys.minesense.component.sub;
+package studio.dreamys.icarus.component.sub;
 
 import org.lwjgl.input.Keyboard;
-import studio.dreamys.minesense.component.Component;
-import studio.dreamys.minesense.component.Window;
-import studio.dreamys.minesense.util.RenderUtils;
+import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 import java.util.regex.Pattern;

@@ -1,8 +1,8 @@
-package studio.dreamys.minesense.component;
+package studio.dreamys.icarus.component;
 
 import com.google.common.collect.Lists;
-import studio.dreamys.minesense.component.sub.Group;
-import studio.dreamys.minesense.util.RenderUtils;
+import studio.dreamys.icarus.component.sub.Group;
+import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -21,7 +21,6 @@ public class Page extends Component {
 
     private char icon;
     private ArrayList<Group> groups = new ArrayList<>();
-    private boolean active;
 
     public Page(char icon) {
         this.icon = icon;
@@ -33,17 +32,16 @@ public class Page extends Component {
         x = window.x + relativeX;
         y = window.y + relativeY;
 
-        Color color = active ? window.color : Color.DARK_GRAY;
+        Color color = Window.pageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
 
-        RenderUtils.drawOutline(width, height, x, y, color);
+//        RenderUtils.drawOutline(width, height, x, y, color);
         RenderUtils.drawIcon(icon, x + 5, y + 5, color);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
-            active = !active;
-            window.setActive(this);
+            window.setActivePage(this);
         }
     }
 
@@ -56,9 +54,9 @@ public class Page extends Component {
         this.window = window;
 
         //offsetting the page based on the last one
-        if (window.children.stream().anyMatch(comp -> comp instanceof Page)) {
-            Page lastPage = (Page) Lists.reverse(window.children).stream().filter(comp -> comp instanceof Page).findFirst().get();
-            y += lastPage.getHeight() * window.children.stream().filter(comp -> comp instanceof Page).count() - 1;
+        if (window.pages.size() > 0) {
+            Page lastPage = Lists.reverse(window.pages).get(0);
+            y += lastPage.getHeight() * (window.pages.size() - 1);
         }
 
         relativeX = x;
@@ -66,13 +64,30 @@ public class Page extends Component {
     }
 
     public Group addGroup(Group group) {
+        //add group to list
         groups.add(group);
-        window.addChild(group);
+        //pass window to group
+        group.setWindow(window);
         return group;
     }
 
+    public ArrayList<Group> getGroups() {
+        return groups;
+    }
+
+    @Override
     public Window getWindow() {
         return window;
+    }
+
+    @Override
+    public double getX() {
+        return x;
+    }
+
+    @Override
+    public double getY() {
+        return y;
     }
 
     @Override
@@ -86,12 +101,7 @@ public class Page extends Component {
     }
 
     @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
+    public boolean equals(Object obj) {
+        return icon == ((Page) obj).icon && getGroups().equals(((Page) obj).getGroups());
     }
 }

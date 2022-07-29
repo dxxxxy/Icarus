@@ -1,4 +1,4 @@
-package studio.dreamys.minesense.util;
+package studio.dreamys.icarus.util;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -6,10 +6,7 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -96,7 +93,7 @@ public class GlyphPageFontRenderer {
                 i1 /= 4;
             }
 
-            this.colorCode[i] = (k & 255) << 16 | (l & 255) << 8 | i1 & 255;
+            colorCode[i] = (k & 255) << 16 | (l & 255) << 8 | i1 & 255;
         }
     }
 
@@ -149,14 +146,14 @@ public class GlyphPageFontRenderer {
      */
     public int drawString(String text, float x, float y, int color, boolean dropShadow) {
         GlStateManager.enableAlpha();
-        this.resetStyles();
+        resetStyles();
         int i;
 
         if (dropShadow) {
-            i = this.renderString(text, x + 1.0F, y + 1.0F, color, true);
-            i = Math.max(i, this.renderString(text, x, y, color, false));
+            i = renderString(text, x + 1.0F, y + 1.0F, color, true);
+            i = Math.max(i, renderString(text, x, y, color, false));
         } else {
-            i = this.renderString(text, x, y, color, false);
+            i = renderString(text, x, y, color, false);
         }
 
         return i;
@@ -178,15 +175,15 @@ public class GlyphPageFontRenderer {
                 color = (color & 16579836) >> 2 | color & -16777216;
             }
 
-            this.red = (float) (color >> 16 & 255) / 255.0F;
-            this.blue = (float) (color >> 8 & 255) / 255.0F;
-            this.green = (float) (color & 255) / 255.0F;
-            this.alpha = (float) (color >> 24 & 255) / 255.0F;
-            GlStateManager.color(this.red, this.blue, this.green, this.alpha);
-            this.posX = x * 2.0f;
-            this.posY = y * 2.0f;
-            this.renderStringAtPos(text, dropShadow);
-            return (int) (this.posX / 4.0f);
+            red = (float) (color >> 16 & 255) / 255.0F;
+            blue = (float) (color >> 8 & 255) / 255.0F;
+            green = (float) (color & 255) / 255.0F;
+            alpha = (float) (color >> 24 & 255) / 255.0F;
+            GlStateManager.color(red, blue, green, alpha);
+            posX = x * 2.0f;
+            posY = y * 2.0f;
+            renderStringAtPos(text, dropShadow);
+            return (int) (posX / 4.0f);
         }
     }
 
@@ -215,11 +212,11 @@ public class GlyphPageFontRenderer {
                 int i1 = "0123456789abcdefklmnor".indexOf(text.toLowerCase(Locale.ENGLISH).charAt(i + 1));
 
                 if (i1 < 16) {
-                    this.randomStyle = false;
-                    this.boldStyle = false;
-                    this.strikethroughStyle = false;
-                    this.underlineStyle = false;
-                    this.italicStyle = false;
+                    randomStyle = false;
+                    boldStyle = false;
+                    strikethroughStyle = false;
+                    underlineStyle = false;
+                    italicStyle = false;
 
                     if (i1 < 0) {
                         i1 = 15;
@@ -229,28 +226,28 @@ public class GlyphPageFontRenderer {
                         i1 += 16;
                     }
 
-                    int j1 = this.colorCode[i1];
-                    this.textColor = j1;
+                    int j1 = colorCode[i1];
+                    textColor = j1;
 
-                    GlStateManager.color((float) (j1 >> 16) / 255.0F, (float) (j1 >> 8 & 255) / 255.0F, (float) (j1 & 255) / 255.0F, this.alpha);
+                    GlStateManager.color((float) (j1 >> 16) / 255.0F, (float) (j1 >> 8 & 255) / 255.0F, (float) (j1 & 255) / 255.0F, alpha);
                 } else if (i1 == 16) {
-                    this.randomStyle = true;
+                    randomStyle = true;
                 } else if (i1 == 17) {
-                    this.boldStyle = true;
+                    boldStyle = true;
                 } else if (i1 == 18) {
-                    this.strikethroughStyle = true;
+                    strikethroughStyle = true;
                 } else if (i1 == 19) {
-                    this.underlineStyle = true;
+                    underlineStyle = true;
                 } else if (i1 == 20) {
-                    this.italicStyle = true;
+                    italicStyle = true;
                 } else {
-                    this.randomStyle = false;
-                    this.boldStyle = false;
-                    this.strikethroughStyle = false;
-                    this.underlineStyle = false;
-                    this.italicStyle = false;
+                    randomStyle = false;
+                    boldStyle = false;
+                    strikethroughStyle = false;
+                    underlineStyle = false;
+                    italicStyle = false;
 
-                    GlStateManager.color(this.red, this.blue, this.green, this.alpha);
+                    GlStateManager.color(red, blue, green, alpha);
                 }
 
                 ++i;
@@ -271,34 +268,34 @@ public class GlyphPageFontRenderer {
     }
 
     private void doDraw(float f, GlyphPage glyphPage) {
-        if (this.strikethroughStyle) {
+        if (strikethroughStyle) {
             Tessellator tessellator = Tessellator.getInstance();
             WorldRenderer worldrenderer = tessellator.getWorldRenderer();
             GlStateManager.disableTexture2D();
             worldrenderer.begin(7, DefaultVertexFormats.POSITION);
-            worldrenderer.pos((double) this.posX, (double) (this.posY + (float) (glyphPage.getMaxFontHeight() / 2)), 0.0D).endVertex();
-            worldrenderer.pos((double) (this.posX + f), (double) (this.posY + (float) (glyphPage.getMaxFontHeight() / 2)), 0.0D).endVertex();
-            worldrenderer.pos((double) (this.posX + f), (double) (this.posY + (float) (glyphPage.getMaxFontHeight() / 2) - 1.0F), 0.0D).endVertex();
-            worldrenderer.pos((double) this.posX, (double) (this.posY + (float) (glyphPage.getMaxFontHeight() / 2) - 1.0F), 0.0D).endVertex();
+            worldrenderer.pos(posX, posY + (float) (glyphPage.getMaxFontHeight() / 2), 0.0D).endVertex();
+            worldrenderer.pos(posX + f, posY + (float) (glyphPage.getMaxFontHeight() / 2), 0.0D).endVertex();
+            worldrenderer.pos(posX + f, posY + (float) (glyphPage.getMaxFontHeight() / 2) - 1.0F, 0.0D).endVertex();
+            worldrenderer.pos(posX, posY + (float) (glyphPage.getMaxFontHeight() / 2) - 1.0F, 0.0D).endVertex();
             tessellator.draw();
             GlStateManager.enableTexture2D();
         }
 
-        if (this.underlineStyle) {
+        if (underlineStyle) {
             Tessellator tessellator1 = Tessellator.getInstance();
             WorldRenderer worldrenderer1 = tessellator1.getWorldRenderer();
             GlStateManager.disableTexture2D();
             worldrenderer1.begin(7, DefaultVertexFormats.POSITION);
-            int l = this.underlineStyle ? -1 : 0;
-            worldrenderer1.pos((double) (this.posX + (float) l), (double) (this.posY + (float) glyphPage.getMaxFontHeight()), 0.0D).endVertex();
-            worldrenderer1.pos((double) (this.posX + f), (double) (this.posY + (float) glyphPage.getMaxFontHeight()), 0.0D).endVertex();
-            worldrenderer1.pos((double) (this.posX + f), (double) (this.posY + (float) glyphPage.getMaxFontHeight() - 1.0F), 0.0D).endVertex();
-            worldrenderer1.pos((double) (this.posX + (float) l), (double) (this.posY + (float) glyphPage.getMaxFontHeight() - 1.0F), 0.0D).endVertex();
+            int l = underlineStyle ? -1 : 0;
+            worldrenderer1.pos(posX + (float) l, posY + (float) glyphPage.getMaxFontHeight(), 0.0D).endVertex();
+            worldrenderer1.pos(posX + f, posY + (float) glyphPage.getMaxFontHeight(), 0.0D).endVertex();
+            worldrenderer1.pos(posX + f, posY + (float) glyphPage.getMaxFontHeight() - 1.0F, 0.0D).endVertex();
+            worldrenderer1.pos(posX + (float) l, posY + (float) glyphPage.getMaxFontHeight() - 1.0F, 0.0D).endVertex();
             tessellator1.draw();
             GlStateManager.enableTexture2D();
         }
 
-        this.posX += f;
+        posX += f;
     }
 
 
@@ -317,11 +314,11 @@ public class GlyphPageFontRenderer {
      * Reset all style flag fields in the class to false; called at the start of string rendering
      */
     private void resetStyles() {
-        this.randomStyle = false;
-        this.boldStyle = false;
-        this.italicStyle = false;
-        this.underlineStyle = false;
-        this.strikethroughStyle = false;
+        randomStyle = false;
+        boldStyle = false;
+        italicStyle = false;
+        underlineStyle = false;
+        strikethroughStyle = false;
     }
 
     public int getFontHeight() {
@@ -378,7 +375,7 @@ public class GlyphPageFontRenderer {
      * Trims a string to fit a specified Width.
      */
     public String trimStringToWidth(String text, int width) {
-        return this.trimStringToWidth(text, width, false);
+        return trimStringToWidth(text, width, false);
     }
 
     /**
