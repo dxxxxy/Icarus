@@ -25,6 +25,7 @@ public class Window extends GuiScreen {
     public static int pageIndex;
     public ArrayList<Page> pages = new ArrayList<>();
     public ArrayList<Component> components = new ArrayList<>();
+    public ArrayList<Component> allComponents = new ArrayList<>();
 
     //dragging stuff
     public double dragX;
@@ -140,6 +141,7 @@ public class Window extends GuiScreen {
         pageIndex = pages.indexOf(active);
         //clear components to draw
         components.clear();
+        allComponents.clear();
         //add pages
         components.addAll(pages);
         //refill components to draw with those inside the page
@@ -147,6 +149,14 @@ public class Window extends GuiScreen {
             components.add(group);
             components.addAll(group.getChildren());
         }
+
+        for (Page page1 : pages) {
+            for (Group group : page1.getGroups()) {
+                allComponents.add(group);
+                allComponents.addAll(group.getChildren());
+            }
+        }
+
         //reverse list
         Collections.reverse((components));
     }

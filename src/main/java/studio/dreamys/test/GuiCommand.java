@@ -40,7 +40,11 @@ public class GuiCommand extends CommandBase {
 
         window.addPage(new Page('t'));
         window.addPage(new Page('u'));
-        window.addPage(new Page('v'));
+        Page page2 = window.addPage(new Page('v'));
+        page2.addGroup(new Group("Visuals", 47.5, 10))
+                .addChild(new Checkbox("haha"))
+                .addChild(new Choice("hihi", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
+                .addChild(new Checkbox("hoho"));
 
         Page page = window.addPage(new Page('s'));
         page.addGroup(new Group("Visuals", 47.5, 10))

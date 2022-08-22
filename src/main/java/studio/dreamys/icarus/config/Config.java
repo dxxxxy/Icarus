@@ -29,7 +29,7 @@ public class Config {
         try {
             ArrayList<String> toSave = new ArrayList<>();
 
-            for (Component comp : Window.instance.components) {
+            for (Component comp : Window.instance.allComponents) {
                 //do nothing for button
                 if (comp instanceof Checkbox) {
                     toSave.add("Checkbox:" + comp.getLabel() + ":" + ((Checkbox) comp).isToggled());
@@ -77,7 +77,7 @@ public class Config {
                 String[] args = s.split(":");
                 for (Class sub : ClassUtils.findAllClassesUsingClassLoader("studio.dreamys.icarus.component.sub")) {
                     if (sub.getSimpleName().equals(args[0])) {
-                        for (Component comp : Window.instance.components) {
+                        for (Component comp : Window.instance.allComponents) {
                             if (comp.getLabel().equals(args[1])) {
                                 //do nothing for button
                                 if (comp instanceof Checkbox) {
