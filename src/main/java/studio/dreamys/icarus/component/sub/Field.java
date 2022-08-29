@@ -132,4 +132,8 @@ public class Field extends Component {
     public void setText(String text) {
         this.text = text;
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

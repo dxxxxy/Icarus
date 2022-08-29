@@ -4,4 +4,8 @@ public class Attachment extends Component{
     public Component attachTo(Component child) {
         return null;
     }
+
+    public Component getChild() {
+        return null;
+    }
 }

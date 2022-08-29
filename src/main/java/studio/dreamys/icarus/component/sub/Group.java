@@ -58,6 +58,7 @@ public class Group extends Component {
 
     public Group addChild(Component child) {
         child.setWindow(window);
+        child.setGroup(this);
         children.add(child);
         child.setX(x + 12.5);
         child.setY(y + height + (children.size() == 1 ? 0 : child.getClearance()));

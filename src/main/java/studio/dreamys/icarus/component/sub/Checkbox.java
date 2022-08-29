@@ -8,6 +8,7 @@ import java.awt.Color;
 
 public class Checkbox extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;
@@ -104,11 +105,30 @@ public class Checkbox extends Component {
         return label;
     }
 
+    @Override
+    public Group getGroup() {
+        return group;
+    }
+
+    @Override
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
     public boolean isToggled() {
         return toggled;
     }
 
     public void setToggled(boolean toggled) {
         this.toggled = toggled;
+    }
+
+    public boolean toggle() {
+        return toggled = !toggled;
+    }
+
+    //set label
+    public void setLabel(String label) {
+        this.label = label;
     }
 }

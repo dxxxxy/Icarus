@@ -113,4 +113,8 @@ public class Button extends Component {
     public double getClearance() {
         return 7.5;
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

@@ -160,4 +160,8 @@ public class Choice extends Component {
     public void setSelected(String selected) {
         this.selected = selected;
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

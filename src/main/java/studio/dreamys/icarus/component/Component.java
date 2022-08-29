@@ -1,5 +1,7 @@
 package studio.dreamys.icarus.component;
 
+import studio.dreamys.icarus.component.sub.Group;
+
 public class Component {
     public void render(int mouseX, int mouseY) {
 
@@ -19,6 +21,14 @@ public class Component {
 
     public void setWindow(Window window) {
 
+    }
+
+    public void setGroup(Group group) {
+
+    }
+
+    public Group getGroup() {
+        return null;
     }
 
     public Window getWindow() {

@@ -1,16 +1,20 @@
 package studio.dreamys.icarus.config;
 
 import net.minecraft.client.Minecraft;
+import scala.actors.threadpool.Arrays;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.*;
 import studio.dreamys.icarus.util.ClassUtils;
 
 import java.io.*;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Objects;
 
+@SuppressWarnings("unused")
 public class Config {
-    private File file;
+    public static File file;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Config(String modid) {
@@ -19,7 +23,6 @@ public class Config {
         try {
             if (!dir.exists()) dir.mkdir();
             if (!file.exists()) file.createNewFile();
-//            load();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -29,7 +32,7 @@ public class Config {
         try {
             ArrayList<String> toSave = new ArrayList<>();
 
-            for (Component comp : Window.instance.allComponents) {
+            for (Component comp : Window.instance.all) {
                 //do nothing for button
                 if (comp instanceof Checkbox) {
                     toSave.add("Checkbox:" + comp.getLabel() + ":" + ((Checkbox) comp).isToggled());
@@ -73,43 +76,81 @@ public class Config {
                 line = reader.readLine();
             }
             reader.close();
+
             for (String s : lines) {
                 String[] args = s.split(":");
-                for (Class sub : ClassUtils.findAllClassesUsingClassLoader("studio.dreamys.icarus.component.sub")) {
+
+                //for every line, create a component and set the default value
+                for (@SuppressWarnings("unchecked") Class<Component> sub : ClassUtils.findAllClassesUsingClassLoader("studio.dreamys.icarus.component.sub")) {
                     if (sub.getSimpleName().equals(args[0])) {
-                        for (Component comp : Window.instance.allComponents) {
-                            if (comp.getLabel().equals(args[1])) {
-                                //do nothing for button
-                                if (comp instanceof Checkbox) {
-                                    ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[2]));
-                                }
-                                if (comp instanceof Choice) {
-                                    ((Choice) comp).setSelected(args[2]);
-                                }
-                                //TODO: color
-                                if (comp instanceof Combo) {
-                                    ((Combo) comp).setActiveOptions(args[2]);
-                                }
-                                if (comp instanceof Field) {
-                                    ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
-                                }
-                                //do nothing for Group
-                                //TODO: keybind
-                                if (comp instanceof Slider) {
-                                    ((Slider) comp).setValue(Double.parseDouble(args[2]));
-                                }
-                            }
+                        Component component = (Component) Class.forName("studio.dreamys.icarus.component.sub." + args[0]).newInstance();
+                        if (component instanceof Button) {
+                            ((Button) component).setLabel(args[1]);
+                        }
+                        if (component instanceof Checkbox) {
+                            ((Checkbox) component).setLabel(args[1]);
+                            ((Checkbox) component).setToggled(Boolean.parseBoolean(args[2]));
+                        }
+                        if (component instanceof Choice) {
+                            ((Choice) component).setLabel(args[1]);
+                            ((Choice) component).setSelected(args[2]);
+                        }
+                        //TODO: color
+                        if (component instanceof Combo) {
+                            ((Combo) component).setLabel(args[1]);
+                            ((Combo) component).setActiveOptions(args[2]);
+                        }
+                        if (component instanceof Field) {
+                            ((Field) component).setLabel(args[1]);
+                            ((Field) component).setText(args[2]);
+                        }
+                        //do nothing for Group
+                        //TODO: keybind
+                        if (component instanceof Slider) {
+                            ((Slider) component).setLabel(args[1]);
+                            ((Slider) component).setValue(Integer.parseInt(args[2]));
                         }
                     }
                 }
             }
-        } catch (IOException e) {
+
+//            for (String s : lines) {
+//                String[] args = s.split(":");
+//                for (@SuppressWarnings("unchecked") Class<Component> sub : ClassUtils.findAllClassesUsingClassLoader("studio.dreamys.icarus.component.sub")) {
+//                    if (sub.getSimpleName().equals(args[0])) {
+//                        for (Component comp : Window.instance.all) {
+//                            if (comp.getLabel().equals(args[1])) {
+//                                //do nothing for button
+//                                if (comp instanceof Checkbox) {
+//                                    ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[2]));
+//                                }
+//                                if (comp instanceof Choice) {
+//                                    ((Choice) comp).setSelected(args[2]);
+//                                }
+//                                //TODO: color
+//                                if (comp instanceof Combo) {
+//                                    ((Combo) comp).setActiveOptions(args[2]);
+//                                }
+//                                if (comp instanceof Field) {
+//                                    ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
+//                                }
+//                                //do nothing for Group
+//                                //TODO: keybind
+//                                if (comp instanceof Slider) {
+//                                    ((Slider) comp).setValue(Double.parseDouble(args[2]));
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public boolean getCheckbox(String label) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
                 return ((Checkbox) comp).isToggled();
             }
@@ -118,7 +159,7 @@ public class Config {
     }
 
     public String getChoice(String label) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Choice) {
                 return ((Choice) comp).getSelected();
             }
@@ -127,7 +168,7 @@ public class Config {
     }
 
     public String getCombo(String label) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Combo) {
                 return ((Combo) comp).getActiveOptions();
             }
@@ -136,7 +177,7 @@ public class Config {
     }
 
     public String getField(String label) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Field) {
                 return ((Field) comp).getText();
             }
@@ -145,7 +186,7 @@ public class Config {
     }
 
     public double getSlider(String label) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Slider) {
                 return ((Slider) comp).getValue();
             }
@@ -154,7 +195,7 @@ public class Config {
     }
 
     public void setCheckbox(String label, boolean toggled) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
                 ((Checkbox) comp).setToggled(toggled);
             }
@@ -162,7 +203,7 @@ public class Config {
     }
 
     public void setChoice(String label, String selected) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Choice) {
                 ((Choice) comp).setSelected(selected);
             }
@@ -170,7 +211,7 @@ public class Config {
     }
 
     public void setCombo(String label, String activeOptions) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Combo) {
                 ((Combo) comp).setActiveOptions(activeOptions);
             }
@@ -178,7 +219,7 @@ public class Config {
     }
 
     public void setField(String label, String text) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Field) {
                 ((Field) comp).setText(text);
             }
@@ -186,7 +227,7 @@ public class Config {
     }
 
     public void setSlider(String label, double value) {
-        for (Component comp : Window.instance.components) {
+        for (Component comp : Window.instance.all) {
             if (comp.getLabel().equals(label) && comp instanceof Slider) {
                 ((Slider) comp).setValue(value);
             }

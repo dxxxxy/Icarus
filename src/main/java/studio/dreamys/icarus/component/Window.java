@@ -21,11 +21,11 @@ public class Window extends GuiScreen {
     public double height;
     public Color color;
 
-    public static Page active;
-    public static int pageIndex;
+    public int activePageIndex;
     public ArrayList<Page> pages = new ArrayList<>();
-    public ArrayList<Component> components = new ArrayList<>();
-    public ArrayList<Component> allComponents = new ArrayList<>();
+    public ArrayList<Component> visible = new ArrayList<>();
+    public ArrayList<Component> all = new ArrayList<>();
+    public ArrayList<Attachment> attachments = new ArrayList<>();
 
     //dragging stuff
     public double dragX;
@@ -44,7 +44,18 @@ public class Window extends GuiScreen {
 
     @Override
     public void initGui() {
-        setActivePage(pages.get(pageIndex));
+        //load all components
+        for (Page page : pages) {
+            for (Group group : page.getGroups()) {
+                all.add(group);
+                all.addAll(group.getChildren());
+            }
+        }
+
+        //set the active page
+        setActivePage(pages.get(activePageIndex));
+
+        //load config
         Icarus.config.load();
     }
 
@@ -64,7 +75,7 @@ public class Window extends GuiScreen {
         update(mouseX, mouseY);
 
         //draw and update children
-        for (Component component : components) {
+        for (Component component : visible) {
             component.render(mouseX, mouseY);
         }
     }
@@ -83,11 +94,12 @@ public class Window extends GuiScreen {
         }
 
         //call for children then
-        for (Component component : components.stream().filter(component -> !(component instanceof Page)).collect(Collectors.toList())) {
+        for (Component component : visible.stream().filter(component -> !(component instanceof Page)).collect(Collectors.toList())) {
             component.mouseClicked(mouseX, mouseY, mouseButton);
             if (component.open()) break; //avoid clicking underlying elements when something is open
         }
 
+        //save config on mouse click (button, checkbox, choice, etc...)
         Icarus.config.save();
     }
 
@@ -96,10 +108,11 @@ public class Window extends GuiScreen {
         super.keyTyped(typedChar, keyCode);
 
         //call for children
-        for (Component component : components) {
+        for (Component component : visible) {
             component.keyTyped(typedChar, keyCode);
         }
 
+        //save config on key typed (typically fields)
         Icarus.config.save();
     }
 
@@ -108,10 +121,11 @@ public class Window extends GuiScreen {
         isDragging = false;
 
         //call for children
-        for (Component component : components) {
+        for (Component component : visible) {
             component.mouseReleased(mouseX, mouseY, state);
         }
 
+        //save config on mouse release (typically sliders)
         Icarus.config.save();
     }
 
@@ -129,35 +143,30 @@ public class Window extends GuiScreen {
     public Page addPage(Page page) {
         //add page to list
         pages.add(page);
+
         //pass window to page
         page.setWindow(this);
+
         return page;
     }
 
     public void setActivePage(Page page) {
-        //set page to active
-        active = page;
-        //keep page index for later
-        pageIndex = pages.indexOf(active);
+        //set the index of the active page
+        activePageIndex = pages.indexOf(page);
+
         //clear components to draw
-        components.clear();
-        allComponents.clear();
+        visible.clear();
+
         //add pages
-        components.addAll(pages);
-        //refill components to draw with those inside the page
-        for (Group group : active.getGroups()) {
-            components.add(group);
-            components.addAll(group.getChildren());
+        visible.addAll(pages);
+
+        //add components + group
+        for (Group group : pages.get(activePageIndex).getGroups()) {
+            visible.add(group);
+            visible.addAll(group.getChildren());
         }
 
-        for (Page page1 : pages) {
-            for (Group group : page1.getGroups()) {
-                allComponents.add(group);
-                allComponents.addAll(group.getChildren());
-            }
-        }
-
-        //reverse list
-        Collections.reverse((components));
+        //reverse list to render from bottom to top
+        Collections.reverse((visible));
     }
 }

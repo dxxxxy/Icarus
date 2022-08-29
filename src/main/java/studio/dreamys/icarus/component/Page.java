@@ -32,7 +32,7 @@ public class Page extends Component {
         x = window.x + relativeX;
         y = window.y + relativeY;
 
-        Color color = Window.pageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
+        Color color = Window.instance.activePageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
 
 //        RenderUtils.drawOutline(width, height, x, y, color);
         RenderUtils.drawIcon(icon, x + 5, y + 5, color);

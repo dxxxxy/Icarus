@@ -164,4 +164,8 @@ public class Slider extends Component {
         this.value = value;
         percent = (value - min) / (max - min);
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }

@@ -203,4 +203,8 @@ public class Combo extends Component {
             this.options.put(option, true);
         }
     }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
 }
