@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.component.sub.Button;
 import studio.dreamys.icarus.component.sub.Checkbox;
 import studio.dreamys.icarus.component.sub.Keybind;
 import studio.dreamys.icarus.config.Config;
@@ -41,6 +42,9 @@ public class Icarus {
                     if (keybind.getKey() == keyCode) { //if the keys match
                         if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
                             ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
+                        }
+                        if (keybind.getChild() instanceof Button) { //if the child is a button
+                            ((Button) keybind.getChild()).getOnClick().run(); //click the button
                         }
                     }
                 }

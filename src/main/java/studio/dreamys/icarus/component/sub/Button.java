@@ -8,6 +8,7 @@ import java.awt.Color;
 
 public class Button extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;
@@ -116,5 +117,19 @@ public class Button extends Component {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public Runnable getOnClick() {
+        return onClick;
+    }
+
+    @Override
+    public Group getGroup() {
+        return group;
+    }
+
+    @Override
+    public void setGroup(Group group) {
+        this.group = group;
     }
 }

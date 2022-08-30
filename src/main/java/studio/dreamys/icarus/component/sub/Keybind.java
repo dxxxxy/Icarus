@@ -30,7 +30,8 @@ public class Keybind extends Attachment {
         return key;
     }
 
-    public Component attachTo(Checkbox child) {
+    @Override
+    public Component attachTo(Component child) {
         this.child = child;
         this.child.getGroup().addChild(this);
         Icarus.window.attachments.add(this);
