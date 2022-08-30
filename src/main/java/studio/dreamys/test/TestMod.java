@@ -5,7 +5,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import studio.dreamys.icarus.Icarus;
 
-@Mod(modid = "icarus")
+@Mod(modid = "Icarus")
 public class TestMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {

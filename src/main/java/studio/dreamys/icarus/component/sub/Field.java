@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 @EqualsAndHashCode(callSuper = false)
 public class Field extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;

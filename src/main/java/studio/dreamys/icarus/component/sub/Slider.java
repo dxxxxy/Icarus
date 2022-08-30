@@ -18,6 +18,7 @@ import java.math.RoundingMode;
 @EqualsAndHashCode(callSuper = false)
 public class Slider extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;

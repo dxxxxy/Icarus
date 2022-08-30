@@ -17,6 +17,7 @@ import java.util.ArrayList;
 @EqualsAndHashCode(callSuper = false)
 public class Group extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;

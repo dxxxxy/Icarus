@@ -1,6 +1,10 @@
 package studio.dreamys.icarus.component;
 
 import com.google.common.collect.Lists;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -8,6 +12,10 @@ import studio.dreamys.icarus.util.RenderUtils;
 import java.awt.*;
 import java.util.ArrayList;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Page extends Component {
     private Window window;
 
@@ -50,6 +58,14 @@ public class Page extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    public Group addGroup(Group group) {
+        //add group to list
+        groups.add(group);
+        //pass window to group
+        group.setWindow(window);
+        return group;
+    }
+
     @Override
     public void setWindow(Window window) {
         this.window = window;
@@ -62,47 +78,5 @@ public class Page extends Component {
 
         relativeX = x;
         relativeY = y;
-    }
-
-    public Group addGroup(Group group) {
-        //add group to list
-        groups.add(group);
-        //pass window to group
-        group.setWindow(window);
-        return group;
-    }
-
-    public ArrayList<Group> getGroups() {
-        return groups;
-    }
-
-    @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return icon == ((Page) obj).icon && getGroups().equals(((Page) obj).getGroups());
     }
 }

@@ -39,10 +39,6 @@ public class Component {
         return false;
     }
 
-    public Component attach(Attachment attachment) {
-        return attachment.attachTo(this);
-    }
-
     public double getX() {
         return 0;
     }

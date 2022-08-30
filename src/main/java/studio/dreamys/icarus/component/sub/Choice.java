@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @EqualsAndHashCode(callSuper = false)
 public class Choice extends Component {
     private Window window;
+    private Group group;
 
     private double x;
     private double y;

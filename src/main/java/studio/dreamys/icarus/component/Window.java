@@ -47,14 +47,8 @@ public class Window extends GuiScreen {
 
     @Override
     public void initGui() {
-        //load all components
-
-
         //set the active page
         setActivePage(pages.get(activePageIndex));
-
-//        //load config
-//        Icarus.config.load();
     }
 
     @Override
