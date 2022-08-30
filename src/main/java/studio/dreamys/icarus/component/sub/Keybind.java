@@ -4,7 +4,6 @@ import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;

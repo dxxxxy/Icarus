@@ -31,8 +31,6 @@ public class Icarus {
             int keyCode = Keyboard.getEventKey(); //get keycode
             if (keyCode <= 0) return; //ignore invalid keycode
             if (keyCode == window.key) {
-                System.out.println("ooooh");
-                System.out.println(window.all.size());
                 Minecraft.getMinecraft().displayGuiScreen(window);
                 return;
             }
@@ -44,7 +42,7 @@ public class Icarus {
                             ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
                         }
                         if (keybind.getChild() instanceof Button) { //if the child is a button
-                            ((Button) keybind.getChild()).getOnClick().run(); //click the button
+                            ((Button) keybind.getChild()).getRunnable().run(); //click the button
                         }
                     }
                 }

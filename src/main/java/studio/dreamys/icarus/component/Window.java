@@ -94,7 +94,7 @@ public class Window extends GuiScreen {
         //call for children then
         for (Component component : visible.stream().filter(component -> !(component instanceof Page)).collect(Collectors.toList())) {
             component.mouseClicked(mouseX, mouseY, mouseButton);
-            if (component.open()) break; //avoid clicking underlying elements when something is open
+            if (component.isOpen()) break; //avoid clicking underlying elements when something is open
         }
 
         //save config on mouse click (button, checkbox, choice, etc...)

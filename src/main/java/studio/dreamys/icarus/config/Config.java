@@ -74,43 +74,6 @@ public class Config {
             }
             reader.close();
 
-//            for (String s : lines) {
-//                String[] args = s.split(":");
-//
-//                //for every line, create a component and set the default value
-//                for (@SuppressWarnings("unchecked") Class<Component> sub : ClassUtils.findAllClassesUsingClassLoader("studio.dreamys.icarus.component.sub")) {
-//                    if (sub.getSimpleName().equals(args[0])) {
-//                        Component component = (Component) Class.forName("studio.dreamys.icarus.component.sub." + args[0]).newInstance();
-//                        if (component instanceof Button) {
-//                            ((Button) component).setLabel(args[1]);
-//                        }
-//                        if (component instanceof Checkbox) {
-//                            ((Checkbox) component).setLabel(args[1]);
-//                            ((Checkbox) component).setToggled(Boolean.parseBoolean(args[2]));
-//                        }
-//                        if (component instanceof Choice) {
-//                            ((Choice) component).setLabel(args[1]);
-//                            ((Choice) component).setSelected(args[2]);
-//                        }
-//                        //TODO: color
-//                        if (component instanceof Combo) {
-//                            ((Combo) component).setLabel(args[1]);
-//                            ((Combo) component).setActiveOptions(args[2]);
-//                        }
-//                        if (component instanceof Field) {
-//                            ((Field) component).setLabel(args[1]);
-//                            ((Field) component).setText(args[2]);
-//                        }
-//                        //do nothing for Group
-//                        //TODO: keybind
-//                        if (component instanceof Slider) {
-//                            ((Slider) component).setLabel(args[1]);
-//                            ((Slider) component).setValue(Integer.parseInt(args[2]));
-//                        }
-//                    }
-//                }
-//            }
-
             for (String s : lines) {
                 String[] args = s.split(":");
                 for (Component comp : Icarus.window.all) {

@@ -28,6 +28,14 @@ minecraft {
     makeObfSourceJar = false //disable creation of sources jar
 }
 
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+}
+
 //exclude test files in jar build
 //jar {
 //    sourceSets {

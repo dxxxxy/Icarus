@@ -1,5 +1,9 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -8,6 +12,10 @@ import java.awt.Color;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Slider extends Component {
     private Window window;
 
@@ -32,20 +40,9 @@ public class Slider extends Component {
 
     public Slider(String label, double min, double max, boolean onlyInt) {
         this.label = label;
+
         this.min = min;
         this.max = max;
-        this.onlyInt = onlyInt;
-    }
-
-    public Slider(double x, double y, double width, double height, String label, double max, double min, boolean onlyInt) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.label = label;
-
-        this.max = max;
-        this.min = min;
         this.onlyInt = onlyInt;
     }
 
@@ -112,33 +109,8 @@ public class Slider extends Component {
     }
 
     @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
     public void setX(double x) {
         relativeX = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
     }
 
     @Override
@@ -151,21 +123,8 @@ public class Slider extends Component {
         return 15;
     }
 
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
     public void setValue(double value) {
         this.value = value;
         percent = (value - min) / (max - min);
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

@@ -1,11 +1,20 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.util.ArrayList;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Group extends Component {
     private Window window;
 
@@ -66,7 +75,16 @@ public class Group extends Component {
         return this;
     }
 
-    public ArrayList<Component> getChildren() {
-        return children;
+    public Group addChild(Component child, Attachment... attachments) {
+        child.setWindow(window);
+        child.setGroup(this);
+        children.add(child);
+        child.setX(x + 12.5);
+        child.setY(y + height + (children.size() == 1 ? 0 : child.getClearance()));
+        height += child.getHeight() + (children.size() == 1 ? 0 : child.getClearance());
+        for (Attachment attachment : attachments) {
+            attachment.attachTo(child);
+        }
+        return this;
     }
 }

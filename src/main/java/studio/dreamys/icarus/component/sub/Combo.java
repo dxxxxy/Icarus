@@ -1,5 +1,9 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -10,6 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Combo extends Component {
     private Window window;
 
@@ -27,16 +35,6 @@ public class Combo extends Component {
     private double relativeY;
 
     public Combo(String label, ArrayList<String> options) {
-        this.label = label;
-
-        options.forEach(option -> this.options.put(option, false));
-    }
-
-    public Combo(double x, double y, double width, double height, String label, ArrayList<String> options) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
         this.label = label;
 
         options.forEach(option -> this.options.put(option, false));
@@ -123,63 +121,6 @@ public class Combo extends Component {
         return formatted.toString();
     }
 
-    @Override
-    public boolean open() {
-        return open;
-    }
-
-    @Override
-    public void setWindow(Window window) {
-        this.window = window;
-        relativeX = x;
-        relativeY = y;
-    }
-
-    @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
-    public void setX(double x) {
-        relativeX = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
-    }
-
-    @Override
-    public void setY(double y) {
-        relativeY = y;
-    }
-
-    @Override
-    public double getClearance() {
-        return 10;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
     public String getActiveOptions() {
         StringBuilder formatted = new StringBuilder();
         for (Map.Entry<String, Boolean> option : options.entrySet()) {
@@ -204,7 +145,25 @@ public class Combo extends Component {
         }
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    @Override
+    public void setWindow(Window window) {
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
+    }
+
+    @Override
+    public void setX(double x) {
+        relativeX = x;
+    }
+
+    @Override
+    public void setY(double y) {
+        relativeY = y;
+    }
+
+    @Override
+    public double getClearance() {
+        return 10;
     }
 }

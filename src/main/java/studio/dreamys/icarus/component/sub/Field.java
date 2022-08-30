@@ -1,5 +1,9 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
@@ -9,6 +13,10 @@ import java.awt.Color;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Field extends Component {
     private Window window;
 
@@ -26,14 +34,6 @@ public class Field extends Component {
     private double relativeY;
 
     public Field(String label) {
-        this.label = label;
-    }
-
-    public Field(double x, double y, double width, double height, String label) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
         this.label = label;
     }
 
@@ -73,6 +73,10 @@ public class Field extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    public String getText() {
+        return text.equals("") ? "null" : text;
+    }
+
     @Override
     public void setWindow(Window window) {
         this.window = window;
@@ -81,33 +85,8 @@ public class Field extends Component {
     }
 
     @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
     public void setX(double x) {
         relativeX = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
     }
 
     @Override
@@ -118,22 +97,5 @@ public class Field extends Component {
     @Override
     public double getClearance() {
         return 10;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    public String getText() {
-        return text.equals("") ? "null" : text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

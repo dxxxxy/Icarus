@@ -1,11 +1,19 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Checkbox extends Component {
     private Window window;
     private Group group;
@@ -23,14 +31,6 @@ public class Checkbox extends Component {
     private double relativeY;
 
     public Checkbox(String label) {
-        this.label = label;
-    }
-
-    public Checkbox(double x, double y, double width, double height, String label) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
         this.label = label;
     }
 
@@ -58,6 +58,10 @@ public class Checkbox extends Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
+    public void toggle() {
+        toggled = !toggled;
+    }
+
     @Override
     public void setWindow(Window window) {
         this.window = window;
@@ -66,69 +70,12 @@ public class Checkbox extends Component {
     }
 
     @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
     public void setX(double x) {
         relativeX = x;
     }
 
     @Override
-    public double getY() {
-        return y;
-    }
-
-    @Override
     public void setY(double y) {
         relativeY = y;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    @Override
-    public Group getGroup() {
-        return group;
-    }
-
-    @Override
-    public void setGroup(Group group) {
-        this.group = group;
-    }
-
-    public boolean isToggled() {
-        return toggled;
-    }
-
-    public void setToggled(boolean toggled) {
-        this.toggled = toggled;
-    }
-
-    public boolean toggle() {
-        return toggled = !toggled;
-    }
-
-    //set label
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

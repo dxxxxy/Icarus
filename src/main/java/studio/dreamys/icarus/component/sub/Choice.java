@@ -1,5 +1,9 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -8,6 +12,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Choice extends Component {
     private Window window;
 
@@ -26,17 +34,6 @@ public class Choice extends Component {
     private double relativeY;
 
     public Choice(String label, ArrayList<String> options) {
-        this.label = label;
-
-        this.options = options;
-        selected = this.options.get(0);
-    }
-
-    public Choice(double x, double y, double width, double height, String label, ArrayList<String> options) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
         this.label = label;
 
         this.options = options;
@@ -97,11 +94,6 @@ public class Choice extends Component {
     }
 
     @Override
-    public boolean open() {
-        return open;
-    }
-
-    @Override
     public void setWindow(Window window) {
         this.window = window;
         relativeX = x;
@@ -109,33 +101,8 @@ public class Choice extends Component {
     }
 
     @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
     public void setX(double x) {
         relativeX = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
     }
 
     @Override
@@ -146,22 +113,5 @@ public class Choice extends Component {
     @Override
     public double getClearance() {
         return 10;
-    }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
-
-    public String getSelected() {
-        return selected;
-    }
-
-    public void setSelected(String selected) {
-        this.selected = selected;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 }

@@ -1,11 +1,19 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Button extends Component {
     private Window window;
     private Group group;
@@ -16,27 +24,17 @@ public class Button extends Component {
     private double height = 12;
     private String label;
 
-    private Runnable onClick;
+    private Runnable runnable;
     private boolean held;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
 
-    public Button(String label, Runnable onClick) {
+    public Button(String label, Runnable runnable) {
         this.label = label;
 
-        this.onClick = onClick;
-    }
-
-    public Button(double x, double y, double width, double height, String label, Runnable onClick) {
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.label = label;
-
-        this.onClick = onClick;
+        this.runnable = runnable;
     }
 
     @Override
@@ -54,7 +52,7 @@ public class Button extends Component {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
-            onClick.run();
+            runnable.run();
             held = true;
         }
     }
@@ -76,33 +74,8 @@ public class Button extends Component {
     }
 
     @Override
-    public Window getWindow() {
-        return window;
-    }
-
-    @Override
-    public double getWidth() {
-        return width;
-    }
-
-    @Override
-    public double getHeight() {
-        return height;
-    }
-
-    @Override
-    public double getX() {
-        return x;
-    }
-
-    @Override
     public void setX(double x) {
         relativeX = x;
-    }
-
-    @Override
-    public double getY() {
-        return y;
     }
 
     @Override
@@ -113,23 +86,5 @@ public class Button extends Component {
     @Override
     public double getClearance() {
         return 7.5;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public Runnable getOnClick() {
-        return onClick;
-    }
-
-    @Override
-    public Group getGroup() {
-        return group;
-    }
-
-    @Override
-    public void setGroup(Group group) {
-        this.group = group;
     }
 }

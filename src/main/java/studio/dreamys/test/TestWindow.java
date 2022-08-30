@@ -33,7 +33,7 @@ public class TestWindow extends Window {
         //3. Chaining Mania
         addPage(new Page('s'))
                 .addGroup(new Group("Visuals", 47.5, 10))
-                    .addChild(new Checkbox("Checkbox"))
+                    .addChild(new Checkbox("Checkbox"), new Keybind())
                     .addChild(new Choice("Choice", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
                     .addChild(new Checkbox("Another Checkbox"))
                     .addChild(new Combo("Combo", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
@@ -52,6 +52,7 @@ public class TestWindow extends Window {
                     .addChild(new Slider("Int slider", 10, 1, true))
         ;
 
+        /*  ADDING COMPONENTS   */
         //add all components
         for (Page p : pages) {
             for (Group g : p.getGroups()) {

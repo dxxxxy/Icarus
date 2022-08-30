@@ -35,7 +35,7 @@ public class Component {
         return null;
     }
 
-    public boolean open() {
+    public boolean isOpen() {
         return false;
     }
 
