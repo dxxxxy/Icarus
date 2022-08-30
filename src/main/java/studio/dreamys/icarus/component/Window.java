@@ -2,6 +2,7 @@ package studio.dreamys.icarus.component;
 
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -32,6 +33,8 @@ public class Window extends GuiScreen {
     public double dragY;
     public boolean isDragging;
 
+    public int key = Keyboard.KEY_RSHIFT;
+
     public Window(double x, double y, double width, double height, Color color) {
         this.x = x;
         this.y = y;
@@ -45,18 +48,13 @@ public class Window extends GuiScreen {
     @Override
     public void initGui() {
         //load all components
-        for (Page page : pages) {
-            for (Group group : page.getGroups()) {
-                all.add(group);
-                all.addAll(group.getChildren());
-            }
-        }
+
 
         //set the active page
         setActivePage(pages.get(activePageIndex));
 
-        //load config
-        Icarus.config.load();
+//        //load config
+//        Icarus.config.load();
     }
 
     @Override
@@ -168,5 +166,9 @@ public class Window extends GuiScreen {
 
         //reverse list to render from bottom to top
         Collections.reverse((visible));
+    }
+
+    public void setKey(int key) {
+        this.key = key;
     }
 }

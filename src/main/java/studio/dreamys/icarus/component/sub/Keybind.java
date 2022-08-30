@@ -1,6 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
 import org.lwjgl.input.Keyboard;
+import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
@@ -32,7 +33,7 @@ public class Keybind extends Attachment {
     public Component attachTo(Checkbox child) {
         this.child = child;
         this.child.getGroup().addChild(this);
-        Window.instance.attachments.add(this);
+        Icarus.window.attachments.add(this);
         return child;
     }
 
