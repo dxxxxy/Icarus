@@ -7,6 +7,7 @@ import studio.dreamys.icarus.component.sub.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class Config {
@@ -45,7 +46,9 @@ public class Config {
                     toSave.add("Field:" + comp.getLabel() + ":" + ((Field) comp).getText());
                 }
                 //do nothing for Group
-                //TODO: keybind
+                if (comp instanceof Keybind) {
+                    toSave.add("Keybind:" + ((Keybind) comp).getChild().getLabel() + ":" + ((Keybind) comp).getKey());
+                }
                 if (comp instanceof Slider) {
                     toSave.add("Slider:" + comp.getLabel() + ":" + ((Slider) comp).getValue());
                 }
@@ -93,9 +96,16 @@ public class Config {
                             ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
                         }
                         //do nothing for Group
-                        //TODO: keybind
                         if (comp instanceof Slider) {
                             ((Slider) comp).setValue(Double.parseDouble(args[2]));
+                        }
+                    }
+                    if (args[0].equals("Keybind")) {
+                        if (comp instanceof Keybind) {
+                            if (((Keybind) comp).getChild().getLabel().equals(args[1])) {
+                                System.out.println(Arrays.toString(args));
+                                ((Keybind) comp).setKey(Integer.parseInt(args[2]));
+                            }
                         }
                     }
                 }

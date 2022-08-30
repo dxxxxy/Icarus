@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Attachment;
+import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.Button;
 import studio.dreamys.icarus.component.sub.Checkbox;
@@ -34,12 +35,13 @@ public class Icarus {
                 Minecraft.getMinecraft().displayGuiScreen(window);
                 return;
             }
-            for (Attachment attachment : window.attachments) { //for every attachment
+            for (Component attachment : window.all) { //for every attachment
                 if (attachment instanceof Keybind) { //if it's a keybind
                     Keybind keybind = (Keybind) attachment; //cast to keybind
                     if (keybind.getKey() == keyCode) { //if the keys match
                         if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
                             ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
+                            config.save(); //save the config
                         }
                         if (keybind.getChild() instanceof Button) { //if the child is a button
                             ((Button) keybind.getChild()).getRunnable().run(); //click the button

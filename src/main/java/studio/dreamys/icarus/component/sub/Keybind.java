@@ -1,15 +1,20 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.lwjgl.input.Keyboard;
-import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Keybind extends Attachment {
     private Component child;
 
@@ -17,7 +22,7 @@ public class Keybind extends Attachment {
     private double y;
 
     private String keybind = "[NONE]";
-    @Getter private int key;
+    private int key;
     private boolean capturing;
 
     @Override
@@ -31,7 +36,6 @@ public class Keybind extends Attachment {
     public void attachTo(Component child) {
         this.child = child;
         this.child.getGroup().addChild(this);
-        this.child.getWindow().attachments.add(this);
     }
 
     @Override
@@ -54,5 +58,10 @@ public class Keybind extends Attachment {
 
     private boolean hovered(double x, double y) {
         return x > this.x && x < this.x + RenderUtils.getStringWidth(keybind) && y > this.y && y < this.y + RenderUtils.getFontHeight();
+    }
+
+    public void setKey(int key) {
+        this.key = key;
+        keybind = "["+ Keyboard.getKeyName(key) +"]";
     }
 }

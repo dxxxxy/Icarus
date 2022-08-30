@@ -1,5 +1,6 @@
 package studio.dreamys.icarus.component;
 
+import com.google.common.collect.Lists;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
@@ -11,7 +12,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.stream.Collectors;
 
 public class Window extends GuiScreen {
     public static Window instance;
@@ -26,7 +26,6 @@ public class Window extends GuiScreen {
     public ArrayList<Page> pages = new ArrayList<>();
     public ArrayList<Component> visible = new ArrayList<>();
     public ArrayList<Component> all = new ArrayList<>();
-    public ArrayList<Attachment> attachments = new ArrayList<>();
 
     //dragging stuff
     public double dragX;
@@ -66,6 +65,11 @@ public class Window extends GuiScreen {
 
         update(mouseX, mouseY);
 
+        //draw and update page
+        for (Page page : pages) {
+            page.render(mouseX, mouseY);
+        }
+
         //draw and update children
         for (Component component : visible) {
             component.render(mouseX, mouseY);
@@ -86,7 +90,7 @@ public class Window extends GuiScreen {
         }
 
         //call for children then
-        for (Component component : visible.stream().filter(component -> !(component instanceof Page)).collect(Collectors.toList())) {
+        for (Component component : Lists.reverse(visible)) {
             component.mouseClicked(mouseX, mouseY, mouseButton);
             if (component.isOpen()) break; //avoid clicking underlying elements when something is open
         }
@@ -149,9 +153,6 @@ public class Window extends GuiScreen {
         //clear components to draw
         visible.clear();
 
-        //add pages
-        visible.addAll(pages);
-
         //add components + group
         for (Group group : pages.get(activePageIndex).getGroups()) {
             visible.add(group);
@@ -159,7 +160,7 @@ public class Window extends GuiScreen {
         }
 
         //reverse list to render from bottom to top
-        Collections.reverse((visible));
+        Collections.reverse(visible);
     }
 
     public void setKey(int key) {
