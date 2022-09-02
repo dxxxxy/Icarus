@@ -1,9 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -12,8 +10,6 @@ import java.awt.Color;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
 public class Checkbox extends Component {
     private Window window;
     private Group group;
@@ -32,6 +28,12 @@ public class Checkbox extends Component {
 
     public Checkbox(String label) {
         this.label = label;
+    }
+
+    public Checkbox(String label, boolean toggled) {
+        this.label = label;
+
+        this.toggled = toggled;
     }
 
     @Override

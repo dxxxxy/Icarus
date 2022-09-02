@@ -1,22 +1,18 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
+
 public class Field extends Component {
     private Window window;
     private Group group;
@@ -36,6 +32,11 @@ public class Field extends Component {
 
     public Field(String label) {
         this.label = label;
+    }
+
+    public Field(String label, String text) {
+        this.label = label;
+        this.text = text;
     }
 
     @Override

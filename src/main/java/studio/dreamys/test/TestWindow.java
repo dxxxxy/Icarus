@@ -39,7 +39,7 @@ public class TestWindow extends Window {
                     .addChild(new Combo("Combo", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
                     .addChild(new Button("Button", () -> {
                         System.out.println("Runnable");
-                    }))
+                    }), new Keybind())
                     .addChild(new Button("Another Button", () -> {
                         System.out.println("Another Runnable");
                     }))

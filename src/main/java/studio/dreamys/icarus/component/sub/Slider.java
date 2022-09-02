@@ -1,9 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -14,8 +12,7 @@ import java.math.RoundingMode;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
+
 public class Slider extends Component {
     private Window window;
     private Group group;
@@ -42,6 +39,15 @@ public class Slider extends Component {
     public Slider(String label, double min, double max, boolean onlyInt) {
         this.label = label;
 
+        this.min = min;
+        this.max = max;
+        this.onlyInt = onlyInt;
+    }
+
+    public Slider(String label, double value, double min, double max, boolean onlyInt) {
+        this.label = label;
+
+        this.value = value;
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
@@ -102,6 +108,11 @@ public class Slider extends Component {
         }
     }
 
+    public void setValue(double value) {
+        this.value = value;
+        percent = (value - min) / (max - min);
+    }
+
     @Override
     public void setWindow(Window window) {
         this.window = window;
@@ -122,10 +133,5 @@ public class Slider extends Component {
     @Override
     public double getClearance() {
         return 15;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-        percent = (value - min) / (max - min);
     }
 }

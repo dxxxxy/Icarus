@@ -1,9 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -16,8 +14,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
 public class Combo extends Component {
     private Window window;
     private Group group;
@@ -39,6 +35,12 @@ public class Combo extends Component {
         this.label = label;
 
         options.forEach(option -> this.options.put(option, false));
+    }
+
+    public Combo(String label, HashMap<String, Boolean> options) {
+        this.label = label;
+
+        this.options = options;
     }
 
     @Override

@@ -1,9 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
@@ -13,8 +11,7 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
+
 public class Group extends Component {
     private Window window;
     private Group group;

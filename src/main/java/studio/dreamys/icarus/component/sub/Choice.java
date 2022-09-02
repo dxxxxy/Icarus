@@ -1,9 +1,7 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
@@ -14,8 +12,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
 public class Choice extends Component {
     private Window window;
     private Group group;
@@ -39,6 +35,13 @@ public class Choice extends Component {
 
         this.options = options;
         selected = this.options.get(0);
+    }
+
+    public Choice(String label, ArrayList<String> options, String selected) {
+        this.label = label;
+
+        this.options = options;
+        this.selected = selected;
     }
 
     @Override

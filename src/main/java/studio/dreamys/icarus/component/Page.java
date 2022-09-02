@@ -14,8 +14,7 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-@ToString
-@EqualsAndHashCode(callSuper = false)
+
 public class Page extends Component {
     private Window window;
 

@@ -10,5 +10,8 @@ public class TestMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         Icarus.init(e.getModMetadata().modId, new TestWindow());
+        System.out.println(Icarus.config.getCheckbox("haha"));
+        System.out.println(Icarus.config.getCheckbox("Another Checkbox"));
+        System.out.println(Icarus.config.getCheckbox("Checkbox"));
     }
 }

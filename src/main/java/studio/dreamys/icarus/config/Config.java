@@ -7,7 +7,6 @@ import studio.dreamys.icarus.component.sub.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @SuppressWarnings("unused")
 public class Config {
@@ -80,31 +79,28 @@ public class Config {
             for (String s : lines) {
                 String[] args = s.split(":");
                 for (Component comp : Icarus.window.all) {
-                    if (comp.getLabel().equals(args[1])) {
-                        //do nothing for button
-                        if (comp instanceof Checkbox) {
-                            ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[2]));
-                        }
-                        if (comp instanceof Choice) {
-                            ((Choice) comp).setSelected(args[2]);
-                        }
-                        //TODO: color
-                        if (comp instanceof Combo) {
-                            ((Combo) comp).setActiveOptions(args[2]);
-                        }
-                        if (comp instanceof Field) {
-                            ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
-                        }
-                        //do nothing for Group
-                        if (comp instanceof Slider) {
-                            ((Slider) comp).setValue(Double.parseDouble(args[2]));
-                        }
-                    }
-                    if (args[0].equals("Keybind")) {
-                        if (comp instanceof Keybind) {
-                            if (((Keybind) comp).getChild().getLabel().equals(args[1])) {
-                                System.out.println(Arrays.toString(args));
+                    if (comp.getClass().getSimpleName().equals(args[0])) {
+                        if (comp.getLabel().equals(args[1])) {
+                            //do nothing for button
+                            if (comp instanceof Checkbox) {
+                                ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[2]));
+                            }
+                            if (comp instanceof Choice) {
+                                ((Choice) comp).setSelected(args[2]);
+                            }
+                            //TODO: color
+                            if (comp instanceof Combo) {
+                                ((Combo) comp).setActiveOptions(args[2]);
+                            }
+                            if (comp instanceof Field) {
+                                ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
+                            }
+                            //do nothing for Group
+                            if (comp instanceof Keybind) {
                                 ((Keybind) comp).setKey(Integer.parseInt(args[2]));
+                            }
+                            if (comp instanceof Slider) {
+                                ((Slider) comp).setValue(Double.parseDouble(args[2]));
                             }
                         }
                     }
