@@ -29,7 +29,7 @@ public class Config {
         try {
             ArrayList<String> toSave = new ArrayList<>();
 
-            for (Component comp : Icarus.window.all) {
+            for (Component comp : Icarus.getWindow().all) {
                 //do nothing for button
                 if (comp instanceof Checkbox) {
                     toSave.add("Checkbox:" + comp.getLabel() + ":" + ((Checkbox) comp).isToggled());
@@ -78,7 +78,7 @@ public class Config {
 
             for (String s : lines) {
                 String[] args = s.split(":");
-                for (Component comp : Icarus.window.all) {
+                for (Component comp : Icarus.getWindow().all) {
                     if (comp.getClass().getSimpleName().equals(args[0])) {
                         if (comp.getLabel().equals(args[1])) {
                             //do nothing for button
@@ -112,7 +112,7 @@ public class Config {
     }
 
     public boolean getCheckbox(String label) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
                 return ((Checkbox) comp).isToggled();
             }
@@ -121,7 +121,7 @@ public class Config {
     }
 
     public String getChoice(String label) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Choice) {
                 return ((Choice) comp).getSelected();
             }
@@ -130,7 +130,7 @@ public class Config {
     }
 
     public String getCombo(String label) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Combo) {
                 return ((Combo) comp).getActiveOptions();
             }
@@ -139,7 +139,7 @@ public class Config {
     }
 
     public String getField(String label) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Field) {
                 return ((Field) comp).getText();
             }
@@ -148,7 +148,7 @@ public class Config {
     }
 
     public double getSlider(String label) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Slider) {
                 return ((Slider) comp).getValue();
             }
@@ -157,7 +157,7 @@ public class Config {
     }
 
     public void setCheckbox(String label, boolean toggled) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
                 ((Checkbox) comp).setToggled(toggled);
             }
@@ -165,7 +165,7 @@ public class Config {
     }
 
     public void setChoice(String label, String selected) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Choice) {
                 ((Choice) comp).setSelected(selected);
             }
@@ -173,7 +173,7 @@ public class Config {
     }
 
     public void setCombo(String label, String activeOptions) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Combo) {
                 ((Combo) comp).setActiveOptions(activeOptions);
             }
@@ -181,7 +181,7 @@ public class Config {
     }
 
     public void setField(String label, String text) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Field) {
                 ((Field) comp).setText(text);
             }
@@ -189,7 +189,7 @@ public class Config {
     }
 
     public void setSlider(String label, double value) {
-        for (Component comp : Icarus.window.all) {
+        for (Component comp : Icarus.getWindow().all) {
             if (comp.getLabel().equals(label) && comp instanceof Slider) {
                 ((Slider) comp).setValue(value);
             }

@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 
 @Getter
 @Setter
-
 public class Field extends Component {
     private Window window;
     private Group group;

@@ -12,7 +12,6 @@ import java.math.RoundingMode;
 
 @Getter
 @Setter
-
 public class Slider extends Component {
     private Window window;
     private Group group;
@@ -39,6 +38,7 @@ public class Slider extends Component {
     public Slider(String label, double min, double max, boolean onlyInt) {
         this.label = label;
 
+        value = min;
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;

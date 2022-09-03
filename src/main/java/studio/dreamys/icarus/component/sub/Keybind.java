@@ -11,7 +11,6 @@ import java.awt.Color;
 
 @Getter
 @Setter
-
 public class Keybind extends Attachment {
     private Component child;
 
@@ -33,7 +32,7 @@ public class Keybind extends Attachment {
     @Override
     public void render(int mouseX, int mouseY) {
         x = child.getX() + child.getGroup().getWidth() - 50;
-        y = child.getY();
+        y = child.getY() + child.getHeight() / 8;
         RenderUtils.drawString(keybind, x, y, Color.WHITE);
     }
 

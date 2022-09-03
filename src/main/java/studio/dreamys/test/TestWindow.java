@@ -3,9 +3,6 @@ package studio.dreamys.test;
 import net.minecraft.client.Minecraft;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.component.sub.Button;
-import studio.dreamys.icarus.component.sub.Checkbox;
-import studio.dreamys.icarus.component.sub.Choice;
 import studio.dreamys.icarus.component.sub.*;
 
 import java.awt.Color;

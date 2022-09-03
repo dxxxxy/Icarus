@@ -31,8 +31,8 @@ public class Window extends GuiScreen {
     public double dragX;
     public double dragY;
     public boolean isDragging;
-
-    public int key = Keyboard.KEY_RSHIFT;
+    
+    public int key = Keyboard.KEY_RSHIFT; //default key
 
     public Window(double x, double y, double width, double height, Color color) {
         this.x = x;
@@ -60,7 +60,7 @@ public class Window extends GuiScreen {
 
         //draw them sexy bottom strings
         RenderUtils.drawString("uid: 001", x + 3, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
-        RenderUtils.drawCenteredString("Icarus", x + width / 2, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
+        RenderUtils.drawCenteredString(Icarus.getModid(), x + width / 2, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
         RenderUtils.drawString("dxxxxy#0776", x + width - 3 - RenderUtils.getStringWidth("dxxxxy#0776"), y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
 
         update(mouseX, mouseY);
@@ -96,7 +96,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on mouse click (button, checkbox, choice, etc...)
-        Icarus.config.save();
+        Icarus.getConfig().save();
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on key typed (typically fields)
-        Icarus.config.save();
+        Icarus.getConfig().save();
     }
 
     @Override
@@ -122,7 +122,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on mouse release (typically sliders)
-        Icarus.config.save();
+        Icarus.getConfig().save();
     }
 
     private boolean hovered(double x, double y) {

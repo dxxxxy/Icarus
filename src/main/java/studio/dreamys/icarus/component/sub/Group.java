@@ -11,7 +11,6 @@ import java.util.ArrayList;
 
 @Getter
 @Setter
-
 public class Group extends Component {
     private Window window;
     private Group group;

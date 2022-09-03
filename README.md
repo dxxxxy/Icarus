@@ -1,9 +1,39 @@
 # Icarus
-> renamed from MineSenseUI
+> rebranded from MineSenseUI
 
-A GUI menu inspired by some CS:GO cheats, notably: GameSense/Skeet (but not an exact copy)
+A simple and extremely [lightweight](#lightweightness) Gui and config library for Minecraft Forge 1.8.9 modding heavily inspired by the GameSense/Skeet CS:GO cheat (not an exact copy). A fully working example mod using this library can be found at [test](src/main/java/studio/dreamys/test).
 
-~~Very~~ Early development.
+## Importing
+### Gradle
+```
+repositories {
+    maven { url "https://repo.dreamys.studio/" }
+}
+```
+```
+dependencies {
+    implementation "studio.dreamys:Icarus:1.0.0"
+}
+```
 
-## Menu (as of now) is a single window with a single Page:
-![img.png](.github/img.png)
+## Components
+> Some components have secondary constructors with default values.
+- Button
+- Checkbox
+- Choice
+- ~~Color~~ (coming soon)
+- Combo
+- Field
+- Group
+- Keybind
+- Slider
+- Page
+- Window
+
+## Lightweightness
+- Everything is created and stored on client init.
+- Everything is rendered using libraries present on runtime.
+- Small size, no extra-dependencies, no bloatware.
+
+## Menu (as of 09/02/2022) is fully functional:
+![icarus.gif](.github/icarus.gif)

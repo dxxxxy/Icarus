@@ -81,6 +81,6 @@ public class Button extends Component {
 
     @Override
     public double getClearance() {
-        return 7.5;
+        return 5;
     }
 }

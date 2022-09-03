@@ -147,8 +147,12 @@ public class GlyphPageFontRenderer {
     public int drawString(String text, float x, float y, int color, boolean dropShadow) {
         GlStateManager.enableAlpha();
         resetStyles();
-        int i;
 
+        //fix mcs font bitmap scaling
+        x = (float) (Math.round(x * 2) / 2.0);
+        y = (float) (Math.round(y * 2) / 2.0);
+
+        int i;
         if (dropShadow) {
             i = renderString(text, x + 1.0F, y + 1.0F, color, true);
             i = Math.max(i, renderString(text, x, y, color, false));

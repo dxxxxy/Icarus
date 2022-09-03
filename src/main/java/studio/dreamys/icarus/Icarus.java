@@ -1,11 +1,11 @@
 package studio.dreamys.icarus;
 
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
-import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.Button;
@@ -15,12 +15,14 @@ import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.RenderUtils;
 
 public class Icarus {
-    public static Config config;
-    public static Window window;
+    @Getter private static Config config;
+    @Getter private static Window window;
+    @Getter private static String modid;
 
     public static void init(String modid, Window window) {
         RenderUtils.loadFonts();
         Icarus.window = window; //create window object and store it forever
+        Icarus.modid = modid;
         config = new Config(modid); //create config which will load settings into window
         MinecraftForge.EVENT_BUS.register(new Icarus());
     }

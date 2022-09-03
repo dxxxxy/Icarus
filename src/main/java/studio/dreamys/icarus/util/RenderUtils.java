@@ -12,6 +12,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Objects;
 
+@SuppressWarnings("ALL")
 public class RenderUtils {
     public static GlyphPageFontRenderer iconRenderer;
     public static GlyphPageFontRenderer fontRenderer;
@@ -92,7 +93,7 @@ public class RenderUtils {
     }
 
     public static void drawCenteredString(String text, double x, double y, Color color) {
-       fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
+        fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
     }
 
     public static void drawCenteredString(String text, double x, double y, Color color, boolean shadow) {
