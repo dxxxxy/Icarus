@@ -2,8 +2,10 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
@@ -84,6 +86,7 @@ public class Choice extends Component {
                 double posY = mouseY - y - height;
                 int index = (int) (posY / height);
                 selected = options.get(index);
+                MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
             } else open = !open;
             return;
         }
