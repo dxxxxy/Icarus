@@ -32,24 +32,24 @@ public class Config {
             for (Component comp : Icarus.getWindow().all) {
                 //do nothing for button
                 if (comp instanceof Checkbox) {
-                    toSave.add("Checkbox:" + comp.getLabel() + ":" + ((Checkbox) comp).isToggled());
+                    toSave.add("Checkbox:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Checkbox) comp).isToggled());
                 }
                 if (comp instanceof Choice) {
-                    toSave.add("Choice:" + comp.getLabel() + ":" + ((Choice) comp).getSelected());
+                    toSave.add("Choice:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Choice) comp).getSelected());
                 }
                 //TODO: color
                 if (comp instanceof Combo) {
-                    toSave.add("Combo:" + comp.getLabel() + ":" + ((Combo) comp).getActiveOptions());
+                    toSave.add("Combo:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Combo) comp).getActiveOptions());
                 }
                 if (comp instanceof Field) {
-                    toSave.add("Field:" + comp.getLabel() + ":" + ((Field) comp).getText());
+                    toSave.add("Field:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Field) comp).getText());
                 }
                 //do nothing for Group
                 if (comp instanceof Keybind) {
-                    toSave.add("Keybind:" + ((Keybind) comp).getChild().getLabel() + ":" + ((Keybind) comp).getKey());
+                    toSave.add("Keybind:" + ((Keybind) comp).getChild().getLabel() + ":" + ((Keybind) comp).getChild().getGroup().getLabel() + ":" + ((Keybind) comp).getKey());
                 }
                 if (comp instanceof Slider) {
-                    toSave.add("Slider:" + comp.getLabel() + ":" + ((Slider) comp).getValue());
+                    toSave.add("Slider:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Slider) comp).getValue());
                 }
             }
 
@@ -81,26 +81,28 @@ public class Config {
                 for (Component comp : Icarus.getWindow().all) {
                     if (comp.getClass().getSimpleName().equals(args[0])) {
                         if (comp.getLabel().equals(args[1])) {
-                            //do nothing for button
-                            if (comp instanceof Checkbox) {
-                                ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[2]));
-                            }
-                            if (comp instanceof Choice) {
-                                ((Choice) comp).setSelected(args[2]);
-                            }
-                            //TODO: color
-                            if (comp instanceof Combo) {
-                                ((Combo) comp).setActiveOptions(args[2]);
-                            }
-                            if (comp instanceof Field) {
-                                ((Field) comp).setText(args[2].equals("null") ? "" : args[2]);
-                            }
-                            //do nothing for Group
-                            if (comp instanceof Keybind) {
-                                ((Keybind) comp).setKey(Integer.parseInt(args[2]));
-                            }
-                            if (comp instanceof Slider) {
-                                ((Slider) comp).setValue(Double.parseDouble(args[2]));
+                            if (comp.getGroup().getLabel().equals(args[2])) {
+                                //do nothing for button
+                                if (comp instanceof Checkbox) {
+                                    ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[3]));
+                                }
+                                if (comp instanceof Choice) {
+                                    ((Choice) comp).setSelected(args[3]);
+                                }
+                                //TODO: color
+                                if (comp instanceof Combo) {
+                                    ((Combo) comp).setActiveOptions(args[3]);
+                                }
+                                if (comp instanceof Field) {
+                                    ((Field) comp).setText(args[3].equals("null") ? "" : args[3]);
+                                }
+                                //do nothing for Group
+                                if (comp instanceof Keybind) {
+                                    ((Keybind) comp).setKey(Integer.parseInt(args[3]));
+                                }
+                                if (comp instanceof Slider) {
+                                    ((Slider) comp).setValue(Double.parseDouble(args[3]));
+                                }
                             }
                         }
                     }
@@ -111,86 +113,86 @@ public class Config {
         }
     }
 
-    public boolean getCheckbox(String label) {
+    public boolean getCheckbox(String group, String label) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Checkbox) {
                 return ((Checkbox) comp).isToggled();
             }
         }
         return false;
     }
 
-    public String getChoice(String label) {
+    public String getChoice(String group, String label) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Choice) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Choice) {
                 return ((Choice) comp).getSelected();
             }
         }
         return null;
     }
 
-    public String getCombo(String label) {
+    public String getCombo(String group, String label) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Combo) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Combo) {
                 return ((Combo) comp).getActiveOptions();
             }
         }
         return null;
     }
 
-    public String getField(String label) {
+    public String getField(String group, String label) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Field) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Field) {
                 return ((Field) comp).getText();
             }
         }
         return null;
     }
 
-    public double getSlider(String label) {
+    public double getSlider(String group, String label) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Slider) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Slider) {
                 return ((Slider) comp).getValue();
             }
         }
         return 0;
     }
 
-    public void setCheckbox(String label, boolean toggled) {
+    public void setCheckbox(String group, String label, boolean toggled) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Checkbox) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Checkbox) {
                 ((Checkbox) comp).setToggled(toggled);
             }
         }
     }
 
-    public void setChoice(String label, String selected) {
+    public void setChoice(String group, String label, String selected) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Choice) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Choice) {
                 ((Choice) comp).setSelected(selected);
             }
         }
     }
 
-    public void setCombo(String label, String activeOptions) {
+    public void setCombo(String group, String label, String activeOptions) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Combo) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Combo) {
                 ((Combo) comp).setActiveOptions(activeOptions);
             }
         }
     }
 
-    public void setField(String label, String text) {
+    public void setField(String group, String label, String text) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Field) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Field) {
                 ((Field) comp).setText(text);
             }
         }
     }
 
-    public void setSlider(String label, double value) {
+    public void setSlider(String group, String label, double value) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp instanceof Slider) {
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Slider) {
                 ((Slider) comp).setValue(value);
             }
         }

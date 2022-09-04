@@ -73,4 +73,9 @@ public class Keybind extends Attachment {
     public String getLabel() {
         return child.getLabel();
     }
+
+    @Override
+    public Group getGroup() {
+        return child.getGroup();
+    }
 }
