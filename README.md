@@ -12,7 +12,7 @@ repositories {
 ```
 ```
 dependencies {
-    implementation "studio.dreamys:Icarus:1.1.1"
+    implementation "studio.dreamys:Icarus:1.1.2"
 }
 ```
 
