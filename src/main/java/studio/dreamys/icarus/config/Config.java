@@ -21,7 +21,6 @@ public class Config {
         try {
             if (!dir.exists()) dir.mkdir();
             if (!file.exists()) file.createNewFile();
-            load();
         } catch (IOException e) {
             e.printStackTrace();
         }

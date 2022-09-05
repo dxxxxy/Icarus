@@ -24,6 +24,7 @@ public class Icarus {
         Icarus.window = window; //create window object and store it forever
         Icarus.modid = modid;
         config = new Config(modid); //create config which will load settings into window
+        config.load(); //load settings from config
         MinecraftForge.EVENT_BUS.register(new Icarus());
     }
 
