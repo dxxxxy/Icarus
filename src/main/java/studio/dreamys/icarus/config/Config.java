@@ -1,9 +1,11 @@
 package studio.dreamys.icarus.config;
 
 import net.minecraft.client.Minecraft;
+import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -103,6 +105,7 @@ public class Config {
                                 if (comp instanceof Slider) {
                                     ((Slider) comp).setValue(Double.parseDouble(args[3]));
                                 }
+                                MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(comp));
                             }
                         }
                     }
