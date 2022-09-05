@@ -16,6 +16,7 @@ import java.util.Objects;
 public class RenderUtils {
     public static GlyphPageFontRenderer iconRenderer;
     public static GlyphPageFontRenderer fontRenderer;
+    public static GlyphPageFontRenderer titleRenderer;
 
     public static void loadFonts() {
         //register font in jvm
@@ -28,6 +29,7 @@ public class RenderUtils {
         //initialize font renderer
         iconRenderer = GlyphPageFontRenderer.create("undefeated", 50, false, false, false);
         fontRenderer = GlyphPageFontRenderer.create("Verdana", 11, false, false, false);
+        titleRenderer = GlyphPageFontRenderer.create("Verdana", 20, true, false, false);
     }
 
     /**
@@ -60,6 +62,14 @@ public class RenderUtils {
         GlStateManager.disableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.enableTexture2D();
+    }
+
+    public static void drawTitle(String text, double x, double y, Color color) {
+        titleRenderer.drawString(text, (float) x, (float) y, color.getRGB(), false);
+    }
+
+    public static void drawTitle(String text, double x, double y, Color color, boolean shadow) {
+        titleRenderer.drawString(text, (float) x, (float) y, color.getRGB(), shadow);
     }
 
     public static void drawIcon(char character, double x, double y, Color color) {

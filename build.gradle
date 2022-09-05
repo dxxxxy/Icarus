@@ -14,7 +14,7 @@ plugins {
 
 apply plugin: "net.minecraftforge.gradle.forge"
 
-version = "1.1.3"
+version = "1.2.0"
 group = "dreamys.studio" //http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Icarus" //name of the output jar
 
