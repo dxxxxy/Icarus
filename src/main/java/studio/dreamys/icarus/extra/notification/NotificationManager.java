@@ -1,4 +1,4 @@
-package studio.dreamys.icarus.extra;
+package studio.dreamys.icarus.extra.notification;
 
 import net.minecraftforge.common.MinecraftForge;
 

@@ -1,4 +1,4 @@
-package studio.dreamys.icarus.extra;
+package studio.dreamys.icarus.extra.notification;
 
 import lombok.Getter;
 import lombok.Setter;

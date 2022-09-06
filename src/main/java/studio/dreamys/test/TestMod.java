@@ -9,8 +9,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.event.ComponentStateChangeEvent;
-import studio.dreamys.icarus.extra.Notification;
-import studio.dreamys.icarus.extra.NotificationManager;
+import studio.dreamys.icarus.extra.notification.Notification;
+import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.icarus.extra.Watermark;
 
 import java.awt.*;
 
@@ -23,6 +24,8 @@ public class TestMod {
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
+        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Minecraft.getMinecraft().displayWidth / 2.0 - 5, 5).enable();
+        new Watermark("testing123testing", 5, 5).enable();
     }
 
     @SubscribeEvent
