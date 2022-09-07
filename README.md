@@ -12,7 +12,7 @@ repositories {
 ```
 ```
 dependencies {
-    implementation "studio.dreamys:Icarus:1.2.0"
+    implementation "studio.dreamys:Icarus:1.3.0"
 }
 ```
 
@@ -29,6 +29,11 @@ dependencies {
 - Slider
 - Page
 - Window
+
+## Extra
+- [Notification](https://www.youtube.com/watch?v=624J5kAZqNw&ab_channel=DxxxxY)
+- Watermark ![Watermark](.github/watermark.png)
+
 
 ## Lightweightness
 - Everything is created and stored on client init.
