@@ -30,6 +30,7 @@ public class Slider extends Component {
     private boolean onlyInt;
     private double percent;
     private double value;
+    private String units;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
@@ -45,6 +46,7 @@ public class Slider extends Component {
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
+        units = "";
     }
 
     public Slider(String label, double value, double min, double max, boolean onlyInt) {
@@ -54,6 +56,17 @@ public class Slider extends Component {
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
+        units = "";
+    }
+
+    public Slider(String label, double min, double max, boolean onlyInt, String units) {
+        this.label = label;
+
+        this.min = min;
+        this.max = max;
+        this.onlyInt = onlyInt;
+
+        this.units = units;
     }
 
     @Override
@@ -72,7 +85,7 @@ public class Slider extends Component {
         RenderUtils.drawString(label, x - 1, y - height * 2.5, Color.WHITE);
 
         //value
-        RenderUtils.drawString(onlyInt ? Integer.toString((int) value) : String.valueOf(value), x - 1 + width * percent, y + height - 1, Color.WHITE);
+        RenderUtils.drawString((onlyInt ? Integer.toString((int) value) : String.valueOf(value)) + units, x - 1 + width * percent, y + height - 1, Color.WHITE);
 
         update(mouseX);
 
