@@ -6,6 +6,7 @@ import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.event.ComponentStateChangeEvent;
+import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
@@ -74,6 +75,8 @@ public class Slider extends Component {
         RenderUtils.drawString(onlyInt ? Integer.toString((int) value) : String.valueOf(value), x - 1 + width * percent, y + height - 1, Color.WHITE);
 
         update(mouseX);
+
+        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -134,7 +137,7 @@ public class Slider extends Component {
     }
 
     @Override
-    public double getClearance() {
-        return 17.5;
+    public Bounds getBounds() {
+        return new Bounds(width, height + 5, 7);
     }
 }

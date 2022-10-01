@@ -26,7 +26,7 @@ public class TestWindow extends Window {
                 .addChild(new Checkbox("haha"))
                 .addChild(new Choice("hihi", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
                 .addChild(new Checkbox("hoho"));
-        
+
         //3. Chaining Mania
         addPage(new Page('s'))
                 .addGroup(new Group("Visuals", 47.5, 10))
@@ -47,6 +47,19 @@ public class TestWindow extends Window {
                     .addChild(new Field("Field"))
                     .addChild(new Slider("Decimal slider", 1, 10, false))
                     .addChild(new Slider("Int slider", 10, 1, true))
+        ;
+
+        addPage(new Page('s'))
+                .addGroup(new Group("AHSniper", 47.5, 10))
+                .addChild(new Checkbox("Enabled"), new Keybind())
+                .addChild(new Slider("Sleep (ms)", 2000, 1, 5000, true))
+                .addChild(new Slider("Minimum Profit (x)", 5, 2, 30, true))
+                .addChild(new Choice("Lowest Bin Prices", new ArrayList<>(Arrays.asList("Moulberry", "Binmaster", "SkyHelper"))))
+                .addChild(new Button("Force Update Prices", () -> {
+                    System.out.println("Force Update Prices");
+                }))
+                .addChild(new Checkbox("Verbose Chat"))
+                .addChild(new Checkbox("Auto Buy"))
         ;
 
         /*  ADDING COMPONENTS   */

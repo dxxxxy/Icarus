@@ -24,7 +24,7 @@ public class TestMod {
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
-        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Minecraft.getMinecraft().displayWidth / 2.0 - 5, 5).enable();
+        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Minecraft.getMinecraft().displayWidth - 5, 5).enable();
         new Watermark("testing123testing", 5, 5).enable();
     }
 

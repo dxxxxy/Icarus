@@ -5,6 +5,7 @@ import lombok.Setter;
 import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 
@@ -45,6 +46,8 @@ public class Button extends Component {
         RenderUtils.drawGradientRect(x, y, x + width, y + height, held ? Color.DARK_GRAY.darker().darker() : Color.DARK_GRAY.darker(), held ? Color.DARK_GRAY.darker() : Color.DARK_GRAY.darker().darker());
         RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
         RenderUtils.drawCenteredString(label, x + width / 2, y + height / 5,  Color.WHITE);
+
+        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -83,7 +86,7 @@ public class Button extends Component {
     }
 
     @Override
-    public double getClearance() {
-        return 5;
+    public Bounds getBounds() {
+        return new Bounds(width, height);
     }
 }

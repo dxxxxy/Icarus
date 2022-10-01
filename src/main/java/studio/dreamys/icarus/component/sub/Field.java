@@ -7,6 +7,7 @@ import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.event.ComponentStateChangeEvent;
+import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
@@ -53,6 +54,8 @@ public class Field extends Component {
 
         //label
         RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
+
+        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -101,7 +104,7 @@ public class Field extends Component {
     }
 
     @Override
-    public double getClearance() {
-        return 10;
+    public Bounds getBounds() {
+        return new Bounds(width, height, 7);
     }
 }

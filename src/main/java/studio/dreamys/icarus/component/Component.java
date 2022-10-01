@@ -1,6 +1,7 @@
 package studio.dreamys.icarus.component;
 
 import studio.dreamys.icarus.component.sub.Group;
+import studio.dreamys.icarus.util.Bounds;
 
 public class Component {
     public void render(int mouseX, int mouseY) {
@@ -63,8 +64,8 @@ public class Component {
         return 0;
     }
 
-    public double getClearance() {
-        return 5;
+    public Bounds getBounds() {
+        return null;
     }
 
     public String getLabel() {

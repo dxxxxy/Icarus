@@ -41,7 +41,6 @@ public class Keybind extends Attachment {
     @Override
     public void attachTo(Component child) {
         this.child = child;
-        this.child.getGroup().addChild(this);
     }
 
     @Override

@@ -2,11 +2,13 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.lwjgl.util.Rectangle;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 @Getter
@@ -16,7 +18,7 @@ public class Group extends Component {
     private Group group;
 
     private double x;
-    private double y;
+    private double y = 5;
     private double width = 150;
     private double height = 10;
     private String label;
@@ -66,9 +68,9 @@ public class Group extends Component {
         child.setWindow(window);
         child.setGroup(this);
         children.add(child);
-        child.setX(x + 12.5);
-        child.setY(y + height + (children.size() == 1 ? 0 : child.getClearance()));
-        height += child.getHeight() + (children.size() == 1 ? 0 : child.getClearance());
+
+        positionChild(child);
+
         return this;
     }
 
@@ -76,12 +78,20 @@ public class Group extends Component {
         child.setWindow(window);
         child.setGroup(this);
         children.add(child);
-        child.setX(x + 12.5);
-        child.setY(y + height + (children.size() == 1 ? 0 : child.getClearance()));
-        height += child.getHeight() + (children.size() == 1 ? 0 : child.getClearance());
+
+        positionChild(child);
+
         for (Attachment attachment : attachments) {
             attachment.attachTo(child);
+            children.add(attachment);
         }
+
         return this;
+    }
+
+    public void positionChild(Component child) {
+        child.setX(x + 12.5);
+        child.setY(y + height + child.getBounds().getOffsetY());
+        height += child.getBounds().getHeight() + child.getBounds().getOffsetY() + 5;
     }
 }
