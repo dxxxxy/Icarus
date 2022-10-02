@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
+import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
 import studio.dreamys.icarus.extra.Watermark;
@@ -19,8 +19,8 @@ import java.awt.*;
 public class TestMod {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
-        Icarus.init(e.getModMetadata().modId, new TestWindow());
         MinecraftForge.EVENT_BUS.register(this);
+        Icarus.init(e.getModMetadata().modId, new TestWindow());
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
@@ -29,8 +29,44 @@ public class TestMod {
     }
 
     @SubscribeEvent
-    public void onComponentStateChange(ComponentStateChangeEvent e) {
+    public void onComponentStateChange(ComponentEvent e) {
         System.out.println(e.component);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.CheckboxEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.toggled);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.ChoiceEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.selected);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.ComboEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.activeOptions);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.FieldEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.text);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.key);
+    }
+
+    @SubscribeEvent
+    public void onComponentStateChange(ComponentEvent.SliderEvent e) {
+        System.out.println(e.component);
+        System.out.println(e.value);
     }
 
     @SubscribeEvent

@@ -2,10 +2,8 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -88,8 +86,6 @@ public class Slider extends Component {
         RenderUtils.drawString((onlyInt ? Integer.toString((int) value) : String.valueOf(value)) + units, x - 1 + width * percent, y + height - 1, Color.WHITE);
 
         update(mouseX);
-
-        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -123,7 +119,7 @@ public class Slider extends Component {
             percent = value;
 
             this.value = onlyInt ? Math.round(min + (max - min) * percent) : roundToPlace(min + (max - min) * percent);
-            MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+            fireChange();
         }
     }
 

@@ -2,11 +2,9 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -54,8 +52,6 @@ public class Field extends Component {
 
         //label
         RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
-
-        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -69,11 +65,11 @@ public class Field extends Component {
             if (keyCode == Keyboard.KEY_BACK) {
                 if (text.length() > 0) {
                     text = text.substring(0, text.length() - 1);
-                    MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+                    fireChange();
                 }
             } else if (Pattern.compile("[a-zA-Z0-9\\t\\n ./<>?;:\"'`!@#$%^&*()\\[\\]{}_+=~|\\\\-]").matcher(String.valueOf(typedChar)).find()) {
                 text += typedChar;
-                MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+                fireChange();
             }
         }
     }

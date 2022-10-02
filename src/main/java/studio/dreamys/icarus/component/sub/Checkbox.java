@@ -2,10 +2,8 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -50,15 +48,13 @@ public class Checkbox extends Component {
         //the box itself + label next to it
         RenderUtils.drawGradientRect(x, y, x + width, y + height, color, color.darker().darker());
         RenderUtils.drawString(label, x + width * 2 - 1, y - height / 2 + 0.75,  Color.WHITE);
-
-        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             toggled = !toggled;
-            MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+            fireChange();
         }
     }
 

@@ -2,10 +2,8 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -75,8 +73,6 @@ public class Combo extends Component {
                 currentY.updateAndGet(v -> v + height);
             });
         }
-
-        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -93,7 +89,7 @@ public class Combo extends Component {
                     }
                     i++;
                 }
-                MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+                fireChange();
             } else open = !open;
             return;
         }

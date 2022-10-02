@@ -2,11 +2,9 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
@@ -58,7 +56,7 @@ public class Keybind extends Attachment {
             key = keyCode;
             keybind = "["+ Keyboard.getKeyName(key) +"]";
             capturing = false;
-            MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+            fireChange();
         }
     }
 

@@ -39,7 +39,6 @@ public class Page extends Component {
 
         Color color = Icarus.getWindow().activePageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
 
-//        RenderUtils.drawOutline(width, height, x, y, color);
         RenderUtils.drawIcon(icon, x + 5, y + 5, color);
     }
 
@@ -66,11 +65,7 @@ public class Page extends Component {
     public void setWindow(Window window) {
         this.window = window;
 
-        //offsetting the page based on the last one
-        if (window.pages.size() > 0) {
-            Page lastPage = Lists.reverse(window.pages).get(0);
-            y += lastPage.getHeight() * (window.pages.size() - 1);
-        }
+        y = height * (window.pages.size() - 1);
 
         relativeX = x;
         relativeY = y;

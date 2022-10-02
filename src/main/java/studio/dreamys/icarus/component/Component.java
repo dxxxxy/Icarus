@@ -1,8 +1,12 @@
 package studio.dreamys.icarus.component;
 
-import studio.dreamys.icarus.component.sub.Group;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.eventhandler.Event;
+import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.Bounds;
 
+//keep this not abstract to avoid some useless empty methods
 public class Component {
     public void render(int mouseX, int mouseY) {
 
@@ -28,22 +32,6 @@ public class Component {
 
     }
 
-    public Group getGroup() {
-        return null;
-    }
-
-    public Window getWindow() {
-        return null;
-    }
-
-    public boolean isOpen() {
-        return false;
-    }
-
-    public double getX() {
-        return 0;
-    }
-
     public void setX(double x) {
 
     }
@@ -52,8 +40,24 @@ public class Component {
 
     }
 
+    public Group getGroup() {
+        return null;
+    }
+
+    public Window getWindow() {
+        return null;
+    }
+
+    public double getX() {
+        return 0;
+    }
+
     public double getY() {
         return 0;
+    }
+
+    public boolean isOpen() {
+        return false;
     }
 
     public double getWidth() {
@@ -70,5 +74,16 @@ public class Component {
 
     public String getLabel() {
         return "null";
+    }
+
+    public void fireChange() {
+        Event event = null;
+        if (this instanceof Checkbox) event = new ComponentEvent.CheckboxEvent((Checkbox) this);
+        if (this instanceof Choice) event = new ComponentEvent.ChoiceEvent((Choice) this);
+        if (this instanceof Combo) event = new ComponentEvent.ComboEvent((Combo) this);
+        if (this instanceof Field) event = new ComponentEvent.FieldEvent((Field) this);
+        if (this instanceof Keybind) event = new ComponentEvent.KeybindEvent((Keybind) this);
+        if (this instanceof Slider) event = new ComponentEvent.SliderEvent((Slider) this);
+        MinecraftForge.EVENT_BUS.post(event);
     }
 }

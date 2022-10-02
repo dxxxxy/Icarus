@@ -2,12 +2,10 @@ package studio.dreamys.icarus.component.sub;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
-import studio.dreamys.icarus.event.ComponentStateChangeEvent;
 
 import java.awt.Color;
 
@@ -46,8 +44,6 @@ public class Button extends Component {
         RenderUtils.drawGradientRect(x, y, x + width, y + height, held ? Color.DARK_GRAY.darker().darker() : Color.DARK_GRAY.darker(), held ? Color.DARK_GRAY.darker() : Color.DARK_GRAY.darker().darker());
         RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
         RenderUtils.drawCenteredString(label, x + width / 2, y + height / 5,  Color.WHITE);
-
-        RenderUtils.drawOutline(getBounds().getWidth(), getBounds().getHeight() + getBounds().getOffsetY(), x, y - getBounds().getOffsetY(), Color.GREEN);
     }
 
     @Override
@@ -55,7 +51,7 @@ public class Button extends Component {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             runnable.run();
             held = true;
-            MinecraftForge.EVENT_BUS.post(new ComponentStateChangeEvent(this));
+            fireChange();
         }
     }
 
