@@ -45,6 +45,7 @@ public class Icarus {
                         if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
                             ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
                             config.save(); //save the config
+                            keybind.getChild().fireChange(); //fire change event
                         }
                         if (keybind.getChild() instanceof Button) { //if the child is a button
                             ((Button) keybind.getChild()).getRunnable().run(); //click the button
