@@ -65,7 +65,7 @@ public class Page extends Component {
     public void setWindow(Window window) {
         this.window = window;
 
-        y = height * (window.pages.size() - 1);
+        y += height * (window.pages.size() - 1);
 
         relativeX = x;
         relativeY = y;
