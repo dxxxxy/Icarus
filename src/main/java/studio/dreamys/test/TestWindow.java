@@ -46,7 +46,7 @@ public class TestWindow extends Window {
                     .addChild(new Combo("Another Combo", new ArrayList<>(Arrays.asList("Option 1", "Option 2", "Option 3"))))
                     .addChild(new Field("Field"))
                     .addChild(new Slider("Decimal slider", 1, 10, false))
-                    .addChild(new Slider("Int slider", 10, 1, true, "ms"))
+                    .addChild(new Slider("Int slider", 10, 1, 10, true, "ms"))
         ;
 
         addPage(new Page('s'))

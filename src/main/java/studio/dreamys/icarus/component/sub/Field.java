@@ -79,7 +79,7 @@ public class Field extends Component {
     }
 
     public String getText() {
-        return text.equals("") ? "null" : text;
+        return text.equals("") ? "null" : text; //for config purposes
     }
 
     @Override

@@ -40,10 +40,10 @@ public class Slider extends Component {
     public Slider(String label, double min, double max, boolean onlyInt) {
         this.label = label;
 
-        value = min;
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
+
         units = "";
     }
 
@@ -54,12 +54,14 @@ public class Slider extends Component {
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
+
         units = "";
     }
 
-    public Slider(String label, double min, double max, boolean onlyInt, String units) {
+    public Slider(String label, double value, double min, double max, boolean onlyInt, String units) {
         this.label = label;
 
+        this.value = value;
         this.min = min;
         this.max = max;
         this.onlyInt = onlyInt;
