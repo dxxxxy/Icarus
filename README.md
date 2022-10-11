@@ -12,9 +12,11 @@ repositories {
 ```
 ```
 dependencies {
-    implementation "studio.dreamys:Icarus:1.4.0"
+    implementation "studio.dreamys:Icarus:$VERSION"
 }
 ```
+
+Replace $VERSION with any version from the [repo](https://github.com/DxxxxY/repo/tree/master/studio/dreamys/Icarus).
 
 ## Components
 > Some components have secondary constructors with default values.
