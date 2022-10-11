@@ -54,7 +54,7 @@ public class Group extends Component {
         y = window.y + relativeY;
 
         //the box itself
-        RenderUtils.drawGroupWithString(width, height + 10, x, y, label);
+        RenderUtils.drawGroupWithString(width, height + 4, x, y, label);
     }
 
     @Override

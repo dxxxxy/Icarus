@@ -84,6 +84,6 @@ public class Component {
         if (this instanceof Field) event = new ComponentEvent.FieldEvent((Field) this);
         if (this instanceof Keybind) event = new ComponentEvent.KeybindEvent((Keybind) this);
         if (this instanceof Slider) event = new ComponentEvent.SliderEvent((Slider) this);
-        MinecraftForge.EVENT_BUS.post(event);
+        if (event != null) MinecraftForge.EVENT_BUS.post(event);
     }
 }

@@ -12,6 +12,7 @@ import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
 import studio.dreamys.icarus.extra.Watermark;
+import studio.dreamys.icarus.util.Placement;
 
 import java.awt.*;
 
@@ -24,8 +25,17 @@ public class TestMod {
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
-        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Minecraft.getMinecraft().displayWidth - 5, 5).enable();
-        new Watermark("testing123testing", 5, 5).enable();
+        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Placement.TOP_RIGHT, Color.WHITE).enable();
+
+        //try all except top_right
+        new Watermark("testing123testing", Placement.TOP_LEFT, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.TOP_CENTER, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.CENTER_LEFT, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.CENTER, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.CENTER_RIGHT, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.BOTTOM_LEFT, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.BOTTOM_CENTER, Color.WHITE).enable();
+        new Watermark("testing123testing", Placement.BOTTOM_RIGHT, Color.WHITE).enable();
     }
 
     @SubscribeEvent
