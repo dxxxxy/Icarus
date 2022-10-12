@@ -9,10 +9,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.event.ComponentEvent;
+import studio.dreamys.icarus.extra.Watermark;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
-import studio.dreamys.icarus.extra.Watermark;
-import studio.dreamys.icarus.util.Placement;
 
 import java.awt.*;
 
@@ -25,57 +24,61 @@ public class TestMod {
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
-        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms", Placement.TOP_RIGHT, Color.WHITE).enable();
+        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
+        NotificationManager.startY = 20; //start below watermark
 
         //try all except top_right
-        new Watermark("testing123testing", Placement.TOP_LEFT, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.TOP_CENTER, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.CENTER_LEFT, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.CENTER, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.CENTER_RIGHT, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.BOTTOM_LEFT, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.BOTTOM_CENTER, Color.WHITE).enable();
-        new Watermark("testing123testing", Placement.BOTTOM_RIGHT, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.TOP_LEFT, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.TOP_CENTER, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.CENTER_LEFT, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.CENTER, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.CENTER_RIGHT, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.BOTTOM_LEFT, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.BOTTOM_CENTER, Color.WHITE).enable();
+//        new Watermark("testing123testing", Position.BOTTOM_RIGHT, Color.WHITE).enable();
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent e) {
         System.out.println(e.component);
+        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.CheckboxEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.checkbox);
         System.out.println(e.toggled);
+        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ChoiceEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.choice);
         System.out.println(e.selected);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ComboEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.combo);
         System.out.println(e.activeOptions);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.FieldEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.field);
         System.out.println(e.text);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.keybind);
         System.out.println(e.key);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.SliderEvent e) {
-        System.out.println(e.component);
+        System.out.println(e.slider);
         System.out.println(e.value);
     }
 

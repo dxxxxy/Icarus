@@ -7,10 +7,12 @@ import studio.dreamys.icarus.component.sub.*;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @SuppressWarnings("unused")
 public class Config {
     public static File file;
+    private Component comp;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public Config(String modid) {
@@ -114,87 +116,56 @@ public class Config {
     }
 
     public boolean getCheckbox(String group, String label) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Checkbox) {
-                return ((Checkbox) comp).isToggled();
-            }
-        }
+        if ((comp = find(group, label, Checkbox.class)) != null) return ((Checkbox) comp).isToggled();
         return false;
     }
 
     public String getChoice(String group, String label) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Choice) {
-                return ((Choice) comp).getSelected();
-            }
-        }
+        if ((comp = find(group, label, Choice.class)) != null) return ((Choice) comp).getSelected();
         return null;
     }
 
-    public String getCombo(String group, String label) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Combo) {
-                return ((Combo) comp).getActiveOptions();
-            }
-        }
+    public HashMap<String, Boolean> getCombo(String group, String label) {
+        if ((comp = find(group, label, Combo.class)) != null) return ((Combo) comp).getOptions();
         return null;
     }
 
     public String getField(String group, String label) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Field) {
-                return ((Field) comp).getText();
-            }
-        }
+        if ((comp = find(group, label, Field.class)) != null) return ((Field) comp).getText();
         return null;
     }
 
     public double getSlider(String group, String label) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Slider) {
-                return ((Slider) comp).getValue();
-            }
-        }
+        if ((comp = find(group, label, Slider.class)) != null) return ((Slider) comp).getValue();
         return 0;
     }
 
     public void setCheckbox(String group, String label, boolean toggled) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Checkbox) {
-                ((Checkbox) comp).setToggled(toggled);
-            }
-        }
+        if ((comp = find(group, label, Checkbox.class)) != null) ((Checkbox) comp).setToggled(toggled);
     }
 
     public void setChoice(String group, String label, String selected) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Choice) {
-                ((Choice) comp).setSelected(selected);
-            }
-        }
+        if ((comp = find(group, label, Choice.class)) != null) ((Choice) comp).setSelected(selected);
     }
 
-    public void setCombo(String group, String label, String activeOptions) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Combo) {
-                ((Combo) comp).setActiveOptions(activeOptions);
-            }
-        }
+    public void setCombo(String group, String label, HashMap<String, Boolean> options) {
+        if ((comp = find(group, label, Combo.class)) != null) ((Combo) comp).setOptions(options);
     }
 
     public void setField(String group, String label, String text) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Field) {
-                ((Field) comp).setText(text);
-            }
-        }
+        if ((comp = find(group, label, Field.class)) != null) ((Field) comp).setText(text);
     }
 
     public void setSlider(String group, String label, double value) {
+        if ((comp = find(group, label, Slider.class)) != null) ((Slider) comp).setValue(value);
+    }
+
+    public Component find(String group, String label, Class<? extends Component> subType) {
         for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && comp instanceof Slider) {
-                ((Slider) comp).setValue(value);
+            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && subType.isInstance(comp)) {
+                return comp;
             }
         }
+        return null;
     }
 }

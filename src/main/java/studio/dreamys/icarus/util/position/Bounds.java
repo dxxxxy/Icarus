@@ -1,9 +1,10 @@
-package studio.dreamys.icarus.util;
+package studio.dreamys.icarus.util.position;
 
 import lombok.Getter;
 
+@Getter
 public class Bounds {
-    @Getter private double width, height, offsetY;
+    private double width, height, offsetY;
 
     public Bounds(double width, double height) {
         this(width, height, 0);

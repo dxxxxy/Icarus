@@ -51,15 +51,15 @@ public class TestWindow extends Window {
 
         addPage(new Page('s'))
                 .addGroup(new Group("AHSniper", 47.5, 10))
-                .addChild(new Checkbox("Enabled"), new Keybind())
-                .addChild(new Slider("Sleep (ms)", 2000, 1, 5000, true))
-                .addChild(new Slider("Minimum Profit (x)", 5, 2, 30, true))
-                .addChild(new Choice("Lowest Bin Prices", new ArrayList<>(Arrays.asList("Moulberry", "Binmaster", "SkyHelper"))))
-                .addChild(new Button("Force Update Prices", () -> {
-                    System.out.println("Force Update Prices");
-                }))
-                .addChild(new Checkbox("Verbose Chat"))
-                .addChild(new Checkbox("Auto Buy"))
+                    .addChild(new Checkbox("Enabled"), new Keybind())
+                    .addChild(new Slider("Sleep (ms)", 2000, 1, 5000, true))
+                    .addChild(new Slider("Minimum Profit (x)", 5, 2, 30, true))
+                    .addChild(new Choice("Lowest Bin Prices", new ArrayList<>(Arrays.asList("Moulberry", "Binmaster", "SkyHelper"))))
+                    .addChild(new Button("Force Update Prices", () -> {
+                        System.out.println("Force Update Prices");
+                    }))
+                    .addChild(new Checkbox("Verbose Chat"))
+                    .addChild(new Checkbox("Auto Buy"))
         ;
 
         /*  ADDING COMPONENTS   */

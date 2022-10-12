@@ -1,8 +1,10 @@
-package studio.dreamys.icarus.util;
+package studio.dreamys.icarus.util.position;
 
+import lombok.Getter;
 import net.minecraft.client.Minecraft;
 
-public enum Placement {
+@Getter
+public enum Position {
     TOP_LEFT,
     TOP_CENTER,
     TOP_RIGHT,

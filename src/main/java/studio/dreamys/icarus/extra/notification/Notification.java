@@ -22,7 +22,7 @@ public class Notification {
     private ArrayList<String> lines;
 
     public Notification(String title, String message) {
-        this(title, message, 20, Color.BLACK, Color.WHITE, Color.WHITE, Color.PINK);
+        this(title, message, 20);
     }
 
     public Notification(String title, String message, int ticksToStay) {
@@ -66,7 +66,7 @@ public class Notification {
 
     @SubscribeEvent
     public void onGameOverlay(RenderGameOverlayEvent e) {
-        y = 0;
+        y = NotificationManager.startY;
 
         //notification dynamic stacking
         for (Notification notification : NotificationManager.notifications) {

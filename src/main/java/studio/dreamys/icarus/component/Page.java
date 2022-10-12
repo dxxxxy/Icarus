@@ -1,6 +1,5 @@
 package studio.dreamys.icarus.component;
 
-import com.google.common.collect.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import studio.dreamys.icarus.Icarus;

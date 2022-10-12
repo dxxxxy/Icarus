@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.util.Bounds;
+import studio.dreamys.icarus.util.position.Bounds;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;

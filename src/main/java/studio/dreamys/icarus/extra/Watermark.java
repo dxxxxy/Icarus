@@ -7,7 +7,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import studio.dreamys.icarus.util.Placement;
+import studio.dreamys.icarus.util.position.Position;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
@@ -16,26 +16,35 @@ import java.awt.*;
 @Setter
 public class Watermark {
     private String text;
-    private Placement placement;
+    private Position position;
     private double x, y, width, height = RenderUtils.getFontHeight() + 7.5;
     private Color textColor;
 
-    public Watermark(String text, Placement placement, Color textColor) {
-        this.text = text;
-        this.placement = placement;
-        this.textColor = textColor;
+    public Watermark(String text) {
+        this(text, Position.TOP_RIGHT);
+    }
 
-        width = RenderUtils.getStringWidth(text) + 5;
+    public Watermark(String text, Position position) {
+        this(text, position, Color.WHITE);
+    }
+
+    public Watermark(String text, Position position, Color textColor) {
+        this.text = text;
+        this.position = position;
+        this.textColor = textColor;
     }
 
     @SubscribeEvent
     public void onGameOverlay(RenderGameOverlayEvent e) {
+        if (e.type != RenderGameOverlayEvent.ElementType.TEXT) return;
+
         //update width in case text changes
         width = RenderUtils.getStringWidth(text) + 5;
 
-        placement.init(width, height);
-        x = placement.getX();
-        y = placement.getY();
+        //position
+        position.init(width, height);
+        x = position.getX();
+        y = position.getY();
 
         //draw our very professional skeet watermark
         Minecraft.getMinecraft().getTextureManager().bindTexture(new ResourceLocation("icarus", "watermark.png"));

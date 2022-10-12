@@ -4,7 +4,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import studio.dreamys.icarus.component.sub.*;
 import studio.dreamys.icarus.event.ComponentEvent;
-import studio.dreamys.icarus.util.Bounds;
+import studio.dreamys.icarus.util.position.Bounds;
 
 //keep this not abstract to avoid some useless empty methods
 public class Component {

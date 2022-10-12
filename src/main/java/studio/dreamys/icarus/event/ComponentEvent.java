@@ -13,56 +13,62 @@ public abstract class ComponentEvent extends Event {
         this.component = component;
     }
 
-    public static class CheckboxEvent extends ComponentEvent {
+    public static class CheckboxEvent extends Event {
+        public Checkbox checkbox;
         public boolean toggled;
 
         public CheckboxEvent(Checkbox checkbox) {
-            super(checkbox);
+            this.checkbox = checkbox;
             toggled = checkbox.isToggled();
         }
     }
 
-    public static class ChoiceEvent extends ComponentEvent {
+    public static class ChoiceEvent extends Event {
+        public Choice choice;
         public String selected;
 
         public ChoiceEvent(Choice choice) {
-            super(choice);
+            this.choice = choice;
             selected = choice.getSelected();
         }
     }
 
-    public static class ComboEvent extends ComponentEvent {
+    public static class ComboEvent extends Event {
+        public Combo combo;
         public HashMap<String, Boolean> activeOptions;
 
         public ComboEvent(Combo combo) {
-            super(combo);
+            this.combo = combo;
             activeOptions = combo.getOptions();
         }
     }
 
-    public static class FieldEvent extends ComponentEvent {
+    public static class FieldEvent extends Event {
+        public Field field;
         public String text;
 
         public FieldEvent(Field field) {
-            super(field);
+            this.field = field;
             text = field.getText();
         }
     }
 
-    public static class KeybindEvent extends ComponentEvent {
+    public static class KeybindEvent extends Event {
+        public Keybind keybind;
         public int key;
 
         public KeybindEvent(Keybind keybind) {
-            super(keybind);
+            this.keybind = keybind;
             key = keybind.getKey();
         }
     }
 
-    public static class SliderEvent extends ComponentEvent {
+    public static class SliderEvent extends Event {
+        public Slider slider;
         public double value;
 
         public SliderEvent(Slider slider) {
-            super(slider);
+            this.slider = slider;
             value = slider.getValue();
         }
     }
