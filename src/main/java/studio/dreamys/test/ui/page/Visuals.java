@@ -1,52 +1,32 @@
 package studio.dreamys.test.ui.page;
 
-import studio.dreamys.icarus.annotation.IGroup;
-import studio.dreamys.icarus.annotation.IPage;
-import studio.dreamys.icarus.component.wrapper.WChoice;
-import studio.dreamys.icarus.component.wrapper.WSlider;
+import studio.dreamys.icarus.annotation.field.Options;
+import studio.dreamys.icarus.annotation.field.SOptions;
+import studio.dreamys.icarus.annotation.type.IGroup;
+import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
-
-import java.util.Arrays;
-import java.util.HashMap;
 
 @IPage(icon = 'v')
 public class Visuals {
     @IGroup(x = 47.5, y = 10)
     public static class ESP {
-        public static Runnable Button = () -> NotificationManager.send(new Notification("Button", "You pressed the button!"));
+        public static Runnable Button = () -> {
+            NotificationManager.send(new Notification("Button", "You pressed the button!"));
+            System.out.println("Button pressed!");
+        };
 
         public static boolean Checkbox = true;
 
-        public static WChoice Choice = new WChoice("Option 1", Arrays.asList("Option 1", "Option 2", "Option 3"));
+        @Options({"Option 1", "Option 2", "Option 3"})
+        public static String Choice = "Option 1";
 
-        public static HashMap<String, Boolean> Combo = new HashMap<String, Boolean>() {{
-            put("Option 1", true);
-            put("Option 2", false);
-            put("Option 3", true);
-        }};
+        @Options({"Option 1", "Option 2", "Option 3"})
+        public static String[] Combo = {"Option 1", "Option 3"};
 
         public static String Field = "Hello World!";
 
-        public static WSlider Slider = new WSlider(1, 10, 30, false, "x");
-    }
-
-    @IGroup(x = 180, y = 10)
-    public static class Chams {
-        public static Runnable Button = () -> NotificationManager.send(new Notification("Button", "You pressed the button!"));
-
-        public static boolean Checkbox = true;
-
-        public static WChoice Choice = new WChoice("Option 1", Arrays.asList("Option 1", "Option 2", "Option 3"));
-
-        public static HashMap<String, Boolean> Combo = new HashMap<String, Boolean>() {{
-            put("Option 1", true);
-            put("Option 2", false);
-            put("Option 3", true);
-        }};
-
-        public static String Field = "Hello World!";
-
-        public static WSlider Slider = new WSlider(1, 10, 30, false, "x");
+        @SOptions(min = 0, max = 100, onlyInt = true, units = "%")
+        public static double Slider = 1;
     }
 }

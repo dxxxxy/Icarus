@@ -25,9 +25,9 @@ public class Icarus {
         MinecraftForge.EVENT_BUS.register(new Icarus());
 
         Config.init(modid);
-        Config.generateWindow();
         Config.load();
         Config.save();
+        Config.generateWindow();
     }
 
     @SubscribeEvent

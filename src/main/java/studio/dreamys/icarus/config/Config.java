@@ -1,6 +1,5 @@
 package studio.dreamys.icarus.config;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -8,24 +7,18 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.annotation.IGroup;
-import studio.dreamys.icarus.annotation.IPage;
+import studio.dreamys.icarus.annotation.field.Options;
+import studio.dreamys.icarus.annotation.field.SOptions;
+import studio.dreamys.icarus.annotation.type.IGroup;
+import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
-import studio.dreamys.icarus.component.wrapper.WChoice;
-import studio.dreamys.icarus.component.wrapper.WSlider;
-import studio.dreamys.test.ui.page.Visuals;
 
 import java.io.*;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
-@SuppressWarnings({"UnstableApiUsage", "unchecked"})
 public class Config {
     public static File file;
     public static Reflections reflections;
@@ -79,30 +72,33 @@ public class Config {
                 for (Field iSetting : iSettings) { //for every setting
                     Component component = null; //create component object
 
+                    //get additional annotations
+                    Options options = iSetting.getAnnotation(Options.class);
+                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+
                     try {
                         if (iSetting.getType() == Runnable.class) { //if button
                             component = new Button(iSetting.getName(), (Runnable) iSetting.get(null));
                         }
 
-                        if (iSetting.getType() == boolean.class) { //if checkbox
+                        else if (iSetting.getType() == boolean.class) { //if checkbox
                             component = new Checkbox(iSetting.getName(), (boolean) iSetting.get(null));
                         }
 
-                        if (iSetting.getType() == WChoice.class) { //if choice
-                            component = new Choice(iSetting.getName(), (WChoice) iSetting.get(null));
+                        else if (iSetting.getType() == String.class && options != null) { //if choice
+                            component = new Choice(iSetting.getName(), (String) iSetting.get(null), Arrays.asList(options.value()));
                         }
 
-                        if (iSetting.getType() == HashMap.class) { //if combo
-                            component = new Combo(iSetting.getName(), (HashMap<String, Boolean>) iSetting.get(null));
+                        else if (iSetting.getType() == String[].class && options != null) { //if combo
+                            component = new Combo(iSetting.getName(), Arrays.asList((String[]) iSetting.get(null)), Arrays.asList(options.value()));
                         }
 
-                        if (iSetting.getType() == String.class) { //if field
+                        else if (iSetting.getType() == String.class) { //if field
                             component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName(), (String) iSetting.get(null));
                         }
 
-                        if (iSetting.getType() == WSlider.class) {
-                            WSlider WSlider = (WSlider) iSetting.get(null); //get slider wrapper
-                            component = new Slider(iSetting.getName(), WSlider.getValue(), WSlider.getMin(), WSlider.getMax(), WSlider.isOnlyInt(), WSlider.getUnits());
+                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
+                            component = new Slider(iSetting.getName(), (double) iSetting.get(null), sOptions.min(), sOptions.max(), sOptions.onlyInt(), sOptions.units());
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -128,27 +124,29 @@ public class Config {
                 Field[] iSettings = groupSettings.getValue();
 
                 for (Field iSetting : iSettings) { //for every setting
+                    //get additional annotations
+                    Options options = iSetting.getAnnotation(Options.class);
+                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
                             groupObject.addProperty(iSetting.getName(), (boolean) iSetting.get(null));
                         }
 
-                        if (iSetting.getType() == WChoice.class) { //if choice
-                            groupObject.addProperty(iSetting.getName(), ((WChoice) iSetting.get(null)).getSelected());
-                        }
-
-                        if (iSetting.getType() == HashMap.class) { //if combo
-                            HashMap<String, Boolean> options = (HashMap<String, Boolean>) iSetting.get(null); //get all combo options
-                            List<String> active = options.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList()); //get active (true ones)
-                            groupObject.add(iSetting.getName(), gson.toJsonTree(active, new TypeToken<List<String>>(){}.getType())); //save as an array of strings
-                        }
-
-                        if (iSetting.getType() == String.class) { //if field
+                        else if (iSetting.getType() == String.class && options != null) { //if choice
                             groupObject.addProperty(iSetting.getName(), (String) iSetting.get(null));
                         }
 
-                        if (iSetting.getType() == WSlider.class) { //if slider
-                            groupObject.addProperty(iSetting.getName(), ((WSlider) iSetting.get(null)).getValue());
+                        else if (iSetting.getType() == String[].class && options != null) { //if combo
+                            groupObject.add(iSetting.getName(), gson.toJsonTree(iSetting.get(null)));
+                        }
+
+                        else if (iSetting.getType() == String.class) { //if field
+                            groupObject.addProperty(iSetting.getName(), (String) iSetting.get(null));
+                        }
+
+                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
+                            groupObject.addProperty(iSetting.getName(), (double) iSetting.get(null));
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -171,16 +169,15 @@ public class Config {
     }
 
     public static void load() {
-        JsonObject json = new JsonObject();
+        JsonObject json;
 
         try {
             json = new JsonParser().parse(new FileReader(file)).getAsJsonObject();
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("Failed to load settings");
+            return;
         }
-
-        System.out.println("Before");
-        System.out.println(Visuals.Chams.Field);
 
         for (ReflectionCache reflectionCache : reflectionCaches) { //for every reflection
             JsonObject pageObject = json.getAsJsonObject(reflectionCache.getIPage().getSimpleName());
@@ -191,32 +188,29 @@ public class Config {
                 Field[] iSettings = groupSettings.getValue();
 
                 for (Field iSetting : iSettings) { //for every setting
+                    //get additional annotations
+                    Options options = iSetting.getAnnotation(Options.class);
+                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsBoolean());
                         }
 
-                        if (iSetting.getType() == WChoice.class) { //if choice
-                            WChoice choice = (WChoice) iSetting.get(null);
-                            choice.setSelected(groupObject.get(iSetting.getName()).getAsString());
-                            iSetting.set(null, choice);
-                        }
-
-                        if (iSetting.getType() == HashMap.class) { //if combo
-                            HashMap<String, Boolean> options = (HashMap<String, Boolean>) iSetting.get(null); //get all combo options
-                            List<String> active = gson.fromJson(groupObject.get(iSetting.getName()), new TypeToken<List<String>>(){}.getType()); //get active (true ones)
-                            active.forEach(option -> options.put(option, true)); //set active
-                            iSetting.set(null, options);
-                        }
-
-                        if (iSetting.getType() == String.class) { //if field
+                        else if (iSetting.getType() == String.class && options != null) { //if choice
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsString());
                         }
 
-                        if (iSetting.getType() == WSlider.class) { //if slider
-                            WSlider WSlider = (WSlider) iSetting.get(null);
-                            WSlider.setValue(groupObject.get(iSetting.getName()).getAsDouble());
-                            iSetting.set(null, WSlider);
+                        else if (iSetting.getType() == String[].class && options != null) { //if combo
+                            iSetting.set(null, gson.fromJson(groupObject.get(iSetting.getName()), String[].class));
+                        }
+
+                        else if (iSetting.getType() == String.class) { //if field
+                            iSetting.set(null, groupObject.get(iSetting.getName()).getAsString());
+                        }
+
+                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
+                            iSetting.set(null, groupObject.get(iSetting.getName()).getAsDouble());
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
@@ -224,8 +218,5 @@ public class Config {
                 }
             }
         }
-
-        System.out.println("After load");
-        System.out.println(Visuals.Chams.Field);
     }
 }
