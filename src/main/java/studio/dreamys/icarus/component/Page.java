@@ -13,6 +13,7 @@ import java.util.ArrayList;
 @Setter
 public class Page extends Component {
     private Window window;
+    private String label;
 
     private double x = 3;
     private double y = 4;
@@ -26,7 +27,8 @@ public class Page extends Component {
     private double relativeX;
     private double relativeY;
 
-    public Page(char icon) {
+    public Page(String label, char icon) {
+        this.label = label;
         this.icon = icon;
     }
 
@@ -68,5 +70,10 @@ public class Page extends Component {
 
         relativeX = x;
         relativeY = y;
+    }
+
+    @Override
+    public String getLabel() {
+        return label;
     }
 }
