@@ -9,6 +9,7 @@ import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Getter
@@ -24,21 +25,21 @@ public class Choice extends Component {
     private String label;
 
     private boolean open;
-    private ArrayList<String> options;
+    private List<String> options;
     private String selected;
 
     //relative to window, aka x,y passed in constructor
     private double relativeX;
     private double relativeY;
 
-    public Choice(String label, ArrayList<String> options) {
+    public Choice(String label, List<String> options) {
         this.label = label;
 
         this.options = options;
         selected = this.options.get(0);
     }
 
-    public Choice(String label, ArrayList<String> options, String selected) {
+    public Choice(String label, String selected, List<String> options) {
         this.label = label;
 
         this.options = options;

@@ -10,6 +10,7 @@ import studio.dreamys.icarus.util.RenderUtils;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -36,6 +37,12 @@ public class Combo extends Component {
         this.label = label;
 
         options.forEach(option -> this.options.put(option, false));
+    }
+
+    public Combo(String label, List<String> selected, List<String> options) {
+        this.label = label;
+
+        options.forEach(option -> this.options.put(option, selected.contains(option)));
     }
 
     public Combo(String label, HashMap<String, Boolean> options) {
