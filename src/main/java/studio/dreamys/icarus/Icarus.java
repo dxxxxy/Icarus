@@ -9,21 +9,20 @@ import org.lwjgl.input.Keyboard;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.annotation.IGroup;
 import studio.dreamys.icarus.annotation.IPage;
-import studio.dreamys.icarus.config.SliderWrapper;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.*;
-import studio.dreamys.icarus.config.Config;
+import studio.dreamys.icarus.component.wrapper.WChoice;
+import studio.dreamys.icarus.component.wrapper.WSlider;
 import studio.dreamys.icarus.util.RenderUtils;
+import studio.dreamys.test.ui.page.Visuals;
 
 import java.lang.reflect.Field;
-import java.util.AbstractMap;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Set;
 
 public class Icarus {
-    @Getter private static studio.dreamys.icarus.config.Config config;
     @Getter private static Window window;
     @Getter private static String modid;
 
@@ -31,8 +30,6 @@ public class Icarus {
         RenderUtils.loadFonts();
         Icarus.window = window; //create window object and store it forever
         Icarus.modid = modid;
-        config = new Config(modid); //create config which will load settings into window
-//        config.load(); //load settings from config
         MinecraftForge.EVENT_BUS.register(new Icarus());
 
         generateWindow();
@@ -55,7 +52,6 @@ public class Icarus {
 
                 Field[] iSettings = iGroup.getDeclaredFields(); //get settings
                 for (Field iSetting : iSettings) { //for every declared setting
-//                    ISetting annotatedSetting = iSetting.getAnnotation(ISetting.class); //get annotation
                     Component component = null; //create component object
 
                     try {
@@ -67,29 +63,27 @@ public class Icarus {
                             component = new Checkbox(iSetting.getName(), (boolean) iSetting.get(null)); //create checkbox object
                         }
 
-                        if (iSetting.getType() == AbstractMap.SimpleEntry.class) { //if choice or combo
-                            AbstractMap.SimpleEntry<?, List<String>> entry = (AbstractMap.SimpleEntry<?, List<String>>) iSetting.get(null); //get entry
+                        if (iSetting.getType() == WChoice.class) { //if choice
+                            component = new Choice(iSetting.getName(), (WChoice) iSetting.get(null)); //create choice object
+                        }
 
-                            if (entry.getKey() instanceof String) { //if choice
-                                component = new Choice(iSetting.getName(), (String) entry.getKey(), entry.getValue()); //create choice object
-                            }
-
-                            if (entry.getKey() instanceof List) { //if combo
-                                component = new Combo(iSetting.getName(), (List<String>) entry.getKey(), entry.getValue()); //create combo object
-                            }
+                        if (iSetting.getType() == HashMap.class) { //if combo
+                            component = new Combo(iSetting.getName(), (HashMap<String, Boolean>) iSetting.get(null)); //create combo object
                         }
 
                         if (iSetting.getType() == String.class) { //if field
                             component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName(), (String) iSetting.get(null)); //create field object
                         }
 
-                        if (iSetting.getType() == SliderWrapper.class) {
-                            SliderWrapper sliderWrapper = (SliderWrapper) iSetting.get(null); //get slider wrapper
-                            component = new Slider(iSetting.getName(), sliderWrapper.getValue(), sliderWrapper.getMin(), sliderWrapper.getMax(), sliderWrapper.isOnlyInt(), sliderWrapper.getUnits()); //create slider object
+                        if (iSetting.getType() == WSlider.class) {
+                            WSlider WSlider = (WSlider) iSetting.get(null); //get slider wrapper
+                            component = new Slider(iSetting.getName(), WSlider.getValue(), WSlider.getMin(), WSlider.getMax(), WSlider.isOnlyInt(), WSlider.getUnits()); //create slider object
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
+
+                    System.out.println(Visuals.ESP.Checkbox);
 
                     if (component == null) continue; //if component is null, skip it
                     group.addChild(component); //add component to group
@@ -114,7 +108,7 @@ public class Icarus {
                     if (keybind.getKey() == keyCode) { //if the keys match
                         if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
                             ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
-                            config.save(); //save the config
+//                            config.save(); //save the config
                             keybind.getChild().fireChange(); //fire change event
                         }
                         if (keybind.getChild() instanceof Button) { //if the child is a button

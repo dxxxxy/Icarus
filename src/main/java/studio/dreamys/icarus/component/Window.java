@@ -99,7 +99,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on mouse click (button, checkbox, choice, etc...)
-        Icarus.getConfig().save();
+//        Icarus.getConfig().save();
     }
 
     @Override
@@ -112,7 +112,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on key typed (typically fields)
-        Icarus.getConfig().save();
+//        Icarus.getConfig().save();
     }
 
     @Override
@@ -125,7 +125,7 @@ public class Window extends GuiScreen {
         }
 
         //save config on mouse release (typically sliders)
-        Icarus.getConfig().save();
+//        Icarus.getConfig().save();
     }
 
     private boolean hovered(double x, double y) {

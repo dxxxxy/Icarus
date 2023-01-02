@@ -25,9 +25,9 @@ public class TestMod {
         MinecraftForge.EVENT_BUS.register(this);
         Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
         Icarus.init(e.getModMetadata().modId, window);
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
 
         new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
 
@@ -47,14 +47,14 @@ public class TestMod {
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent e) {
         System.out.println(e.component);
-        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
+//        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.CheckboxEvent e) {
         System.out.println(e.checkbox);
         System.out.println(e.toggled);
-        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
+//        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
 
     }
 
