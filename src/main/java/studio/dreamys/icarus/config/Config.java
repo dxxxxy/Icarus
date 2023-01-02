@@ -1,7 +1,10 @@
 package studio.dreamys.icarus.config;
 
 import com.google.common.reflect.TypeToken;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
@@ -12,6 +15,7 @@ import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
 import studio.dreamys.icarus.component.wrapper.WChoice;
 import studio.dreamys.icarus.component.wrapper.WSlider;
+import studio.dreamys.test.ui.page.Visuals;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -174,5 +178,54 @@ public class Config {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
+        System.out.println("Before");
+        System.out.println(Visuals.Chams.Field);
+
+        for (ReflectionCache reflectionCache : reflectionCaches) { //for every reflection
+            JsonObject pageObject = json.getAsJsonObject(reflectionCache.getIPage().getSimpleName());
+
+            for (Map.Entry<Class<?>, Field[]> groupSettings : reflectionCache.getIGroupMap().entrySet()) {
+                JsonObject groupObject = pageObject.getAsJsonObject(groupSettings.getKey().getSimpleName());
+
+                Field[] iSettings = groupSettings.getValue();
+
+                for (Field iSetting : iSettings) { //for every setting
+                    try {
+                        if (iSetting.getType() == boolean.class) { //if checkbox
+                            iSetting.set(null, groupObject.get(iSetting.getName()).getAsBoolean());
+                        }
+
+                        if (iSetting.getType() == WChoice.class) { //if choice
+                            WChoice choice = (WChoice) iSetting.get(null);
+                            choice.setSelected(groupObject.get(iSetting.getName()).getAsString());
+                            iSetting.set(null, choice);
+                        }
+
+                        if (iSetting.getType() == HashMap.class) { //if combo
+                            HashMap<String, Boolean> options = (HashMap<String, Boolean>) iSetting.get(null); //get all combo options
+                            List<String> active = gson.fromJson(groupObject.get(iSetting.getName()), new TypeToken<List<String>>(){}.getType()); //get active (true ones)
+                            active.forEach(option -> options.put(option, true)); //set active
+                            iSetting.set(null, options);
+                        }
+
+                        if (iSetting.getType() == String.class) { //if field
+                            iSetting.set(null, groupObject.get(iSetting.getName()).getAsString());
+                        }
+
+                        if (iSetting.getType() == WSlider.class) { //if slider
+                            WSlider WSlider = (WSlider) iSetting.get(null);
+                            WSlider.setValue(groupObject.get(iSetting.getName()).getAsDouble());
+                            iSetting.set(null, WSlider);
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        System.out.println("After load");
+        System.out.println(Visuals.Chams.Field);
     }
 }

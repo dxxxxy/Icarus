@@ -26,8 +26,8 @@ public class Icarus {
 
         Config.init(modid);
         Config.generateWindow();
-        Config.save();
         Config.load();
+        Config.save();
     }
 
     @SubscribeEvent

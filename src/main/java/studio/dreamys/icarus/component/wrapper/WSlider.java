@@ -1,8 +1,10 @@
 package studio.dreamys.icarus.component.wrapper;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class WSlider {
     private double value;
     private double min;
