@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
+import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
 
@@ -17,14 +18,19 @@ import java.awt.*;
 
 @Mod(modid = "TestMod")
 public class TestMod {
+    private static Watermark watermark;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(this);
-        Icarus.init(e.getModMetadata().modId, new TestWindow());
+        Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
+        Icarus.init(e.getModMetadata().modId, window);
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
         System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
+
         new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
+
         NotificationManager.startY = 20; //start below watermark
 
         //try all except top_right
