@@ -53,6 +53,26 @@ public class Config {
         }
     }
 
+    public static void update(Component component, Object value) {
+        Field field = findField(component.getGroup().getPage().getLabel(), component.getGroup().getLabel(), component.getLabel());
+        if (field == null) return;
+
+        try {
+            field.set(null, value);
+            Config.save();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static Field findField(String page, String group, String setting) {
+        ReflectionCache reflectionCache = reflectionCaches.stream().filter(cache -> cache.getIPage().getSimpleName().equals(page)).findFirst().orElse(null);
+        if (reflectionCache == null) return null;
+        Class<?> iGroup = reflectionCache.getIGroupMap().keySet().stream().filter(iGroup1 -> iGroup1.getSimpleName().equals(group)).findFirst().orElse(null);
+        if (iGroup == null) return null;
+        return Arrays.stream(reflectionCache.getIGroupMap().get(iGroup)).filter(field -> field.getName().equals(setting)).findFirst().orElse(null);
+    }
+
     public static void generateWindow() {
         for (ReflectionCache reflectionCache : reflectionCaches) {
             Class<?> iPage = reflectionCache.getIPage();

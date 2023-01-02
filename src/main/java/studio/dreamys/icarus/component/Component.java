@@ -3,6 +3,7 @@ package studio.dreamys.icarus.component;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.position.Bounds;
 
@@ -78,12 +79,30 @@ public class Component {
 
     public void fireChange() {
         Event event = null;
-        if (this instanceof Checkbox) event = new ComponentEvent.CheckboxEvent((Checkbox) this);
-        if (this instanceof Choice) event = new ComponentEvent.ChoiceEvent((Choice) this);
-        if (this instanceof Combo) event = new ComponentEvent.ComboEvent((Combo) this);
-        if (this instanceof Field) event = new ComponentEvent.FieldEvent((Field) this);
-        if (this instanceof Keybind) event = new ComponentEvent.KeybindEvent((Keybind) this);
-        if (this instanceof Slider) event = new ComponentEvent.SliderEvent((Slider) this);
+
+        if (this instanceof Checkbox) {
+            event = new ComponentEvent.CheckboxEvent((Checkbox) this);
+            Config.update(this, ((Checkbox) this).isToggled());
+        }
+        if (this instanceof Choice) {
+            event = new ComponentEvent.ChoiceEvent((Choice) this);
+            Config.update(this, ((Choice) this).getSelected());
+        }
+        if (this instanceof Combo) {
+            event = new ComponentEvent.ComboEvent((Combo) this);
+            Config.update(this, ((Combo) this).getActiveOptions().split(","));
+        }
+        if (this instanceof Field) {
+            event = new ComponentEvent.FieldEvent((Field) this);
+            Config.update(this, ((Field) this).getText());
+        }
+        if (this instanceof Keybind) {
+            event = new ComponentEvent.KeybindEvent((Keybind) this);
+        }
+        if (this instanceof Slider) {
+            event = new ComponentEvent.SliderEvent((Slider) this);
+            Config.update(this, ((Slider) this).getValue());
+        }
         if (event != null) MinecraftForge.EVENT_BUS.post(event);
     }
 }

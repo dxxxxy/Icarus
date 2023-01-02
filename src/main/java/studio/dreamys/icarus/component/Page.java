@@ -57,6 +57,7 @@ public class Page extends Component {
     public Group addGroup(Group group) {
         //add group to list
         groups.add(group);
+        group.setPage(this);
         //pass window to group
         group.setWindow(window);
         return group;

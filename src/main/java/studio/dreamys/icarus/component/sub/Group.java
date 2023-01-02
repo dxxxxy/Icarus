@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.lwjgl.util.Rectangle;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 public class Group extends Component {
     private Window window;
     private Group group;
+    private Page page;
 
     private double x;
     private double y = 5;
