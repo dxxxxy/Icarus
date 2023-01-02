@@ -6,21 +6,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
-import org.reflections.Reflections;
-import studio.dreamys.icarus.annotation.IGroup;
-import studio.dreamys.icarus.annotation.IPage;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.component.sub.*;
-import studio.dreamys.icarus.component.wrapper.WChoice;
-import studio.dreamys.icarus.component.wrapper.WSlider;
+import studio.dreamys.icarus.component.sub.Button;
+import studio.dreamys.icarus.component.sub.Checkbox;
+import studio.dreamys.icarus.component.sub.Keybind;
+import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.RenderUtils;
-import studio.dreamys.test.ui.page.Visuals;
-
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Set;
 
 public class Icarus {
     @Getter private static Window window;
@@ -32,64 +24,10 @@ public class Icarus {
         Icarus.modid = modid;
         MinecraftForge.EVENT_BUS.register(new Icarus());
 
-        generateWindow();
-    }
-
-    public static void generateWindow() {
-        Reflections reflections = new Reflections();
-        Set<Class<?>> iPages = reflections.getTypesAnnotatedWith(IPage.class);
-
-        for (Class<?> iPage : iPages) { //for every declared page
-            IPage annotatedPage = iPage.getAnnotation(IPage.class); //get annotation
-            Page page = new Page(annotatedPage.icon()); //create page object
-            window.addPage(page); //add page to window
-
-            Class<?>[] iGroups = iPage.getDeclaredClasses(); //get groups
-            for (Class<?> iGroup : iGroups) { //for every declared group
-                IGroup annotatedGroup = iGroup.getAnnotation(IGroup.class); //get annotation
-                Group group = new Group(iGroup.getSimpleName(), annotatedGroup.x(), annotatedGroup.y()); //create group object
-                page.addGroup(group); //add group to page
-
-                Field[] iSettings = iGroup.getDeclaredFields(); //get settings
-                for (Field iSetting : iSettings) { //for every declared setting
-                    Component component = null; //create component object
-
-                    try {
-                        if (iSetting.getType() == Runnable.class) { //if button
-                            component = new Button(iSetting.getName(), (Runnable) iSetting.get(null)); //create button object
-                        }
-
-                        if (iSetting.getType() == boolean.class) { //if checkbox
-                            component = new Checkbox(iSetting.getName(), (boolean) iSetting.get(null)); //create checkbox object
-                        }
-
-                        if (iSetting.getType() == WChoice.class) { //if choice
-                            component = new Choice(iSetting.getName(), (WChoice) iSetting.get(null)); //create choice object
-                        }
-
-                        if (iSetting.getType() == HashMap.class) { //if combo
-                            component = new Combo(iSetting.getName(), (HashMap<String, Boolean>) iSetting.get(null)); //create combo object
-                        }
-
-                        if (iSetting.getType() == String.class) { //if field
-                            component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName(), (String) iSetting.get(null)); //create field object
-                        }
-
-                        if (iSetting.getType() == WSlider.class) {
-                            WSlider WSlider = (WSlider) iSetting.get(null); //get slider wrapper
-                            component = new Slider(iSetting.getName(), WSlider.getValue(), WSlider.getMin(), WSlider.getMax(), WSlider.isOnlyInt(), WSlider.getUnits()); //create slider object
-                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-
-                    System.out.println(Visuals.ESP.Checkbox);
-
-                    if (component == null) continue; //if component is null, skip it
-                    group.addChild(component); //add component to group
-                }
-            }
-        }
+        Config.init(modid);
+        Config.generateWindow();
+        Config.save();
+        Config.load();
     }
 
     @SubscribeEvent

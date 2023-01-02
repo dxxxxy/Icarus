@@ -1,171 +1,178 @@
 package studio.dreamys.icarus.config;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.*;
 import net.minecraft.client.Minecraft;
+import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.annotation.IGroup;
+import studio.dreamys.icarus.annotation.IPage;
 import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.component.wrapper.WChoice;
+import studio.dreamys.icarus.component.wrapper.WSlider;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"UnstableApiUsage", "unchecked"})
 public class Config {
     public static File file;
-    private Component comp;
+    public static Reflections reflections;
+    public static Gson gson;
+    public static List<ReflectionCache> reflectionCaches = new ArrayList<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public Config(String modid) {
-        File dir = new File(Minecraft.getMinecraft().mcDataDir, modid);
-        file = new File(dir, "config.txt");
+    public static void init(String modid) {
+        //init file
+        file = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "config.json");
         try {
-            if (!dir.exists()) dir.mkdir();
-            if (!file.exists()) file.createNewFile();
+            file.getParentFile().mkdirs();
+            file.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        //init gson
+        gson = new GsonBuilder().setPrettyPrinting().create();
+
+        //init reflection
+        reflections = new Reflections();
+        for (Class<?> iPage : reflections.getTypesAnnotatedWith(IPage.class)) {
+            Map<Class<?>, Field[]> iGroupMap = new HashMap<>();
+
+            Class<?>[] iGroups = iPage.getDeclaredClasses();
+            for (Class<?> iGroup : iGroups) {
+                iGroupMap.put(iGroup, iGroup.getDeclaredFields());
+            }
+
+            reflectionCaches.add(new ReflectionCache(iPage, iGroupMap));
         }
     }
 
-    public void save() {
-        try {
-            ArrayList<String> toSave = new ArrayList<>();
+    public static void generateWindow() {
+        for (ReflectionCache reflectionCache : reflectionCaches) {
+            Class<?> iPage = reflectionCache.getIPage();
 
-            for (Component comp : Icarus.getWindow().all) {
-                //do nothing for button
-                if (comp instanceof Checkbox) {
-                    toSave.add("Checkbox:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Checkbox) comp).isToggled());
-                }
-                if (comp instanceof Choice) {
-                    toSave.add("Choice:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Choice) comp).getSelected());
-                }
-                //TODO: color
-                if (comp instanceof Combo) {
-                    toSave.add("Combo:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Combo) comp).getActiveOptions());
-                }
-                if (comp instanceof Field) {
-                    toSave.add("Field:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Field) comp).getText());
-                }
-                //do nothing for Group
-                if (comp instanceof Keybind) {
-                    toSave.add("Keybind:" + ((Keybind) comp).getChild().getLabel() + ":" + ((Keybind) comp).getChild().getGroup().getLabel() + ":" + ((Keybind) comp).getKey());
-                }
-                if (comp instanceof Slider) {
-                    toSave.add("Slider:" + comp.getLabel() + ":" + comp.getGroup().getLabel() + ":" + ((Slider) comp).getValue());
-                }
-            }
+            IPage annotatedPage = iPage.getAnnotation(IPage.class); //get annotation
+            Page page = new Page(iPage.getSimpleName(), annotatedPage.icon()); //create page object
+            Icarus.getWindow().addPage(page); //add page to window
 
-            PrintWriter pw = new PrintWriter(file);
+            for (Map.Entry<Class<?>, Field[]> entry : reflectionCache.getIGroupMap().entrySet()) {
+                Class<?> iGroup = entry.getKey();
+                Field[] iSettings = entry.getValue();
 
-            for (String str : toSave) {
-                pw.println(str);
-            }
+                IGroup annotatedGroup = iGroup.getAnnotation(IGroup.class); //get annotation
+                Group group = new Group(iGroup.getSimpleName(), annotatedGroup.x(), annotatedGroup.y()); //create group object
+                page.addGroup(group); //add group to page
 
-            pw.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+                for (Field iSetting : iSettings) { //for every setting
+                    Component component = null; //create component object
 
-    public void load() {
-        try {
-            ArrayList<String> lines = new ArrayList<>();
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            String line = reader.readLine();
-            while (line != null) {
-                lines.add(line);
-                line = reader.readLine();
-            }
-            reader.close();
-
-            for (String s : lines) {
-                String[] args = s.split(":");
-                for (Component comp : Icarus.getWindow().all) {
-                    if (comp.getClass().getSimpleName().equals(args[0])) {
-                        if (comp.getLabel().equals(args[1])) {
-                            if (comp.getGroup().getLabel().equals(args[2])) {
-                                //do nothing for button
-                                if (comp instanceof Checkbox) {
-                                    ((Checkbox) comp).setToggled(Boolean.parseBoolean(args[3]));
-                                }
-                                if (comp instanceof Choice) {
-                                    ((Choice) comp).setSelected(args[3]);
-                                }
-                                //TODO: color
-                                if (comp instanceof Combo) {
-                                    ((Combo) comp).setActiveOptions(args[3]);
-                                }
-                                if (comp instanceof Field) {
-                                    ((Field) comp).setText(args[3].equals("null") ? "" : args[3]);
-                                }
-                                //do nothing for Group
-                                if (comp instanceof Keybind) {
-                                    ((Keybind) comp).setKey(Integer.parseInt(args[3]));
-                                }
-                                if (comp instanceof Slider) {
-                                    ((Slider) comp).setValue(Double.parseDouble(args[3]));
-                                }
-                                comp.fireChange();
-                            }
+                    try {
+                        if (iSetting.getType() == Runnable.class) { //if button
+                            component = new Button(iSetting.getName(), (Runnable) iSetting.get(null));
                         }
+
+                        if (iSetting.getType() == boolean.class) { //if checkbox
+                            component = new Checkbox(iSetting.getName(), (boolean) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == WChoice.class) { //if choice
+                            component = new Choice(iSetting.getName(), (WChoice) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == HashMap.class) { //if combo
+                            component = new Combo(iSetting.getName(), (HashMap<String, Boolean>) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == String.class) { //if field
+                            component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName(), (String) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == WSlider.class) {
+                            WSlider WSlider = (WSlider) iSetting.get(null); //get slider wrapper
+                            component = new Slider(iSetting.getName(), WSlider.getValue(), WSlider.getMin(), WSlider.getMax(), WSlider.isOnlyInt(), WSlider.getUnits());
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (component == null) continue; //if component is null, skip it
+                    group.addChild(component); //add component to group
+                }
+            }
+        }
+    }
+
+    public static void save() {
+        JsonObject json = new JsonObject();
+
+        for (ReflectionCache reflectionCache : reflectionCaches) { //for every reflection
+            JsonObject pageObject = new JsonObject();
+
+            for (Map.Entry<Class<?>, Field[]> groupSettings : reflectionCache.getIGroupMap().entrySet()) {
+                JsonObject groupObject = new JsonObject();
+
+                Class<?> iGroup = groupSettings.getKey();
+                Field[] iSettings = groupSettings.getValue();
+
+                for (Field iSetting : iSettings) { //for every setting
+                    try {
+                        if (iSetting.getType() == boolean.class) { //if checkbox
+                            groupObject.addProperty(iSetting.getName(), (boolean) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == WChoice.class) { //if choice
+                            groupObject.addProperty(iSetting.getName(), ((WChoice) iSetting.get(null)).getSelected());
+                        }
+
+                        if (iSetting.getType() == HashMap.class) { //if combo
+                            HashMap<String, Boolean> options = (HashMap<String, Boolean>) iSetting.get(null); //get all combo options
+                            List<String> active = options.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.toList()); //get active (true ones)
+                            groupObject.add(iSetting.getName(), gson.toJsonTree(active, new TypeToken<List<String>>(){}.getType())); //save as an array of strings
+                        }
+
+                        if (iSetting.getType() == String.class) { //if field
+                            groupObject.addProperty(iSetting.getName(), (String) iSetting.get(null));
+                        }
+
+                        if (iSetting.getType() == WSlider.class) { //if slider
+                            groupObject.addProperty(iSetting.getName(), ((WSlider) iSetting.get(null)).getValue());
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
                     }
                 }
+
+                pageObject.add(iGroup.getSimpleName(), groupObject);
             }
-        } catch (Exception e) {
+
+            json.add(reflectionCache.getIPage().getSimpleName(), pageObject);
+        }
+
+        try { //write to file
+            FileWriter writer = new FileWriter(file);
+            writer.write(gson.toJson(json));
+            writer.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean getCheckbox(String group, String label) {
-        if ((comp = find(group, label, Checkbox.class)) != null) return ((Checkbox) comp).isToggled();
-        return false;
-    }
+    public static void load() {
+        JsonObject json = new JsonObject();
 
-    public String getChoice(String group, String label) {
-        if ((comp = find(group, label, Choice.class)) != null) return ((Choice) comp).getSelected();
-        return null;
-    }
-
-    public HashMap<String, Boolean> getCombo(String group, String label) {
-        if ((comp = find(group, label, Combo.class)) != null) return ((Combo) comp).getOptions();
-        return null;
-    }
-
-    public String getField(String group, String label) {
-        if ((comp = find(group, label, Field.class)) != null) return ((Field) comp).getText();
-        return null;
-    }
-
-    public double getSlider(String group, String label) {
-        if ((comp = find(group, label, Slider.class)) != null) return ((Slider) comp).getValue();
-        return 0;
-    }
-
-    public void setCheckbox(String group, String label, boolean toggled) {
-        if ((comp = find(group, label, Checkbox.class)) != null) ((Checkbox) comp).setToggled(toggled);
-    }
-
-    public void setChoice(String group, String label, String selected) {
-        if ((comp = find(group, label, Choice.class)) != null) ((Choice) comp).setSelected(selected);
-    }
-
-    public void setCombo(String group, String label, HashMap<String, Boolean> options) {
-        if ((comp = find(group, label, Combo.class)) != null) ((Combo) comp).setOptions(options);
-    }
-
-    public void setField(String group, String label, String text) {
-        if ((comp = find(group, label, Field.class)) != null) ((Field) comp).setText(text);
-    }
-
-    public void setSlider(String group, String label, double value) {
-        if ((comp = find(group, label, Slider.class)) != null) ((Slider) comp).setValue(value);
-    }
-
-    public Component find(String group, String label, Class<? extends Component> subType) {
-        for (Component comp : Icarus.getWindow().all) {
-            if (comp.getLabel().equals(label) && comp.getGroup().getLabel().equals(group) && subType.isInstance(comp)) {
-                return comp;
-            }
+        try {
+            json = new JsonParser().parse(new FileReader(file)).getAsJsonObject();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        return null;
     }
 }
