@@ -8,9 +8,9 @@ import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
 
 @IPage(icon = 'v')
-public class Visuals {
+public class Combat {
     @IGroup(x = 47.5, y = 10)
-    public static class ESP {
+    public static class KillAura {
         public static Runnable Button = () -> {
             NotificationManager.send(new Notification("Button", "You pressed the button!"));
             System.out.println("Button pressed!");
@@ -31,7 +31,7 @@ public class Visuals {
     }
 
     @IGroup(x = 47.5, y = 80)
-    public static class Chams {
+    public static class Reach {
         public static Runnable Button = () -> {
             NotificationManager.send(new Notification("Button", "You pressed the button!"));
             System.out.println("Button pressed!");
