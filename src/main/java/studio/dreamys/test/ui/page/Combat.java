@@ -40,6 +40,7 @@ public class Combat {
             System.out.println("Button pressed!");
         };
 
+        @IKeybind(Keyboard.KEY_F5)
         public static boolean Checkbox = true;
 
         @DropdownOptions({"Option 1", "Option 2", "Option 3"})

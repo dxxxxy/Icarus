@@ -15,7 +15,7 @@ import java.util.Objects;
 @SuppressWarnings({"unused", "DuplicatedCode", "JavadocReference"})
 public class RenderUtils {
     public static GlyphPageFontRenderer iconRenderer;
-    public static GlyphPageFontRenderer fontRenderer;
+    public static GlyphPageFontRenderer textRenderer;
     public static GlyphPageFontRenderer titleRenderer;
 
     public static void loadFonts() {
@@ -28,7 +28,7 @@ public class RenderUtils {
 
         //initialize font renderer
         iconRenderer = GlyphPageFontRenderer.create("undefeated", 50, false, false, false);
-        fontRenderer = GlyphPageFontRenderer.create("Verdana", 11, false, false, false);
+        textRenderer = GlyphPageFontRenderer.create("Verdana", 11, false, false, false);
         titleRenderer = GlyphPageFontRenderer.create("Verdana", 20, true, false, false);
     }
 
@@ -81,59 +81,59 @@ public class RenderUtils {
     }
 
     public static void drawString(String text, double x, double y, Color color) {
-        fontRenderer.drawString(text, (float) x, (float) y, color.getRGB(), false);
+        textRenderer.drawString(text, (float) x, (float) y, color.getRGB(), false);
     }
 
     public static void drawString(String text, double x, double y, Color color, boolean shadow) {
-        fontRenderer.drawString(text, (float) x, (float) y, color.getRGB(), shadow);
+        textRenderer.drawString(text, (float) x, (float) y, color.getRGB(), shadow);
     }
 
     public static void drawString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        fontRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), false);
+        textRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), false);
         GL11.glPopMatrix();
     }
 
     public static void drawString(String text, double x, double y, float scale, Color color, boolean shadow) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        fontRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), shadow);
+        textRenderer.drawString(text, (float) (x / scale), (float) (y / scale), color.getRGB(), shadow);
         GL11.glPopMatrix();
     }
 
     public static void drawCenteredString(String text, double x, double y, Color color) {
-        fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
+        textRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
     }
 
     public static void drawCenteredString(String text, double x, double y, Color color, boolean shadow) {
-        fontRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), shadow);
+        textRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), shadow);
     }
 
     public static void drawCenteredString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        fontRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), false);
+        textRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), false);
         GL11.glPopMatrix();
     }
 
     public static void drawCenteredString(String text, double x, double y, float scale, Color color, boolean shadow) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
-        fontRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), shadow);
+        textRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), shadow);
         GL11.glPopMatrix();
     }
 
     public static float getStringWidth(String text) {
-        return fontRenderer.getStringWidth(text);
+        return textRenderer.getStringWidth(text);
     }
 
     public static float getStringWidth(String text, float scale) {
-        return fontRenderer.getStringWidth(text) * scale;
+        return textRenderer.getStringWidth(text) * scale;
     }
 
     public static float getFontHeight() {
-        return fontRenderer.getFontHeight();
+        return textRenderer.getFontHeight();
     }
 
     public static void drawGroupWithString(double width, double height, double x, double y, String label) {

@@ -7,8 +7,8 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.DropdownOptions;
+import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
@@ -28,15 +28,15 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class Config {
-    public static File configFile;
-    public static File keybindFile;
+    public static File configFile, keybindFile;
     public static Reflections reflections;
     public static Gson gson;
     public static List<ReflectionCache> reflectionCaches = new ArrayList<>();
+    public static Map<Class<? extends Component>, Class<? extends Component>> componentReplacements = new HashMap<>();
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void init(String modid) {
-        //init file
+        //init files
         configFile = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "config.json");
         keybindFile = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "keybind.json");
         try {
@@ -62,6 +62,14 @@ public class Config {
 
             reflectionCaches.add(new ReflectionCache(iPage, iGroupMap));
         }
+
+        load();
+        save();
+
+        generateWindow();
+
+        loadAttachments();
+        saveAttachments();
     }
 
     public static void generateWindow() {
@@ -86,37 +94,81 @@ public class Config {
                     //get additional annotations
                     DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
                     SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
-                    IKeybind IKeybind = iSetting.getAnnotation(IKeybind.class);
+                    IKeybind iKeybind = iSetting.getAnnotation(IKeybind.class);
 
                     if (iSetting.getType() == Runnable.class) { //if button
                         component = new Button(iSetting.getName());
+                        if (componentReplacements.containsKey(Button.class)) {
+                            try {
+                                component = componentReplacements.get(Button.class).getConstructor(String.class).newInstance(iSetting.getName());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     else if (iSetting.getType() == boolean.class) { //if checkbox
                         component = new Checkbox(iSetting.getName());
+                        if (componentReplacements.containsKey(Checkbox.class)) {
+                            try {
+                                System.out.println("using custom checkbox");
+                                component = componentReplacements.get(Checkbox.class).getConstructor(String.class).newInstance(iSetting.getName());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     else if (iSetting.getType() == String.class && dropdownOptions != null) { //if choice
                         component = new Choice(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                        if (componentReplacements.containsKey(Choice.class)) {
+                            try {
+                                component = componentReplacements.get(Choice.class).getConstructor(String.class, List.class).newInstance(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     else if (iSetting.getType() == String[].class && dropdownOptions != null) { //if combo
                         component = new Combo(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                        if (componentReplacements.containsKey(Combo.class)) {
+                            try {
+                                component = componentReplacements.get(Combo.class).getConstructor(String.class, List.class).newInstance(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     else if (iSetting.getType() == String.class) { //if field
                         component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName());
+                        if (componentReplacements.containsKey(studio.dreamys.icarus.component.sub.Field.class)) {
+                            try {
+                                component = componentReplacements.get(studio.dreamys.icarus.component.sub.Field.class).getConstructor(String.class).newInstance(iSetting.getName());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     else if (iSetting.getType() == double.class && sliderOptions != null) { //if slider
                         component = new Slider(iSetting.getName(), sliderOptions.min(), sliderOptions.max(), sliderOptions.onlyInt(), sliderOptions.units());
+                        if (componentReplacements.containsKey(Slider.class)) {
+                            try {
+                                component = componentReplacements.get(Slider.class).getConstructor(String.class, double.class, double.class, boolean.class, String.class).newInstance(iSetting.getName(), sliderOptions.min(), sliderOptions.max(), sliderOptions.onlyInt(), sliderOptions.units());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
 
                     if (component == null) continue; //if component is null, skip it
                     component.configField = iSetting;
                     group.addChild(component); //add component to group
 
-                    if (iSetting.getType() == Runnable.class && IKeybind != null) new Keybind(IKeybind.value()).attachTo(component);
+                    //only bind keybind to checkbox or button
+                    if ((iSetting.getType() == Runnable.class || iSetting.getType() == boolean.class) && iKeybind != null) new Keybind(iKeybind.value()).attachTo(component);
                 }
             }
         }
@@ -179,7 +231,7 @@ public class Config {
         }
     }
 
-    public static void load() {
+    private static void load() {
         JsonObject json;
 
         try {
@@ -240,13 +292,42 @@ public class Config {
 
         for (Attachment attachment : Icarus.getWindow().attachments) {
             if (attachment instanceof Keybind) {
-                JsonObject groupObject = new JsonObject(); //create group
-                groupObject.addProperty(attachment.getChild().getLabel(), ((Keybind) attachment).getKey()); //add setting to group
+                if (json.has(attachment.getChild().group.page.getLabel())) { //page already exists
+                    //lets get it
+                    JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel());
 
-                JsonObject pageObject = new JsonObject(); //create page
-                pageObject.add(attachment.getChild().group.getLabel(), groupObject); //add group to page
+                    if (pageObject.has(attachment.getChild().group.getLabel())) { //group already exists
+                        //lets get it
+                        JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel());
 
-                json.add(attachment.getChild().group.page.getLabel(), pageObject); //add page to json
+                        //add keybind to group
+                        groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
+                    } else { //group doesn't exist
+                        //lets create one
+                        JsonObject groupObject = new JsonObject();
+
+                        //add keybind to group
+                        groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
+
+                        //add group to page
+                        pageObject.add(attachment.getChild().group.getLabel(), groupObject);
+                    }
+                } else { //page doesn't exist
+                    //lets create a page
+                    JsonObject pageObject = new JsonObject();
+
+                    //lets create a group
+                    JsonObject groupObject = new JsonObject();
+
+                    //add keybind to group
+                    groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
+
+                    //add group to page
+                    pageObject.add(attachment.getChild().group.getLabel(), groupObject);
+
+                    //add page to json
+                    json.add(attachment.getChild().group.page.getLabel(), pageObject);
+                }
             }
         }
 
@@ -259,7 +340,7 @@ public class Config {
         }
     }
 
-    public static void loadAttachments() {
+    private static void loadAttachments() {
         JsonObject json;
 
         try {
