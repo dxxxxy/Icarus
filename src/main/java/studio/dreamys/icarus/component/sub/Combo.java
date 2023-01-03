@@ -17,8 +17,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Combo extends Component {
     private List<String> options;
 
-    private boolean open;
-
     public Combo(String label, List<String> options) {
         super(label, 80, 12);
 

@@ -4,13 +4,14 @@ import studio.dreamys.icarus.util.position.Bounds;
 
 import java.lang.reflect.Field;
 
-public class Component {
+public abstract class Component {
     protected Window window;
     protected Group group;
 
     protected double x, relativeX;
     protected double y, relativeY;
     protected double width, height;
+    protected boolean open;
 
     protected String label;
 
@@ -54,7 +55,7 @@ public class Component {
     }
 
     public void setGroup(Group group) {
-
+        this.group = group;
     }
 
     public void setX(double x) {
@@ -69,43 +70,7 @@ public class Component {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
-    public Group getGroup() {
-        return null;
-    }
-
-    public Window getWindow() {
-        return null;
-    }
-
-    public double getX() {
-        return 0;
-    }
-
-    public double getY() {
-        return 0;
-    }
-
-    public boolean isOpen() {
-        return false;
-    }
-
-    public double getWidth() {
-        return 0;
-    }
-
-    public double getHeight() {
-        return 0;
-    }
-
     public Bounds getBounds() {
         return new Bounds(width, height);
-    }
-
-    public String getLabel() {
-        return "null";
-    }
-
-    public void fireChange() {
-
     }
 }

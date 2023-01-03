@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class Choice extends Component {
     private List<String> options;
 
-    private boolean open;
-
     public Choice(String label, List<String> options) {
         super(label, 80, 12);
 

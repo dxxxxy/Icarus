@@ -67,9 +67,4 @@ public class Page extends Component {
         relativeX = x;
         relativeY = y;
     }
-
-    @Override
-    public String getLabel() {
-        return label;
-    }
 }
