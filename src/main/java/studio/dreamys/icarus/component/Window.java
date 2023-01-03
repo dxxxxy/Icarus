@@ -74,6 +74,9 @@ public class Window extends GuiScreen {
         //draw and update children
         for (Component component : visible) {
             component.render(mouseX, mouseY);
+
+            //render bounds
+            RenderUtils.drawOutline(component.getBounds().getWidth(), component.getBounds().getHeight() + component.getBounds().getOffsetY(), component.x, component.y - component.getBounds().getOffsetY(), Color.RED);
         }
     }
 

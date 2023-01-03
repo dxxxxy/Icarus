@@ -44,7 +44,8 @@ public class Page extends Component {
 
     @Override
     public void setWindow(Window window) {
-        y += height * (window.pages.size() - 1);
+        x = 3;
+        y = 4 + height * (window.pages.size() - 1);
 
         super.setWindow(window);
     }

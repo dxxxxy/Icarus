@@ -44,6 +44,6 @@ public class Group extends Component {
     public void positionChild(Component child) {
         child.setX(x + 12.5);
         child.setY(y + height + child.getBounds().getOffsetY());
-        height += child.getBounds().getHeight() + child.getBounds().getOffsetY() + 5;
+        height += child.getBounds().getHeight() + child.getBounds().getOffsetY() + 7.5;
     }
 }

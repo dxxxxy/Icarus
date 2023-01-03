@@ -29,9 +29,9 @@ public class TestMod {
         MinecraftForge.EVENT_BUS.register(this);
         Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
 
-        Icarus.provideComponent(CustomCheckbox.class, Checkbox.class);
+//        Icarus.provideComponent(CustomCheckbox.class, Checkbox.class);
         Icarus.init(e.getModMetadata().modId, window);
-        Icarus.provideTitleFont(getClass().getResourceAsStream("/assets/icarus/undefeated.ttf"), "undefeated", 50, false, false, false);
+//        Icarus.provideTitleFont(getClass().getResourceAsStream("/assets/icarus/undefeated.ttf"), "undefeated", 50, false, false, false);
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));

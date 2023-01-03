@@ -30,8 +30,8 @@ public class Keybind extends Attachment {
 
     @Override
     public void render(int mouseX, int mouseY) {
-        x = getChild().getX() + getChild().group.getWidth() - 50;
-        y = getChild().getY() + getChild().getHeight() / 8;
+        x = getChild().getX() + getChild().getBounds().getWidth() + 10;
+        y = (getChild().getY() + getChild().getBounds().getHeight() / 2) - RenderUtils.getFontHeight() / 2;
 
         RenderUtils.drawString(keybind, x, y, Color.WHITE);
     }
