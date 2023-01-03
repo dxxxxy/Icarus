@@ -1,4 +1,4 @@
-package studio.dreamys.icarus.config;
+package studio.dreamys.icarus.reflection;
 
 import lombok.Getter;
 

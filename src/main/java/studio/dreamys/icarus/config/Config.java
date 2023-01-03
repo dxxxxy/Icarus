@@ -15,6 +15,7 @@ import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Group;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.reflection.ReflectionCache;
 
 import java.io.File;
 import java.io.FileReader;
