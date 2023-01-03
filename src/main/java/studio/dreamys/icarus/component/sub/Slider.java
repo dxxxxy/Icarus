@@ -16,8 +16,9 @@ public class Slider extends Component {
     private double max;
     private double min;
     private boolean onlyInt;
-    private double percent;
     private String units;
+
+    private double percent;
 
     //dragging stuff
     public boolean dragging;
@@ -33,7 +34,9 @@ public class Slider extends Component {
 
     @SneakyThrows
     public double getValue() {
-        return configField.getDouble(null);
+        double value =  configField.getDouble(null);
+        percent = (value - min) / (max - min);
+        return value;
     }
 
     @SneakyThrows

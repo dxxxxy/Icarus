@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
 import studio.dreamys.icarus.extra.notification.Notification;
@@ -98,6 +99,8 @@ public class TestMod {
             if (keyCode == Keyboard.KEY_K) {
                 NotificationManager.send(new Notification("Test", "Test"));
                 Visuals.ESP.Checkbox = true;
+                Visuals.ESP.Slider = 50;
+                Config.save();
             }
             if (keyCode == Keyboard.KEY_J) {
                 NotificationManager.send(new Notification("Test", "This is a very cool informational notification which is much larger in size.", 40));
