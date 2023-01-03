@@ -78,11 +78,11 @@ public class TestMod {
         System.out.println(e.text);
     }
 
-    @SubscribeEvent
-    public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
-        System.out.println(e.keybind);
-        System.out.println(e.key);
-    }
+//    @SubscribeEvent
+//    public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
+//        System.out.println(e.keybind);
+//        System.out.println(e.key);
+//    }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.SliderEvent e) {

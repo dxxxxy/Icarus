@@ -2,6 +2,7 @@ package studio.dreamys.icarus.component;
 
 import lombok.Getter;
 import lombok.Setter;
+import studio.dreamys.icarus.component.sub.attachment.Attachment;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.util.ArrayList;
