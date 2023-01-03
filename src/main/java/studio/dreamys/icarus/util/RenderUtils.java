@@ -12,7 +12,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.util.Objects;
 
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unused", "DuplicatedCode", "JavadocReference"})
 public class RenderUtils {
     public static GlyphPageFontRenderer iconRenderer;
     public static GlyphPageFontRenderer fontRenderer;
