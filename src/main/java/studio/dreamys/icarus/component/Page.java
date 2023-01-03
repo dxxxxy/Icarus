@@ -22,8 +22,7 @@ public class Page extends Component {
     @Override
     public void render(int mouseX, int mouseY) {
         //update position
-        x = window.x + relativeX;
-        y = window.y + relativeY;
+        super.render(mouseX, mouseY);
 
         Color color = Icarus.getWindow().activePageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
 

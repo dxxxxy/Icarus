@@ -24,7 +24,6 @@ public class Window extends GuiScreen {
     public int activePageIndex;
     public ArrayList<Page> pages = new ArrayList<>();
     public ArrayList<Component> visible = new ArrayList<>();
-    public ArrayList<Component> all = new ArrayList<>();
 
     //dragging stuff
     public double dragX;
@@ -74,7 +73,7 @@ public class Window extends GuiScreen {
             component.render(mouseX, mouseY);
 
             //draw bounds
-//            RenderUtils.drawOutline(component.getBounds().getWidth(), component.getBounds().getHeight() + component.getBounds().getOffsetY(), x, y - component.getBounds().getOffsetY(), Color.GREEN);
+            RenderUtils.drawOutline(component.getBounds().getWidth(), component.getBounds().getHeight() + component.getBounds().getOffsetY(), x, y - component.getBounds().getOffsetY(), Color.GREEN);
         }
     }
 
@@ -96,9 +95,6 @@ public class Window extends GuiScreen {
             component.mouseClicked(mouseX, mouseY, mouseButton);
             if (component.open) break; //avoid clicking underlying elements when something is open
         }
-
-        //save config on mouse click (button, checkbox, choice, etc...)
-//        Icarus.getConfig().save();
     }
 
     @Override
@@ -109,9 +105,6 @@ public class Window extends GuiScreen {
         for (Component component : visible) {
             component.keyTyped(typedChar, keyCode);
         }
-
-        //save config on key typed (typically fields)
-//        Icarus.getConfig().save();
     }
 
     @Override
@@ -122,30 +115,22 @@ public class Window extends GuiScreen {
         for (Component component : visible) {
             component.mouseReleased(mouseX, mouseY, state);
         }
-
-        //save config on mouse release (typically sliders)
-//        Icarus.getConfig().save();
     }
 
-    private boolean hovered(double x, double y) {
+    public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + width && y > this.y && y < this.y + height / 25; //only 1/25 from the top is draggable
     }
 
-    private void update(int mouseX, int mouseY) {
+    public void update(int mouseX, int mouseY) {
         if (isDragging) {
             x = mouseX - dragX;
             y = mouseY - dragY;
         }
     }
 
-    public Page addPage(Page page) {
-        //add page to list
+    public void addPage(Page page) {
         pages.add(page);
-
-        //pass window to page
         page.setWindow(this);
-
-        return page;
     }
 
     public void setActivePage(Page page) {
@@ -163,9 +148,5 @@ public class Window extends GuiScreen {
 
         //reverse list to render from bottom to top
         Collections.reverse(visible);
-    }
-
-    public void setKey(int key) {
-        this.key = key;
     }
 }
