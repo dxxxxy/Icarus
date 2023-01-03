@@ -10,7 +10,7 @@ import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.Button;
 import studio.dreamys.icarus.component.sub.Checkbox;
-import studio.dreamys.icarus.component.sub.attachment.Keybind;
+import studio.dreamys.icarus.component.sub.attachment.sub.Keybind;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -40,21 +40,21 @@ public class Icarus {
                 Minecraft.getMinecraft().displayGuiScreen(window);
                 return;
             }
-            for (Component attachment : window.all) { //for every attachment
-                if (attachment instanceof Keybind) { //if it's a keybind
-                    Keybind keybind = (Keybind) attachment; //cast to keybind
-                    if (keybind.getKey() == keyCode) { //if the keys match
-                        if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
-                            ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
-//                            config.save(); //save the config
-                            keybind.getChild().fireChange(); //fire change event
-                        }
-                        if (keybind.getChild() instanceof Button) { //if the child is a button
-//                            ((Button) keybind.getChild()).getRunnable().run(); //click the button
-                        }
-                    }
-                }
-            }
+//            for (Component attachment : window.all) { //for every attachment
+//                if (attachment instanceof Keybind) { //if it's a keybind
+//                    Keybind keybind = (Keybind) attachment; //cast to keybind
+//                    if (keybind.getKey() == keyCode) { //if the keys match
+//                        if (keybind.getChild() instanceof Checkbox) { //if the child is a checkbox
+//                            ((Checkbox) keybind.getChild()).toggle(); //toggle the checkbox
+////                            config.save(); //save the config
+//                            keybind.getChild().fireChange(); //fire change event
+//                        }
+//                        if (keybind.getChild() instanceof Button) { //if the child is a button
+////                            ((Button) keybind.getChild()).getRunnable().run(); //click the button
+//                        }
+//                    }
+//                }
+//            }
         }
     }
 }
