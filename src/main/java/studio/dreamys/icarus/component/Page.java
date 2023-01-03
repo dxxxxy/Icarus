@@ -3,7 +3,6 @@ package studio.dreamys.icarus.component;
 import lombok.Getter;
 import lombok.Setter;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
@@ -48,10 +47,6 @@ public class Page extends Component {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             window.setActivePage(this);
         }
-    }
-
-    private boolean hovered(double x, double y) {
-        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
     public Group addGroup(Group group) {

@@ -12,10 +12,14 @@ import studio.dreamys.icarus.annotation.field.SOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Group;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -53,26 +57,6 @@ public class Config {
         }
     }
 
-    public static void update(Component component, Object value) {
-        Field field = findField(component.getGroup().getPage().getLabel(), component.getGroup().getLabel(), component.getLabel());
-        if (field == null) return;
-
-        try {
-            field.set(null, value);
-            Config.save();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Field findField(String page, String group, String setting) {
-        ReflectionCache reflectionCache = reflectionCaches.stream().filter(cache -> cache.getIPage().getSimpleName().equals(page)).findFirst().orElse(null);
-        if (reflectionCache == null) return null;
-        Class<?> iGroup = reflectionCache.getIGroupMap().keySet().stream().filter(iGroup1 -> iGroup1.getSimpleName().equals(group)).findFirst().orElse(null);
-        if (iGroup == null) return null;
-        return Arrays.stream(reflectionCache.getIGroupMap().get(iGroup)).filter(field -> field.getName().equals(setting)).findFirst().orElse(null);
-    }
-
     public static void generateWindow() {
         for (ReflectionCache reflectionCache : reflectionCaches) {
             Class<?> iPage = reflectionCache.getIPage();
@@ -102,29 +86,30 @@ public class Config {
                         }
 
                         else if (iSetting.getType() == boolean.class) { //if checkbox
-                            component = new Checkbox(iSetting.getName(), (boolean) iSetting.get(null));
+                            component = new Checkbox(iSetting.getName());
                         }
 
                         else if (iSetting.getType() == String.class && options != null) { //if choice
-                            component = new Choice(iSetting.getName(), (String) iSetting.get(null), Arrays.asList(options.value()));
+                            component = new Choice(iSetting.getName(), Arrays.asList(options.value()));
                         }
 
                         else if (iSetting.getType() == String[].class && options != null) { //if combo
-                            component = new Combo(iSetting.getName(), Arrays.asList((String[]) iSetting.get(null)), Arrays.asList(options.value()));
+                            component = new Combo(iSetting.getName(), Arrays.asList(options.value()));
                         }
 
                         else if (iSetting.getType() == String.class) { //if field
-                            component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName(), (String) iSetting.get(null));
+                            component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName());
                         }
 
                         else if (iSetting.getType() == double.class && sOptions != null) { //if slider
-                            component = new Slider(iSetting.getName(), (double) iSetting.get(null), sOptions.min(), sOptions.max(), sOptions.onlyInt(), sOptions.units());
+                            component = new Slider(iSetting.getName(), sOptions.min(), sOptions.max(), sOptions.onlyInt(), sOptions.units());
                         }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
 
                     if (component == null) continue; //if component is null, skip it
+                    component.configField = iSetting;
                     group.addChild(component); //add component to group
                 }
             }

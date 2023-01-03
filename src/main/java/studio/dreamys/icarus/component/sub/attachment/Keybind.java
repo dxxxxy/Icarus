@@ -1,10 +1,11 @@
-package studio.dreamys.icarus.component.sub;
+package studio.dreamys.icarus.component.sub.attachment;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;
+import studio.dreamys.icarus.component.Group;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
@@ -60,7 +61,7 @@ public class Keybind extends Attachment {
         }
     }
 
-    private boolean hovered(double x, double y) {
+    public boolean hovered(double x, double y) {
         return x > this.x && x < this.x + RenderUtils.getStringWidth(keybind) && y > this.y && y < this.y + RenderUtils.getFontHeight();
     }
 

@@ -10,7 +10,7 @@ import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.component.sub.Button;
 import studio.dreamys.icarus.component.sub.Checkbox;
-import studio.dreamys.icarus.component.sub.Keybind;
+import studio.dreamys.icarus.component.sub.attachment.Keybind;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -50,7 +50,7 @@ public class Icarus {
                             keybind.getChild().fireChange(); //fire change event
                         }
                         if (keybind.getChild() instanceof Button) { //if the child is a button
-                            ((Button) keybind.getChild()).getRunnable().run(); //click the button
+//                            ((Button) keybind.getChild()).getRunnable().run(); //click the button
                         }
                     }
                 }

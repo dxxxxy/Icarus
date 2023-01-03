@@ -5,7 +5,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;

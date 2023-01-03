@@ -3,8 +3,9 @@ package studio.dreamys.icarus.event;
 import net.minecraftforge.fml.common.eventhandler.Event;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.component.sub.attachment.Keybind;
 
-import java.util.HashMap;
+import java.util.List;
 
 public abstract class ComponentEvent extends Event {
     public Component component;
@@ -35,11 +36,11 @@ public abstract class ComponentEvent extends Event {
 
     public static class ComboEvent extends Event {
         public Combo combo;
-        public HashMap<String, Boolean> activeOptions;
+        public List<String> active;
 
         public ComboEvent(Combo combo) {
             this.combo = combo;
-            activeOptions = combo.getOptions();
+            active = combo.getActive();
         }
     }
 

@@ -8,11 +8,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.test.ui.page.Visuals;
 
 import java.awt.*;
 
@@ -29,7 +30,7 @@ public class TestMod {
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
 
-        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
+//        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
 
         NotificationManager.startY = 20; //start below watermark
 
@@ -67,7 +68,7 @@ public class TestMod {
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ComboEvent e) {
         System.out.println(e.combo);
-        System.out.println(e.activeOptions);
+        System.out.println(e.active);
     }
 
     @SubscribeEvent
@@ -96,6 +97,7 @@ public class TestMod {
             if (keyCode <= 0) return; //ignore invalid keycode
             if (keyCode == Keyboard.KEY_K) {
                 NotificationManager.send(new Notification("Test", "Test"));
+                Visuals.ESP.Checkbox = true;
             }
             if (keyCode == Keyboard.KEY_J) {
                 NotificationManager.send(new Notification("Test", "This is a very cool informational notification which is much larger in size.", 40));

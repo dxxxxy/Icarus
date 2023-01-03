@@ -1,4 +1,4 @@
-package studio.dreamys.icarus.component.sub;
+package studio.dreamys.icarus.component.sub.attachment;
 
 import studio.dreamys.icarus.component.Attachment;
 import studio.dreamys.icarus.component.Component;

@@ -1,16 +1,38 @@
 package studio.dreamys.icarus.component;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import studio.dreamys.icarus.component.sub.*;
-import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.position.Bounds;
 
-//keep this not abstract to avoid some useless empty methods
-public class Component {
-    public void render(int mouseX, int mouseY) {
+import java.lang.reflect.Field;
 
+public class Component {
+    protected Window window;
+    protected Group group;
+
+    protected double x, relativeX;
+    protected double y, relativeY;
+    protected double width, height;
+
+    protected String label;
+
+    public Field configField;
+
+    public Component(String label, double width, double height) {
+        this.label = label;
+        this.width = width;
+        this.height = height;
+    }
+
+    public Component() {
+
+    }
+
+    public void render(int mouseX, int mouseY) {
+        update();
+    }
+
+    public void update() {
+        x = window.x + relativeX;
+        y = window.y + relativeY;
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -26,7 +48,9 @@ public class Component {
     }
 
     public void setWindow(Window window) {
-
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 
     public void setGroup(Group group) {
@@ -34,11 +58,15 @@ public class Component {
     }
 
     public void setX(double x) {
-
+        relativeX = x;
     }
 
     public void setY(double y) {
+        relativeY = y;
+    }
 
+    public boolean hovered(double x, double y) {
+        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
     public Group getGroup() {
@@ -70,7 +98,7 @@ public class Component {
     }
 
     public Bounds getBounds() {
-        return null;
+        return new Bounds(width, height);
     }
 
     public String getLabel() {
@@ -78,31 +106,6 @@ public class Component {
     }
 
     public void fireChange() {
-        Event event = null;
 
-        if (this instanceof Checkbox) {
-            event = new ComponentEvent.CheckboxEvent((Checkbox) this);
-            Config.update(this, ((Checkbox) this).isToggled());
-        }
-        if (this instanceof Choice) {
-            event = new ComponentEvent.ChoiceEvent((Choice) this);
-            Config.update(this, ((Choice) this).getSelected());
-        }
-        if (this instanceof Combo) {
-            event = new ComponentEvent.ComboEvent((Combo) this);
-            Config.update(this, ((Combo) this).getActiveOptions().split(","));
-        }
-        if (this instanceof Field) {
-            event = new ComponentEvent.FieldEvent((Field) this);
-            Config.update(this, ((Field) this).getText());
-        }
-        if (this instanceof Keybind) {
-            event = new ComponentEvent.KeybindEvent((Keybind) this);
-        }
-        if (this instanceof Slider) {
-            event = new ComponentEvent.SliderEvent((Slider) this);
-            Config.update(this, ((Slider) this).getValue());
-        }
-        if (event != null) MinecraftForge.EVENT_BUS.post(event);
     }
 }

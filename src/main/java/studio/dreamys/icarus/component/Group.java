@@ -1,15 +1,9 @@
-package studio.dreamys.icarus.component.sub;
+package studio.dreamys.icarus.component;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.lwjgl.util.Rectangle;
-import studio.dreamys.icarus.component.Attachment;
-import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Page;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.util.RenderUtils;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 @Getter
