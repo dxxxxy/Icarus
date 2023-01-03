@@ -6,7 +6,6 @@ import java.lang.reflect.Field;
 
 public abstract class Component {
     protected Window window;
-    protected Group group;
 
     protected double x, relativeX;
     protected double y, relativeY;
@@ -52,10 +51,6 @@ public abstract class Component {
         this.window = window;
         relativeX = x;
         relativeY = y;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
     }
 
     public void setX(double x) {
