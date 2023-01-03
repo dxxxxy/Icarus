@@ -1,12 +1,14 @@
 package studio.dreamys.icarus.component;
 
 import lombok.Getter;
+import studio.dreamys.icarus.component.sub.attachment.Attachment;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Group extends Component {
+    public Page page;
     @Getter private List<Component> children = new ArrayList<>();
 
     public Group(String label, double x, double y) {
@@ -29,7 +31,14 @@ public class Group extends Component {
     public void addChild(Component child) {
         children.add(child);
         child.setWindow(window);
+        child.group = this;
         positionChild(child);
+    }
+
+    public void addChild(Attachment child) {
+        children.add(child);
+        child.setWindow(window);
+        child.group = this;
     }
 
     public void positionChild(Component child) {

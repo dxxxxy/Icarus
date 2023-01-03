@@ -54,15 +54,15 @@ public abstract class ComponentEvent extends Event {
         }
     }
 
-//    public static class KeybindEvent extends Event {
-//        public Keybind keybind;
-//        public int key;
-//
-//        public KeybindEvent(Keybind keybind) {
-//            this.keybind = keybind;
-//            key = keybind.getKey();
-//        }
-//    }
+    public static class KeybindEvent extends Event {
+        public Keybind keybind;
+        public int key;
+
+        public KeybindEvent(Keybind keybind) {
+            this.keybind = keybind;
+            key = keybind.getKey();
+        }
+    }
 
     public static class SliderEvent extends Event {
         public Slider slider;

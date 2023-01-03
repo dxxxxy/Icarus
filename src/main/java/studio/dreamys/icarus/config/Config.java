@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import net.minecraft.client.Minecraft;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.Options;
 import studio.dreamys.icarus.annotation.field.SOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
@@ -15,6 +16,8 @@ import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Group;
 import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.sub.*;
+import studio.dreamys.icarus.component.sub.attachment.Attachment;
+import studio.dreamys.icarus.component.sub.attachment.sub.Keybind;
 import studio.dreamys.icarus.reflection.ReflectionCache;
 
 import java.io.File;
@@ -25,7 +28,8 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class Config {
-    public static File file;
+    public static File configFile;
+    public static File keybindFile;
     public static Reflections reflections;
     public static Gson gson;
     public static List<ReflectionCache> reflectionCaches = new ArrayList<>();
@@ -33,10 +37,12 @@ public class Config {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void init(String modid) {
         //init file
-        file = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "config.json");
+        configFile = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "config.json");
+        keybindFile = new File(new File(Minecraft.getMinecraft().mcDataDir, modid), "keybind.json");
         try {
-            file.getParentFile().mkdirs();
-            file.createNewFile();
+            configFile.getParentFile().mkdirs();
+            configFile.createNewFile();
+            keybindFile.createNewFile();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,6 +86,7 @@ public class Config {
                     //get additional annotations
                     Options options = iSetting.getAnnotation(Options.class);
                     SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+                    IKeybind IKeybind = iSetting.getAnnotation(IKeybind.class);
 
                     try {
                         if (iSetting.getType() == Runnable.class) { //if button
@@ -112,6 +119,8 @@ public class Config {
                     if (component == null) continue; //if component is null, skip it
                     component.configField = iSetting;
                     group.addChild(component); //add component to group
+
+                    if (iSetting.getType() == Runnable.class && IKeybind != null) new Keybind(IKeybind.value()).attachTo(component);
                 }
             }
         }
@@ -166,7 +175,7 @@ public class Config {
         }
 
         try { //write to file
-            FileWriter writer = new FileWriter(file);
+            FileWriter writer = new FileWriter(configFile);
             writer.write(gson.toJson(json));
             writer.close();
         } catch (IOException e) {
@@ -178,7 +187,7 @@ public class Config {
         JsonObject json;
 
         try {
-            json = new JsonParser().parse(new FileReader(file)).getAsJsonObject();
+            json = new JsonParser().parse(new FileReader(configFile)).getAsJsonObject();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Failed to load settings");
@@ -191,7 +200,6 @@ public class Config {
             for (Map.Entry<Class<?>, Field[]> groupSettings : reflectionCache.getIGroupMap().entrySet()) {
                 if (pageObject == null) continue;
                 JsonObject groupObject = pageObject.getAsJsonObject(groupSettings.getKey().getSimpleName());
-
 
                 if (groupObject == null) continue;
                 Field[] iSettings = groupSettings.getValue();
@@ -227,6 +235,53 @@ public class Config {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+    }
+
+    public static void saveAttachments() {
+        JsonObject json = new JsonObject();
+
+        for (Attachment attachment : Icarus.getWindow().attachments) {
+            if (attachment instanceof Keybind) {
+                JsonObject groupObject = new JsonObject(); //create group
+                groupObject.addProperty(attachment.child.label, ((Keybind) attachment).getKey()); //add setting to group
+
+                JsonObject pageObject = new JsonObject(); //create page
+                pageObject.add(attachment.child.group.label, groupObject); //add group to page
+
+                json.add(attachment.child.group.page.label, pageObject); //add page to json
+            }
+        }
+
+        try { //write to file
+            FileWriter writer = new FileWriter(keybindFile);
+            writer.write(gson.toJson(json));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadAttachments() {
+        JsonObject json;
+
+        try {
+            json = new JsonParser().parse(new FileReader(keybindFile)).getAsJsonObject();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Failed to load settings");
+            return;
+        }
+
+        for (Attachment attachment : Icarus.getWindow().attachments) {
+            JsonObject pageObject = json.getAsJsonObject(attachment.child.group.page.label); //get page object
+            if (pageObject == null) continue;
+            JsonObject groupObject = pageObject.getAsJsonObject(attachment.child.group.label); //get group object
+            if (groupObject == null) continue;
+
+            if (attachment instanceof Keybind) {
+                ((Keybind) attachment).setKey(groupObject.get(attachment.child.label).getAsInt());
             }
         }
     }

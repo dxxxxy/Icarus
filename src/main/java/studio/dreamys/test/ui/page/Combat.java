@@ -1,5 +1,7 @@
 package studio.dreamys.test.ui.page;
 
+import org.lwjgl.input.Keyboard;
+import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.Options;
 import studio.dreamys.icarus.annotation.field.SOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
@@ -11,6 +13,7 @@ import studio.dreamys.icarus.extra.notification.NotificationManager;
 public class Combat {
     @IGroup(x = 47.5, y = 10)
     public static class KillAura {
+        @IKeybind(Keyboard.KEY_6)
         public static Runnable Button = () -> {
             NotificationManager.send(new Notification("Button", "You pressed the button!"));
             System.out.println("Button pressed!");

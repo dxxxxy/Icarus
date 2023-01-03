@@ -38,6 +38,7 @@ public class Page extends Component {
 
     public void addGroup(Group group) {
         groups.add(group);
+        group.page = this;
         group.setWindow(window);
     }
 

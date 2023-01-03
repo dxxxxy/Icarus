@@ -5,14 +5,15 @@ import studio.dreamys.icarus.util.position.Bounds;
 import java.lang.reflect.Field;
 
 public abstract class Component {
-    protected Window window;
+    public Window window;
+    public Group group;
 
-    protected double x, relativeX;
-    protected double y, relativeY;
-    protected double width, height;
-    protected boolean open;
+    public double x, y;
+    public double width, height;
+    public double relativeX, relativeY;
 
-    protected String label;
+    public String label;
+    public boolean open;
 
     public Field configField;
 
@@ -27,10 +28,6 @@ public abstract class Component {
     }
 
     public void render(int mouseX, int mouseY) {
-        update();
-    }
-
-    public void update() {
         x = window.x + relativeX;
         y = window.y + relativeY;
     }

@@ -1,5 +1,7 @@
 package studio.dreamys.test.ui.page;
 
+import org.lwjgl.input.Keyboard;
+import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.Options;
 import studio.dreamys.icarus.annotation.field.SOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
@@ -32,6 +34,7 @@ public class Visuals {
 
     @IGroup(x = 200, y = 10)
     public static class Chams {
+        @IKeybind(Keyboard.KEY_ESCAPE)
         public static Runnable Button = () -> {
             NotificationManager.send(new Notification("Button", "You pressed the button!"));
             System.out.println("Button pressed!");

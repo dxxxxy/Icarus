@@ -5,12 +5,14 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.component.sub.attachment.Attachment;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class Window extends GuiScreen {
     public static Window instance;
@@ -24,6 +26,7 @@ public class Window extends GuiScreen {
     public int activePageIndex;
     public ArrayList<Page> pages = new ArrayList<>();
     public ArrayList<Component> visible = new ArrayList<>();
+    public List<Attachment> attachments = new ArrayList<>();
 
     //dragging stuff
     public double dragX;

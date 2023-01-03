@@ -1,11 +1,13 @@
 package studio.dreamys.icarus.component.sub;
 
+import lombok.Getter;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.Color;
 
 public class Button extends Component {
+    @Getter
     private Runnable runnable;
     private boolean held;
 

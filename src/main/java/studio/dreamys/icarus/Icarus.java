@@ -6,11 +6,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
-import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.component.sub.Button;
-import studio.dreamys.icarus.component.sub.Checkbox;
-import studio.dreamys.icarus.component.sub.attachment.sub.Keybind;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.RenderUtils;
 
@@ -28,6 +24,8 @@ public class Icarus {
         Config.load();
         Config.save();
         Config.generateWindow();
+        Config.loadAttachments();
+        Config.saveAttachments();
     }
 
     @SubscribeEvent
