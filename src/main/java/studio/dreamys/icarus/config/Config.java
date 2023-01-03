@@ -189,11 +189,16 @@ public class Config {
             JsonObject pageObject = json.getAsJsonObject(reflectionCache.getIPage().getSimpleName());
 
             for (Map.Entry<Class<?>, Field[]> groupSettings : reflectionCache.getIGroupMap().entrySet()) {
+                if (pageObject == null) continue;
                 JsonObject groupObject = pageObject.getAsJsonObject(groupSettings.getKey().getSimpleName());
 
+
+                if (groupObject == null) continue;
                 Field[] iSettings = groupSettings.getValue();
 
                 for (Field iSetting : iSettings) { //for every setting
+                    if (groupObject.get(iSetting.getName()) == null) continue;
+
                     //get additional annotations
                     Options options = iSetting.getAnnotation(Options.class);
                     SOptions sOptions = iSetting.getAnnotation(SOptions.class);
