@@ -3,6 +3,18 @@
 
 A simple and extremely [lightweight](#lightweightness) Gui and config library for Minecraft Forge 1.8.9 modding heavily inspired by the GameSense/Skeet CS:GO cheat (not an exact copy). A fully working example mod using this library can be found at [test](src/main/java/studio/dreamys/test).
 
+## v2 - What's left
+- [ ] Control access in Component, Group, Page and Window.
+- [ ] Clean up config.
+- [ ] Recheck events.
+- [ ] Recheck bounds.
+- [ ] Recheck Keybind and KeybindHandler.
+- [ ] Retest TestMod.
+
+Possible new features:
+- [ ] Supply fonts.
+- [ ] Supply extended components.
+
 ## Importing
 ### Gradle
 ```
