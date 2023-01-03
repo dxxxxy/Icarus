@@ -30,7 +30,7 @@ public class Combat {
         public static double Slider = 1;
     }
 
-    @IGroup(x = 47.5, y = 80)
+    @IGroup(x = 200, y = 10)
     public static class Reach {
         public static Runnable Button = () -> {
             NotificationManager.send(new Notification("Button", "You pressed the button!"));
