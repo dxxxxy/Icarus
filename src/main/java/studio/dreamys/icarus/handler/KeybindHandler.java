@@ -25,12 +25,12 @@ public class KeybindHandler {
             for (Attachment attachment : Icarus.getWindow().attachments) {
                 if (attachment instanceof Keybind) {
                     if (((Keybind) attachment).getKey() == keyCode) {
-                        if (attachment.child instanceof Button) {
-                            ((Button) attachment.child).getRunnable().run();
+                        if (attachment.getChild() instanceof Button) {
+                            ((Button) attachment.getChild()).getRunnable().run();
                         }
 
-                        if (attachment.child instanceof Checkbox) {
-                            ((Checkbox) attachment.child).toggle();
+                        if (attachment.getChild() instanceof Checkbox) {
+                            ((Checkbox) attachment.getChild()).toggle();
                         }
                     }
                 }

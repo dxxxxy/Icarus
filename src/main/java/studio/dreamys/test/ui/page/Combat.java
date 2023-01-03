@@ -1,15 +1,15 @@
 package studio.dreamys.test.ui.page;
 
 import org.lwjgl.input.Keyboard;
+import studio.dreamys.icarus.annotation.field.DropdownOptions;
 import studio.dreamys.icarus.annotation.field.IKeybind;
-import studio.dreamys.icarus.annotation.field.Options;
-import studio.dreamys.icarus.annotation.field.SOptions;
+import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
 
-@IPage(icon = 'v')
+@IPage('v')
 public class Combat {
     @IGroup(x = 47.5, y = 10)
     public static class KillAura {
@@ -21,15 +21,15 @@ public class Combat {
 
         public static boolean Checkbox = true;
 
-        @Options({"Option 1", "Option 2", "Option 3"})
+        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
         public static String Choice = "Option 1";
 
-        @Options({"Option 1", "Option 2", "Option 3"})
+        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
         public static String[] Combo = {"Option 1", "Option 3"};
 
         public static String Field = "Hello World!";
 
-        @SOptions(min = 0, max = 100, onlyInt = true, units = "%")
+        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
         public static double Slider = 1;
     }
 
@@ -42,15 +42,15 @@ public class Combat {
 
         public static boolean Checkbox = true;
 
-        @Options({"Option 1", "Option 2", "Option 3"})
+        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
         public static String Choice = "Option 1";
 
-        @Options({"Option 1", "Option 2", "Option 3"})
+        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
         public static String[] Combo = {"Option 1", "Option 3"};
 
         public static String Field = "Hello World!";
 
-        @SOptions(min = 0, max = 100, onlyInt = true, units = "%")
+        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
         public static double Slider = 1;
     }
 }

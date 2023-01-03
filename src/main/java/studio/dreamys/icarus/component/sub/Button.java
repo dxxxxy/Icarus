@@ -1,20 +1,21 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.Getter;
+import lombok.SneakyThrows;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.util.RenderUtils;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Button extends Component {
-    @Getter
-    private Runnable runnable;
     private boolean held;
 
-    public Button(String label, Runnable runnable) {
+    public Button(String label) {
         super(label, 80, 12);
+    }
 
-        this.runnable = runnable;
+    @SneakyThrows
+    public Runnable getRunnable() {
+        return (Runnable) configField.get(null);
     }
 
     @Override
@@ -35,7 +36,7 @@ public class Button extends Component {
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
-            runnable.run();
+            getRunnable().run();
             held = true;
         }
     }

@@ -27,7 +27,7 @@ public class Choice extends Component {
     }
 
     @SneakyThrows
-    public void setSelected(String selected) {
+    private void setSelected(String selected) {
         configField.set(null, selected);
     }
 
@@ -76,8 +76,8 @@ public class Choice extends Component {
                 double posY = mouseY - y - height;
                 int index = (int) (posY / height);
 
-                //set and save
                 setSelected(options.get(index));
+
                 Config.save();
                 MinecraftForge.EVENT_BUS.post(new ComponentEvent.ChoiceEvent(this));
             } else open = false;

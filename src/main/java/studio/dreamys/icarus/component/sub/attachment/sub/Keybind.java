@@ -8,11 +8,12 @@ import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Keybind extends Attachment {
-    private String keybind = "[NONE]";
     @Getter private int key;
+
+    private String keybind = "[NONE]";
     private boolean capturing;
 
     public Keybind(int key) {
@@ -22,12 +23,15 @@ public class Keybind extends Attachment {
     public void setKey(int key) {
         this.key = key;
         keybind = "["+ Keyboard.getKeyName(key) +"]";
+
+        Config.saveAttachments();
+        MinecraftForge.EVENT_BUS.post(new ComponentEvent.KeybindEvent(this));
     }
 
     @Override
     public void render(int mouseX, int mouseY) {
-        x = child.x + child.group.width - 50;
-        y = child.y + child.height / 8;
+        x = getChild().getX() + getChild().group.getWidth() - 50;
+        y = getChild().getY() + getChild().getHeight() / 8;
 
         RenderUtils.drawString(keybind, x, y, Color.WHITE);
     }
@@ -46,10 +50,6 @@ public class Keybind extends Attachment {
         if (capturing) {
             setKey(keyCode);
             capturing = false;
-
-            //set and save
-            Config.saveAttachments();
-            MinecraftForge.EVENT_BUS.post(new ComponentEvent.KeybindEvent(this));
         }
     }
 

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface SOptions {
+public @interface SliderOptions {
     double min();
     double max();
     boolean onlyInt() default false;

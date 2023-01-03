@@ -36,7 +36,6 @@ public class Icarus {
             if (keyCode <= 0) return; //ignore invalid keycode
             if (keyCode == window.key) {
                 Minecraft.getMinecraft().displayGuiScreen(window);
-                return;
             }
 //            for (Component attachment : window.all) { //for every attachment
 //                if (attachment instanceof Keybind) { //if it's a keybind

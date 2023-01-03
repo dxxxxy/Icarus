@@ -1,5 +1,6 @@
 package studio.dreamys.icarus.component;
 
+import lombok.Getter;
 import studio.dreamys.icarus.util.position.Bounds;
 
 import java.lang.reflect.Field;
@@ -8,12 +9,12 @@ public abstract class Component {
     public Window window;
     public Group group;
 
-    public double x, y;
-    public double width, height;
-    public double relativeX, relativeY;
+    @Getter protected double x, y;
+    @Getter protected double width, height;
+    protected double relativeX, relativeY;
 
-    public String label;
-    public boolean open;
+    @Getter protected String label;
+    @Getter protected boolean open;
 
     public Field configField;
 

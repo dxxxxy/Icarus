@@ -44,11 +44,8 @@ public class Page extends Component {
 
     @Override
     public void setWindow(Window window) {
-        this.window = window;
-
         y += height * (window.pages.size() - 1);
 
-        relativeX = x;
-        relativeY = y;
+        super.setWindow(window);
     }
 }

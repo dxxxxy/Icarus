@@ -29,7 +29,7 @@ public class Combo extends Component {
     }
 
     @SneakyThrows
-    public void setActive(List<String> active) {
+    private void setActive(List<String> active) {
         configField.set(null, active.toArray(new String[0]));
     }
 
@@ -92,8 +92,8 @@ public class Combo extends Component {
                     i++;
                 }
 
-                //set and save
                 setActive(active);
+
                 Config.save();
                 MinecraftForge.EVENT_BUS.post(new ComponentEvent.ComboEvent(this));
             } else open = false;
@@ -105,7 +105,11 @@ public class Combo extends Component {
         }
     }
 
-    //display active options
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(width, height, 7);
+    }
+
     private String activeOptions() {
         StringBuilder formatted = new StringBuilder();
         for (String option : getActive()) {
@@ -124,10 +128,5 @@ public class Combo extends Component {
         if (formatted.toString().equals("")) formatted = new StringBuilder("-");
 
         return formatted.toString();
-    }
-
-    @Override
-    public Bounds getBounds() {
-        return new Bounds(width, height, 7);
     }
 }

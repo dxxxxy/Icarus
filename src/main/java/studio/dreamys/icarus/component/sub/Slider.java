@@ -20,8 +20,7 @@ public class Slider extends Component {
 
     private double percent;
 
-    //dragging stuff
-    public boolean dragging;
+    private boolean dragging;
 
     public Slider(String label, double min, double max, boolean onlyInt, String units) {
         super(label, 80, 3);
@@ -40,7 +39,7 @@ public class Slider extends Component {
     }
 
     @SneakyThrows
-    public void setValue(double value) {
+    private void setValue(double value) {
         configField.set(null, value);
     }
 
@@ -76,6 +75,11 @@ public class Slider extends Component {
         dragging = false;
     }
 
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(width, height + 5, 7);
+    }
+
     private double roundToPlace(double value) {
         BigDecimal bd = new BigDecimal(value);
         bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -95,10 +99,5 @@ public class Slider extends Component {
             Config.save();
             MinecraftForge.EVENT_BUS.post(new ComponentEvent.SliderEvent(this));
         }
-    }
-
-    @Override
-    public Bounds getBounds() {
-        return new Bounds(width, height + 5, 7);
     }
 }

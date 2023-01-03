@@ -8,8 +8,8 @@ import net.minecraft.client.Minecraft;
 import org.reflections.Reflections;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.annotation.field.IKeybind;
-import studio.dreamys.icarus.annotation.field.Options;
-import studio.dreamys.icarus.annotation.field.SOptions;
+import studio.dreamys.icarus.annotation.field.DropdownOptions;
+import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.component.Component;
@@ -69,7 +69,7 @@ public class Config {
             Class<?> iPage = reflectionCache.getIPage();
 
             IPage annotatedPage = iPage.getAnnotation(IPage.class); //get annotation
-            Page page = new Page(iPage.getSimpleName(), annotatedPage.icon()); //create page object
+            Page page = new Page(iPage.getSimpleName(), annotatedPage.value()); //create page object
             Icarus.getWindow().addPage(page); //add page to window
 
             for (Map.Entry<Class<?>, Field[]> entry : reflectionCache.getIGroupMap().entrySet()) {
@@ -84,36 +84,32 @@ public class Config {
                     Component component = null; //create component object
 
                     //get additional annotations
-                    Options options = iSetting.getAnnotation(Options.class);
-                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+                    DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
+                    SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
                     IKeybind IKeybind = iSetting.getAnnotation(IKeybind.class);
 
-                    try {
-                        if (iSetting.getType() == Runnable.class) { //if button
-                            component = new Button(iSetting.getName(), (Runnable) iSetting.get(null));
-                        }
+                    if (iSetting.getType() == Runnable.class) { //if button
+                        component = new Button(iSetting.getName());
+                    }
 
-                        else if (iSetting.getType() == boolean.class) { //if checkbox
-                            component = new Checkbox(iSetting.getName());
-                        }
+                    else if (iSetting.getType() == boolean.class) { //if checkbox
+                        component = new Checkbox(iSetting.getName());
+                    }
 
-                        else if (iSetting.getType() == String.class && options != null) { //if choice
-                            component = new Choice(iSetting.getName(), Arrays.asList(options.value()));
-                        }
+                    else if (iSetting.getType() == String.class && dropdownOptions != null) { //if choice
+                        component = new Choice(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                    }
 
-                        else if (iSetting.getType() == String[].class && options != null) { //if combo
-                            component = new Combo(iSetting.getName(), Arrays.asList(options.value()));
-                        }
+                    else if (iSetting.getType() == String[].class && dropdownOptions != null) { //if combo
+                        component = new Combo(iSetting.getName(), Arrays.asList(dropdownOptions.value()));
+                    }
 
-                        else if (iSetting.getType() == String.class) { //if field
-                            component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName());
-                        }
+                    else if (iSetting.getType() == String.class) { //if field
+                        component = new studio.dreamys.icarus.component.sub.Field(iSetting.getName());
+                    }
 
-                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
-                            component = new Slider(iSetting.getName(), sOptions.min(), sOptions.max(), sOptions.onlyInt(), sOptions.units());
-                        }
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                    else if (iSetting.getType() == double.class && sliderOptions != null) { //if slider
+                        component = new Slider(iSetting.getName(), sliderOptions.min(), sliderOptions.max(), sliderOptions.onlyInt(), sliderOptions.units());
                     }
 
                     if (component == null) continue; //if component is null, skip it
@@ -140,19 +136,19 @@ public class Config {
 
                 for (Field iSetting : iSettings) { //for every setting
                     //get additional annotations
-                    Options options = iSetting.getAnnotation(Options.class);
-                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+                    DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
+                    SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
 
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
                             groupObject.addProperty(iSetting.getName(), (boolean) iSetting.get(null));
                         }
 
-                        else if (iSetting.getType() == String.class && options != null) { //if choice
+                        else if (iSetting.getType() == String.class && dropdownOptions != null) { //if choice
                             groupObject.addProperty(iSetting.getName(), (String) iSetting.get(null));
                         }
 
-                        else if (iSetting.getType() == String[].class && options != null) { //if combo
+                        else if (iSetting.getType() == String[].class && dropdownOptions != null) { //if combo
                             groupObject.add(iSetting.getName(), gson.toJsonTree(iSetting.get(null)));
                         }
 
@@ -160,7 +156,7 @@ public class Config {
                             groupObject.addProperty(iSetting.getName(), (String) iSetting.get(null));
                         }
 
-                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
+                        else if (iSetting.getType() == double.class && sliderOptions != null) { //if slider
                             groupObject.addProperty(iSetting.getName(), (double) iSetting.get(null));
                         }
                     } catch (IllegalAccessException e) {
@@ -208,19 +204,19 @@ public class Config {
                     if (groupObject.get(iSetting.getName()) == null) continue;
 
                     //get additional annotations
-                    Options options = iSetting.getAnnotation(Options.class);
-                    SOptions sOptions = iSetting.getAnnotation(SOptions.class);
+                    DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
+                    SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
 
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsBoolean());
                         }
 
-                        else if (iSetting.getType() == String.class && options != null) { //if choice
+                        else if (iSetting.getType() == String.class && dropdownOptions != null) { //if choice
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsString());
                         }
 
-                        else if (iSetting.getType() == String[].class && options != null) { //if combo
+                        else if (iSetting.getType() == String[].class && dropdownOptions != null) { //if combo
                             iSetting.set(null, gson.fromJson(groupObject.get(iSetting.getName()), String[].class));
                         }
 
@@ -228,7 +224,7 @@ public class Config {
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsString());
                         }
 
-                        else if (iSetting.getType() == double.class && sOptions != null) { //if slider
+                        else if (iSetting.getType() == double.class && sliderOptions != null) { //if slider
                             iSetting.set(null, groupObject.get(iSetting.getName()).getAsDouble());
                         }
                     } catch (IllegalAccessException e) {
@@ -245,12 +241,12 @@ public class Config {
         for (Attachment attachment : Icarus.getWindow().attachments) {
             if (attachment instanceof Keybind) {
                 JsonObject groupObject = new JsonObject(); //create group
-                groupObject.addProperty(attachment.child.label, ((Keybind) attachment).getKey()); //add setting to group
+                groupObject.addProperty(attachment.getChild().getLabel(), ((Keybind) attachment).getKey()); //add setting to group
 
                 JsonObject pageObject = new JsonObject(); //create page
-                pageObject.add(attachment.child.group.label, groupObject); //add group to page
+                pageObject.add(attachment.getChild().group.getLabel(), groupObject); //add group to page
 
-                json.add(attachment.child.group.page.label, pageObject); //add page to json
+                json.add(attachment.getChild().group.page.getLabel(), pageObject); //add page to json
             }
         }
 
@@ -275,13 +271,13 @@ public class Config {
         }
 
         for (Attachment attachment : Icarus.getWindow().attachments) {
-            JsonObject pageObject = json.getAsJsonObject(attachment.child.group.page.label); //get page object
+            JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel()); //get page object
             if (pageObject == null) continue;
-            JsonObject groupObject = pageObject.getAsJsonObject(attachment.child.group.label); //get group object
+            JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel()); //get group object
             if (groupObject == null) continue;
 
             if (attachment instanceof Keybind) {
-                ((Keybind) attachment).setKey(groupObject.get(attachment.child.label).getAsInt());
+                ((Keybind) attachment).setKey(groupObject.get(attachment.getChild().getLabel()).getAsInt());
             }
         }
     }

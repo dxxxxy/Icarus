@@ -8,7 +8,7 @@ import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
+import java.awt.*;
 
 public class Checkbox extends Component {
     public Checkbox(String label) {
@@ -21,7 +21,7 @@ public class Checkbox extends Component {
     }
 
     @SneakyThrows
-    public void setToggled(boolean toggled) {
+    private void setToggled(boolean toggled) {
         configField.set(null, toggled);
     }
 
@@ -46,16 +46,15 @@ public class Checkbox extends Component {
         }
     }
 
-    @SneakyThrows
-    public void toggle() {
-        //set and save
-        setToggled(!isToggled());
-        Config.save();
-        MinecraftForge.EVENT_BUS.post(new ComponentEvent.CheckboxEvent(this));
-    }
-
     @Override
     public Bounds getBounds() {
         return new Bounds(80, height);
+    }
+
+    public void toggle() {
+        setToggled(!isToggled());
+
+        Config.save();
+        MinecraftForge.EVENT_BUS.post(new ComponentEvent.CheckboxEvent(this));
     }
 }

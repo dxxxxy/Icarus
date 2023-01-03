@@ -25,7 +25,7 @@ public class Field extends Component {
     }
 
     @SneakyThrows
-    public void setText(String text) {
+    private void setText(String text) {
         configField.set(null, text);
     }
 
@@ -57,15 +57,12 @@ public class Field extends Component {
         if (focused) {
             if (keyCode == Keyboard.KEY_BACK) {
                 if (getText().length() > 0) {
-                    //set
                     setText(getText().substring(0, getText().length() - 1));
                 }
             } else if (Pattern.compile("[a-zA-Z0-9\\t\\n ./<>?;:\"'`!@#$%^&*()\\[\\]{}_+=~|\\\\-]").matcher(String.valueOf(typedChar)).find()) {
-                //set
                 setText(getText() + typedChar);
             }
 
-            //save
             Config.save();
             MinecraftForge.EVENT_BUS.post(new ComponentEvent.FieldEvent(this));
         }
