@@ -17,6 +17,7 @@ public class Page extends Component {
         super(label, 37.5, 35);
 
         this.icon = icon;
+        x = 3;
     }
 
     @Override
@@ -44,7 +45,6 @@ public class Page extends Component {
 
     @Override
     public void setWindow(Window window) {
-        x = 3;
         y = 4 + height * (window.pages.size() - 1);
 
         super.setWindow(window);

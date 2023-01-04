@@ -25,7 +25,7 @@ public class Group extends Component {
         super.render(mouseX, mouseY);
 
         //outlined box + label
-        RenderUtils.drawGroupWithString(width, height + 4, x, y, label);
+        RenderUtils.drawGroupWithString(x, y, width, height + 4, label);
     }
 
     public void addChild(Component child) {

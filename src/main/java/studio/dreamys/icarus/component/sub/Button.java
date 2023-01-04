@@ -24,13 +24,13 @@ public class Button extends Component {
         super.render(mouseX, mouseY);
 
         //background
-        RenderUtils.drawGradientRect(x, y, x + width, y + height, held ? Color.DARK_GRAY.darker().darker() : Color.DARK_GRAY.darker(), held ? Color.DARK_GRAY.darker() : Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawGradientRect(x, y, width, height, held ? Color.DARK_GRAY.darker().darker() : Color.DARK_GRAY.darker(), held ? Color.DARK_GRAY.darker() : Color.DARK_GRAY.darker().darker());
 
         //border
-        RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
+        RenderUtils.drawOutline(x, y, width, height, Color.DARK_GRAY);
 
         //label
-        RenderUtils.drawCenteredString(label, x + width / 2, y + height / 5, Color.WHITE);
+        RenderUtils.drawXYCenterString(label, x + width / 2, y + height / 2, Color.WHITE);
     }
 
     @Override

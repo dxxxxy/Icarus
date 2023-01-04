@@ -61,7 +61,7 @@ public class Window extends GuiScreen {
 
         //draw them sexy bottom strings
         RenderUtils.drawString("uid: 001", x + 3, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
-        RenderUtils.drawCenteredString(Icarus.getModid(), x + width / 2, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
+        RenderUtils.drawXCenterString(Icarus.getModid(), x + width / 2, y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
         RenderUtils.drawString("dxxxxy#0776", x + width - 3 - RenderUtils.getStringWidth("dxxxxy#0776"), y + height - RenderUtils.getFontHeight() - 3, Color.WHITE);
 
         update(mouseX, mouseY);
@@ -76,7 +76,7 @@ public class Window extends GuiScreen {
             component.render(mouseX, mouseY);
 
             //render bounds
-            RenderUtils.drawOutline(component.getBounds().getWidth(), component.getBounds().getHeight() + component.getBounds().getOffsetY(), component.x, component.y - component.getBounds().getOffsetY(), Color.RED);
+//            RenderUtils.drawOutline(component.x, component.y - component.getBounds().getOffsetY(), component.getBounds().getWidth(), component.getBounds().getHeight() + component.getBounds().getOffsetY(), Color.RED);
         }
     }
 
