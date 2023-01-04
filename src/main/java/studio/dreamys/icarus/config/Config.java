@@ -77,16 +77,34 @@ public class Config {
             Class<?> iPage = reflectionCache.getIPage();
 
             IPage annotatedPage = iPage.getAnnotation(IPage.class); //get annotation
-            Page page = new Page(iPage.getSimpleName(), annotatedPage.value()); //create page object
-            Icarus.getWindow().addPage(page); //add page to window
+            Component page = new Page(iPage.getSimpleName(), annotatedPage.value()); //create page object
+
+            if (componentReplacements.containsKey(Page.class)) {
+                try {
+                    page = componentReplacements.get(Page.class).getConstructor(String.class, char.class).newInstance(iPage.getSimpleName(), annotatedPage.value());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Icarus.getWindow().addPage((Page) page); //add page to window
 
             for (Map.Entry<Class<?>, Field[]> entry : reflectionCache.getIGroupMap().entrySet()) {
                 Class<?> iGroup = entry.getKey();
                 Field[] iSettings = entry.getValue();
 
                 IGroup annotatedGroup = iGroup.getAnnotation(IGroup.class); //get annotation
-                Group group = new Group(iGroup.getSimpleName(), annotatedGroup.x(), annotatedGroup.y()); //create group object
-                page.addGroup(group); //add group to page
+                Component group = new Group(iGroup.getSimpleName(), annotatedGroup.x(), annotatedGroup.y()); //create group object
+
+                if (componentReplacements.containsKey(Group.class)) {
+                    try {
+                        group = componentReplacements.get(Group.class).getConstructor(String.class, double.class, double.class).newInstance(iGroup.getSimpleName(), annotatedGroup.x(), annotatedGroup.y());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                ((Page) page).addGroup((Group) group); //add group to page
 
                 for (Field iSetting : iSettings) { //for every setting
                     Component component = null; //create component object
@@ -167,7 +185,7 @@ public class Config {
 
                     if (component == null) continue; //if component is null, skip it
                     component.configField = iSetting;
-                    group.addChild(component); //add component to group
+                    ((Group) group).addChild(component); //add component to group
 
                     //only bind keybind to checkbox or button
                     if ((iSetting.getType() == Runnable.class || iSetting.getType() == boolean.class) && iKeybind != null) new Keybind(iKeybind.value()).attachTo(component);
