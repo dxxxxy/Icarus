@@ -1,40 +1,29 @@
 package studio.dreamys.icarus.component;
 
 import lombok.Getter;
-import lombok.Setter;
 import studio.dreamys.icarus.Icarus;
-import studio.dreamys.icarus.component.sub.Group;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
-@Getter
-@Setter
 public class Page extends Component {
-    private Window window;
+    @Getter private List<Group> groups = new ArrayList<>();
 
-    private double x = 3;
-    private double y = 4;
-    private double width = 37.5;
-    private double height = 35;
+    protected char icon;
 
-    private char icon;
-    private ArrayList<Group> groups = new ArrayList<>();
+    public Page(String label, char icon) {
+        super(label, 37.5, 35);
 
-    //relative to window, aka x,y passed in constructor
-    private double relativeX;
-    private double relativeY;
-
-    public Page(char icon) {
         this.icon = icon;
+        x = 3;
     }
 
     @Override
     public void render(int mouseX, int mouseY) {
         //update position
-        x = window.x + relativeX;
-        y = window.y + relativeY;
+        super.render(mouseX, mouseY);
 
         Color color = Icarus.getWindow().activePageIndex == window.pages.indexOf(this) ? window.color : Color.DARK_GRAY;
 
@@ -48,25 +37,16 @@ public class Page extends Component {
         }
     }
 
-    private boolean hovered(double x, double y) {
-        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
-    }
-
-    public Group addGroup(Group group) {
-        //add group to list
+    public void addGroup(Group group) {
         groups.add(group);
-        //pass window to group
+        group.page = this;
         group.setWindow(window);
-        return group;
     }
 
     @Override
     public void setWindow(Window window) {
-        this.window = window;
+        y = 4 + height * (window.pages.size() - 1);
 
-        y += height * (window.pages.size() - 1);
-
-        relativeX = x;
-        relativeY = y;
+        super.setWindow(window);
     }
 }

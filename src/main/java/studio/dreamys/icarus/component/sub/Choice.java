@@ -1,119 +1,84 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.SneakyThrows;
+import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.util.position.Bounds;
+import studio.dreamys.icarus.config.Config;
+import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
+import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
+import java.awt.*;
+import java.util.List;
 
-@Getter
-@Setter
 public class Choice extends Component {
-    private Window window;
-    private Group group;
+    protected List<String> options;
 
-    private double x;
-    private double y;
-    private double width = 80;
-    private double height = 12;
-    private String label;
-
-    private boolean open;
-    private ArrayList<String> options;
-    private String selected;
-
-    //relative to window, aka x,y passed in constructor
-    private double relativeX;
-    private double relativeY;
-
-    public Choice(String label, ArrayList<String> options) {
-        this.label = label;
+    public Choice(String label, List<String> options) {
+        super(label, 80, 12);
 
         this.options = options;
-        selected = this.options.get(0);
     }
 
-    public Choice(String label, ArrayList<String> options, String selected) {
-        this.label = label;
+    @SneakyThrows
+    public String getSelected() {
+        return (String) configField.get(null);
+    }
 
-        this.options = options;
-        this.selected = selected;
+    @SneakyThrows
+    private void setSelected(String selected) {
+        configField.set(null, selected);
     }
 
     @Override
     public void render(int mouseX, int mouseY) {
         //update position
-        x = window.x + relativeX;
-        y = window.y + relativeY;
+        super.render(mouseX, mouseY);
 
-        //the component itself + the chosen option
-        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
-        RenderUtils.drawString(selected, x + 4, y + height / 10, Color.WHITE);
+        //background
+        RenderUtils.drawRect(x, y, width, height, Color.DARK_GRAY.darker().darker());
+
+        //selected
+        RenderUtils.drawYCenterString(getSelected(), x + 4, y + height / 2 - 1, Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawString("v", x + width - 8, y, Color.WHITE);
+        RenderUtils.drawYCenterString("v", x + width - 8, y + height / 2 - 1, Color.WHITE);
 
         //label
-        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
-
-        //lambda stacking stuff
-        AtomicReference<Double> currentY = new AtomicReference<>(y);
-        currentY.updateAndGet(v -> v + height);
+        RenderUtils.drawString(label, x - 1, y - height / 2 - 2, Color.WHITE);
 
         //open dropdown menu
         if (open) {
             options.forEach(option -> {
-                Color color = option.equals(selected) ? window.color : Color.WHITE;
-                RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
-                RenderUtils.drawString(option, x + 4, currentY.get() + height / 10,  color);
-                currentY.updateAndGet(v -> v + height);
+                Color color = option.equals(getSelected()) ? window.color : Color.WHITE;
+
+                //background
+                RenderUtils.drawRect(x, y + height * (options.indexOf(option) + 1), width, height, Color.DARK_GRAY.darker().darker());
+
+                //option
+                RenderUtils.drawYCenterString(option, x + 4, y + height * (options.indexOf(option) + 1) + height / 2 - 1, color);
             });
         }
     }
 
-
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (open && mouseButton == 0) {
             if (mouseX > x && mouseX < x + width && mouseY > y + height && mouseY < y + height * (options.size() + 1)) {
                 double posY = mouseY - y - height;
                 int index = (int) (posY / height);
-                selected = options.get(index);
-                fireChange();
-            } else open = !open;
+
+                setSelected(options.get(index));
+
+                Config.save();
+                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ChoiceEvent());
+            } else open = false;
             return;
         }
 
         if (hovered(mouseX, mouseY) && mouseButton == 0) {
             open = !open;
         }
-    }
-
-    private boolean hovered(double x, double y) {
-        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
-    }
-
-    @Override
-    public void setWindow(Window window) {
-        this.window = window;
-        relativeX = x;
-        relativeY = y;
-    }
-
-    @Override
-    public void setX(double x) {
-        relativeX = x;
-    }
-
-    @Override
-    public void setY(double y) {
-        relativeY = y;
     }
 
     @Override

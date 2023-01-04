@@ -42,30 +42,32 @@ public class Notification {
         tick = -20;
         x = Minecraft.getMinecraft().displayWidth / 2.0;
         width = 150;
-        maskWidth = x + width;
+        maskWidth = width;
 
         //basic end of word separation
         if (RenderUtils.getStringWidth(message) + 20 > 150) {
             lines = new ArrayList<>();
             String[] words = message.split(" ");
-            String line = "";
+            StringBuilder line = new StringBuilder();
             for (String word : words) {
                 if (RenderUtils.getStringWidth(line + word) + 20 > 150) {
-                    lines.add(line);
-                    line = word + " ";
+                    lines.add(line.toString());
+                    line = new StringBuilder(word + " ");
                 } else {
-                    line += word + " ";
+                    line.append(word).append(" ");
                 }
             }
-            lines.add(line);
+            lines.add(line.toString());
             height = lines.size() * 10 + 20;
         } else {
             height = 30;
         }
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
-    public void onGameOverlay(RenderGameOverlayEvent e) {
+    public void onGameOverlay(RenderGameOverlayEvent.Text e) {
         y = NotificationManager.startY;
 
         //notification dynamic stacking
@@ -76,7 +78,7 @@ public class Notification {
         }
 
         //draw background
-        RenderUtils.drawRect(x, y, x + width, y + height, backgroundColor);
+        RenderUtils.drawRect(x, y, width, height, backgroundColor);
 
         //draw title
         RenderUtils.drawTitle(title, x + 10, y + 5, titleColor);
@@ -91,7 +93,7 @@ public class Notification {
         }
 
         //draw mask
-        RenderUtils.drawRect(x, y, maskWidth, y + height, maskColor);
+        RenderUtils.drawRect(x, y, maskWidth, height, maskColor);
     }
 
     @SubscribeEvent
@@ -112,7 +114,7 @@ public class Notification {
             //parabola easing (thank you math classes)
             speed = (((tick / width) / 2) * Math.pow(tick, 2));
             x += speed;
-            maskWidth = x + 10 - speed * 4;
+            maskWidth = 10 - speed * 4;
             tick++;
         }
     }

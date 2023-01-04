@@ -1,81 +1,68 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.SneakyThrows;
+import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.util.position.Bounds;
+import studio.dreamys.icarus.config.Config;
+import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
+import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Arrays;
+import java.util.List;
 
-@Getter
-@Setter
 public class Combo extends Component {
-    private Window window;
-    private Group group;
+    protected List<String> options;
 
-    private double x;
-    private double y;
-    private double width = 80;
-    private double height = 12;
-    private String label;
-
-    private boolean open;
-    private HashMap<String, Boolean> options = new HashMap<>();
-
-    //relative to window, aka x,y passed in constructor
-    private double relativeX;
-    private double relativeY;
-
-    public Combo(String label, ArrayList<String> options) {
-        this.label = label;
-
-        options.forEach(option -> this.options.put(option, false));
-    }
-
-    public Combo(String label, HashMap<String, Boolean> options) {
-        this.label = label;
+    public Combo(String label, List<String> options) {
+        super(label, 80, 12);
 
         this.options = options;
+    }
+
+    @SneakyThrows
+    public List<String> getActive() {
+        return new ArrayList<>(Arrays.asList((String[]) configField.get(null)));
+    }
+
+    @SneakyThrows
+    private void setActive(List<String> active) {
+        configField.set(null, active.toArray(new String[0]));
     }
 
     @Override
     public void render(int mouseX, int mouseY) {
         //update position
-        x = window.x + relativeX;
-        y = window.y + relativeY;
+        super.render(mouseX, mouseY);
 
-        //the component itself + the active options displayed
-        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
-        RenderUtils.drawString(activeOptions(), x + 4, y + height / 10,  Color.WHITE);
+        //background
+        RenderUtils.drawRect(x, y, width, height, Color.DARK_GRAY.darker().darker());
+
+        //selected
+        RenderUtils.drawYCenterString(activeOptions(), x + 4, y + height / 2 - 1, Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawString("v", x + width - 8, y, Color.WHITE);
+        RenderUtils.drawYCenterString("v", x + width - 8, y + height / 2 - 1, Color.WHITE);
 
         //label
-        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
-
-        //lambda stacking stuff
-        AtomicReference<Double> currentY = new AtomicReference<>(y);
-        currentY.updateAndGet(v -> v + height);
+        RenderUtils.drawString(label, x - 1, y - height / 2 - 2, Color.WHITE);
 
         //open dropdown menu
         if (open) {
-            options.forEach((option, active) -> {
-                Color color = active ? window.color : Color.WHITE;
-                RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
-                RenderUtils.drawString(option, x + 4, currentY.get() + height / 10,  color);
-                currentY.updateAndGet(v -> v + height);
+            options.forEach(option -> {
+                Color color = getActive().contains(option) ? window.color : Color.WHITE;
+
+                //background
+                RenderUtils.drawRect(x, y + height * (options.indexOf(option) + 1), width, height, Color.DARK_GRAY.darker().darker());
+
+                //option
+                RenderUtils.drawYCenterString(option, x + 4, y + height * (options.indexOf(option) + 1) + height / 2 - 1, color);
             });
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (open && mouseButton == 0) {
@@ -83,14 +70,23 @@ public class Combo extends Component {
                 double posY = mouseY - y - height;
                 int index = (int) (posY / height);
                 int i = 0;
-                for (Map.Entry<String, Boolean> entry : options.entrySet()) {
+
+                List<String> active = getActive();
+
+                for (String option : options) {
                     if (i == index) {
-                        options.put(entry.getKey(), !entry.getValue());
+                        if (active.contains(option)) active.remove(option);
+                        else active.add(option);
+                        break;
                     }
                     i++;
                 }
-                fireChange();
-            } else open = !open;
+
+                setActive(active);
+
+                Config.save();
+                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ComboEvent());
+            } else open = false;
             return;
         }
 
@@ -99,17 +95,15 @@ public class Combo extends Component {
         }
     }
 
-    private boolean hovered(double x, double y) {
-        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
+    @Override
+    public Bounds getBounds() {
+        return new Bounds(width, height, 7);
     }
 
-    //display active options
     private String activeOptions() {
         StringBuilder formatted = new StringBuilder();
-        for (Map.Entry<String, Boolean> option : options.entrySet()) {
-            if (option.getValue()) {
-                formatted.append(option.getKey()).append(", ");
-            }
+        for (String option : getActive()) {
+            formatted.append(option).append(", ");
         }
 
         //remove last comma
@@ -124,51 +118,5 @@ public class Combo extends Component {
         if (formatted.toString().equals("")) formatted = new StringBuilder("-");
 
         return formatted.toString();
-    }
-
-    public String getActiveOptions() {
-        StringBuilder formatted = new StringBuilder();
-        for (Map.Entry<String, Boolean> option : options.entrySet()) {
-            if (option.getValue()) {
-                formatted.append(option.getKey()).append(",");
-            }
-        }
-
-        //remove last comma
-        if (formatted.length() > 0) {
-            formatted.deleteCharAt(formatted.length() - 1);
-        }
-
-        return formatted.length() > 0 ? formatted.toString() : "null";
-    }
-
-    public void setActiveOptions(String activeOptions) {
-        if (activeOptions.equals("null")) return;
-        String[] options = activeOptions.split(",");
-        for (String option : options) {
-            this.options.put(option, true);
-        }
-    }
-
-    @Override
-    public void setWindow(Window window) {
-        this.window = window;
-        relativeX = x;
-        relativeY = y;
-    }
-
-    @Override
-    public void setX(double x) {
-        relativeX = x;
-    }
-
-    @Override
-    public void setY(double y) {
-        relativeY = y;
-    }
-
-    @Override
-    public Bounds getBounds() {
-        return new Bounds(width, height, 7);
     }
 }

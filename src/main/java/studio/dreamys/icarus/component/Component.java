@@ -1,15 +1,36 @@
 package studio.dreamys.icarus.component;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.eventhandler.Event;
-import studio.dreamys.icarus.component.sub.*;
-import studio.dreamys.icarus.event.ComponentEvent;
+import lombok.Getter;
 import studio.dreamys.icarus.util.position.Bounds;
 
-//keep this not abstract to avoid some useless empty methods
-public class Component {
-    public void render(int mouseX, int mouseY) {
+import java.lang.reflect.Field;
 
+public abstract class Component {
+    @Getter protected Window window;
+    @Getter protected Group group;
+
+    @Getter protected double x, y;
+    @Getter protected double width, height;
+    protected double relativeX, relativeY;
+
+    @Getter protected String label;
+    @Getter protected boolean open;
+
+    public Field configField;
+
+    public Component(String label, double width, double height) {
+        this.label = label.replaceAll("_", " ");
+        this.width = width;
+        this.height = height;
+    }
+
+    public Component() {
+
+    }
+
+    public void render(int mouseX, int mouseY) {
+        x = window.x + relativeX;
+        y = window.y + relativeY;
     }
 
     public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
@@ -25,65 +46,24 @@ public class Component {
     }
 
     public void setWindow(Window window) {
-
-    }
-
-    public void setGroup(Group group) {
-
+        this.window = window;
+        relativeX = x;
+        relativeY = y;
     }
 
     public void setX(double x) {
-
+        relativeX = x;
     }
 
     public void setY(double y) {
-
+        relativeY = y;
     }
 
-    public Group getGroup() {
-        return null;
-    }
-
-    public Window getWindow() {
-        return null;
-    }
-
-    public double getX() {
-        return 0;
-    }
-
-    public double getY() {
-        return 0;
-    }
-
-    public boolean isOpen() {
-        return false;
-    }
-
-    public double getWidth() {
-        return 0;
-    }
-
-    public double getHeight() {
-        return 0;
+    public boolean hovered(double x, double y) {
+        return x > this.x && x < this.x + width && y > this.y && y < this.y + height;
     }
 
     public Bounds getBounds() {
-        return null;
-    }
-
-    public String getLabel() {
-        return "null";
-    }
-
-    public void fireChange() {
-        Event event = null;
-        if (this instanceof Checkbox) event = new ComponentEvent.CheckboxEvent((Checkbox) this);
-        if (this instanceof Choice) event = new ComponentEvent.ChoiceEvent((Choice) this);
-        if (this instanceof Combo) event = new ComponentEvent.ComboEvent((Combo) this);
-        if (this instanceof Field) event = new ComponentEvent.FieldEvent((Field) this);
-        if (this instanceof Keybind) event = new ComponentEvent.KeybindEvent((Keybind) this);
-        if (this instanceof Slider) event = new ComponentEvent.SliderEvent((Slider) this);
-        if (event != null) MinecraftForge.EVENT_BUS.post(event);
+        return new Bounds(width, height);
     }
 }

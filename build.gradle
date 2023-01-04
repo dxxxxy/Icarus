@@ -10,11 +10,12 @@ buildscript {
 
 plugins {
     id "java"
+    id "com.github.johnrengelman.shadow" version "2.0.4"
 }
 
 apply plugin: "net.minecraftforge.gradle.forge"
 
-version = "1.4.2"
+version = "2.0.0"
 group = "dreamys.studio" //http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "Icarus" //name of the output jar
 
@@ -28,12 +29,34 @@ minecraft {
     makeObfSourceJar = false //disable creation of sources jar
 }
 
+configurations {
+    shade
+    compile.extendsFrom(shade)
+}
+
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     compile "org.projectlombok:lombok:1.18.24"
+    shade "org.reflections:reflections:0.10.2"
+}
+
+shadowJar {
+    dependencies {
+        //we remove gson because it belongs to the public api and will break shading
+        //exclude(dependency("com.google.code.gson:gson:2.8.6"))
+    }
+    configurations = [project.configurations.shade]
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE //prevent duplicates
+    classifier "" //prevent creation of unshadowed jar
+}
+
+reobf {
+    //reobfuscate the shadowed jar
+    shadowJar {}
 }
 
 //exclude test files in jar build

@@ -84,10 +84,6 @@ public class GlyphPage {
             glyph.width = bounds.getBounds().width + 8; // Leave some additional space
             glyph.height = bounds.getBounds().height;
 
-            if (posY + glyph.height >= imgSize) {
-//                throw new IllegalStateException("Not all characters will fit");
-            }
-
             if (posX + glyph.width >= imgSize) {
                 posX = 0;
                 posY += currentCharHeight;
@@ -170,29 +166,11 @@ public class GlyphPage {
         return maxFontHeight;
     }
 
-    public boolean isAntiAliasingEnabled() {
-        return antiAliasing;
-    }
-
-    public boolean isFractionalMetricsEnabled() {
-        return fractionalMetrics;
-    }
-
     static class Glyph {
         private int x;
         private int y;
         private int width;
         private int height;
-
-        Glyph(int x, int y, int width, int height) {
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-        }
-
-        Glyph() {
-        }
 
         public int getX() {
             return x;

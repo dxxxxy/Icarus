@@ -8,23 +8,38 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.component.Page;
+import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.test.ui.component.CustomPage;
+import studio.dreamys.test.ui.page.Misc;
+import studio.dreamys.test.ui.page.Visuals;
 
 import java.awt.*;
 
 @Mod(modid = "TestMod")
 public class TestMod {
+    private static Watermark watermark;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent e) {
         MinecraftForge.EVENT_BUS.register(this);
-        Icarus.init(e.getModMetadata().modId, new TestWindow());
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
-        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
-        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
+        Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
+
+//        Icarus.provideComponent(CustomCheckbox.class, Checkbox.class);
+        Icarus.provideComponent(CustomPage.class, Page.class);
+        Icarus.init(e.getModMetadata().modId, window);
+//        Icarus.provideTitleFont(getClass().getResourceAsStream("/assets/icarus/undefeated.ttf"), "undefeated", 50, false, false, false);
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Another Checkbox"));
+//        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
+
+//        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
+        watermark = new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms");
         NotificationManager.startY = 20; //start below watermark
 
         //try all except top_right
@@ -40,46 +55,36 @@ public class TestMod {
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent e) {
-        System.out.println(e.component);
-        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.CheckboxEvent e) {
-        System.out.println(e.checkbox);
-        System.out.println(e.toggled);
-        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
-
+        watermark.setEnabled(Misc.Watermark.Enabled);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ChoiceEvent e) {
-        System.out.println(e.choice);
-        System.out.println(e.selected);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ComboEvent e) {
-        System.out.println(e.combo);
-        System.out.println(e.activeOptions);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.FieldEvent e) {
-        System.out.println(e.field);
-        System.out.println(e.text);
+        watermark.setText(Misc.Watermark.Text);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
-        System.out.println(e.keybind);
-        System.out.println(e.key);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.SliderEvent e) {
-        System.out.println(e.slider);
-        System.out.println(e.value);
+
     }
 
     @SubscribeEvent
@@ -90,6 +95,9 @@ public class TestMod {
             if (keyCode <= 0) return; //ignore invalid keycode
             if (keyCode == Keyboard.KEY_K) {
                 NotificationManager.send(new Notification("Test", "Test"));
+                Visuals.ESP.Checkbox = true;
+                Visuals.ESP.Slider = 50;
+                Config.save();
             }
             if (keyCode == Keyboard.KEY_J) {
                 NotificationManager.send(new Notification("Test", "This is a very cool informational notification which is much larger in size.", 40));

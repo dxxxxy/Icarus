@@ -7,8 +7,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import studio.dreamys.icarus.util.position.Position;
 import studio.dreamys.icarus.util.RenderUtils;
+import studio.dreamys.icarus.util.position.Position;
 
 import java.awt.*;
 
@@ -19,6 +19,7 @@ public class Watermark {
     private Position position;
     private double x, y, width, height = RenderUtils.getFontHeight() + 7.5;
     private Color textColor;
+    private boolean enabled;
 
     public Watermark(String text) {
         this(text, Position.TOP_RIGHT);
@@ -32,11 +33,13 @@ public class Watermark {
         this.text = text;
         this.position = position;
         this.textColor = textColor;
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
     public void onGameOverlay(RenderGameOverlayEvent e) {
-        if (e.type != RenderGameOverlayEvent.ElementType.TEXT) return;
+        if (e.type != RenderGameOverlayEvent.ElementType.TEXT || !enabled) return;
 
         //update width in case text changes
         width = RenderUtils.getStringWidth(text) + 5;
@@ -52,13 +55,5 @@ public class Watermark {
 
         //draw text
         RenderUtils.drawString(text, x + 1, y + 3.5, textColor);
-    }
-
-    public void enable() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    public void disable() {
-        MinecraftForge.EVENT_BUS.unregister(this);
     }
 }
