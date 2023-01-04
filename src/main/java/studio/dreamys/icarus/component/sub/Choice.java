@@ -8,9 +8,8 @@ import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Choice extends Component {
     private List<String> options;
@@ -37,20 +36,16 @@ public class Choice extends Component {
         super.render(mouseX, mouseY);
 
         //background
-        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawRect(x, y, width, height, Color.DARK_GRAY.darker().darker());
 
         //selected
-        RenderUtils.drawString(getSelected(), x + 4, y + height / 10, Color.WHITE);
+        RenderUtils.drawYCenterString(getSelected(), x + 4, y + height / 2 - 1, Color.WHITE);
 
         //dropdown symbol
-        RenderUtils.drawString("v", x + width - 8, y, Color.WHITE);
+        RenderUtils.drawYCenterString("v", x + width - 8, y + height / 2 - 1, Color.WHITE);
 
         //label
-        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
-
-        //dropdown height
-        AtomicReference<Double> currentY = new AtomicReference<>(y);
-        currentY.updateAndGet(v -> v + height);
+        RenderUtils.drawString(label, x - 1, y - height / 2 - 2, Color.WHITE);
 
         //open dropdown menu
         if (open) {
@@ -58,13 +53,10 @@ public class Choice extends Component {
                 Color color = option.equals(getSelected()) ? window.color : Color.WHITE;
 
                 //background
-                RenderUtils.drawRect(x, currentY.get(), x + width, currentY.get() + height, Color.DARK_GRAY.darker().darker());
+                RenderUtils.drawRect(x, y + height * (options.indexOf(option) + 1), width, height, Color.DARK_GRAY.darker().darker());
 
                 //option
-                RenderUtils.drawString(option, x + 4, currentY.get() + height / 10,  color);
-
-                //update y
-                currentY.updateAndGet(v -> v + height);
+                RenderUtils.drawYCenterString(option, x + 4, y + height * (options.indexOf(option) + 1) + height / 2 - 1, color);
             });
         }
     }

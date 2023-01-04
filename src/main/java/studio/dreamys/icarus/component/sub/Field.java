@@ -35,16 +35,16 @@ public class Field extends Component {
         super.render(mouseX, mouseY);
 
         //background
-        RenderUtils.drawRect(x, y, x + width, y + height, Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawRect(x, y, width, height, Color.DARK_GRAY.darker().darker());
 
         //border
-        RenderUtils.drawOutline(width, height, x, y, Color.DARK_GRAY);
+        RenderUtils.drawOutline(x, y, width, height, Color.DARK_GRAY);
 
         //text
-        RenderUtils.drawString(focused ? getText() + "_" : getText(), x + 4, y + height / 10, Color.WHITE);
+        RenderUtils.drawYCenterString(focused ? getText() + "_" : getText(), x + 4, y + height / 2, Color.WHITE);
 
         //label
-        RenderUtils.drawString(label, x, y - height / 1.5, Color.WHITE);
+        RenderUtils.drawString(label, x - 1, y - height / 2 - 2, Color.WHITE);
     }
 
     @Override

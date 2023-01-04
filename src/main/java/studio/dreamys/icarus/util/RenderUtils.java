@@ -35,7 +35,7 @@ public class RenderUtils {
     /**
      * Modified and taken from: {@link Gui#drawGradientRect(int, int, int, int, int, int)}
      * */
-    public static void drawGradientRect(double left, double top, double right, double bottom, Color startColor, Color endColor) {
+    public static void drawGradientRect(double x, double y, double width, double height, Color startColor, Color endColor) {
         double zLevel = 0;
         float f = (float)(startColor.getRGB() >> 24 & 255) / 255.0F;
         float f1 = (float)(startColor.getRGB() >> 16 & 255) / 255.0F;
@@ -53,10 +53,10 @@ public class RenderUtils {
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_COLOR);
-        worldrenderer.pos(right, top, zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos(left, top, zLevel).color(f1, f2, f3, f).endVertex();
-        worldrenderer.pos(left, bottom, zLevel).color(f5, f6, f7, f4).endVertex();
-        worldrenderer.pos(right, bottom, zLevel).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(x + width, y, zLevel).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(x, y, zLevel).color(f1, f2, f3, f).endVertex();
+        worldrenderer.pos(x, y + height, zLevel).color(f5, f6, f7, f4).endVertex();
+        worldrenderer.pos(x + width, y + height, zLevel).color(f5, f6, f7, f4).endVertex();
         tessellator.draw();
         GlStateManager.shadeModel(7424);
         GlStateManager.disableBlend();
@@ -102,22 +102,30 @@ public class RenderUtils {
         GL11.glPopMatrix();
     }
 
-    public static void drawCenteredString(String text, double x, double y, Color color) {
+    public static void drawXCenterString(String text, double x, double y, Color color) {
         textRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), false);
     }
 
-    public static void drawCenteredString(String text, double x, double y, Color color, boolean shadow) {
+    public static void drawXYCenterString(String text, double x, double y, Color color) {
+        textRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y - RenderUtils.getFontHeight() / 2), color.getRGB(), false);
+    }
+
+    public static void drawXCenterString(String text, double x, double y, Color color, boolean shadow) {
         textRenderer.drawString(text, (float) (x - getStringWidth(text) / 2), (float) (y), color.getRGB(), shadow);
     }
 
-    public static void drawCenteredString(String text, double x, double y, float scale, Color color) {
+    public static void drawYCenterString(String text, double x, double y, Color color) {
+        textRenderer.drawString(text, (float) (x), (float) (y - RenderUtils.getFontHeight() / 2), color.getRGB(), false);
+    }
+
+    public static void drawXCenterString(String text, double x, double y, float scale, Color color) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
         textRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), false);
         GL11.glPopMatrix();
     }
 
-    public static void drawCenteredString(String text, double x, double y, float scale, Color color, boolean shadow) {
+    public static void drawXCenterString(String text, double x, double y, float scale, Color color, boolean shadow) {
         GL11.glPushMatrix();
         GL11.glScalef(scale, scale, 1);
         textRenderer.drawString(text, (float) ((x  / scale) - getStringWidth(text, scale) / 2), (float) (y / scale), color.getRGB(), shadow);
@@ -136,7 +144,7 @@ public class RenderUtils {
         return textRenderer.getFontHeight();
     }
 
-    public static void drawGroupWithString(double width, double height, double x, double y, String label) {
+    public static void drawGroupWithString(double x, double y, double width, double height, String label) {
         GL11.glPushMatrix();
         GL11.glScalef(0.5f, 0.5f, 1f);
 
@@ -146,28 +154,27 @@ public class RenderUtils {
         height /= 0.5f;
         double offset = 2 / 0.5f;
 
-        drawRect(x, y, x + 1, y + height, Color.DARK_GRAY); //LEFT
-        drawRect(x, y + height, x + width, y + height + 1, Color.DARK_GRAY); //BOTTOM
-        drawRect(x + width, y, x + width + 1, y + height + 1, Color.DARK_GRAY); //RIGHT
+        drawRect(x, y, 1, height, Color.DARK_GRAY); //LEFT
+        drawRect(x, y + height, width, 1, Color.DARK_GRAY); //BOTTOM
+        drawRect(x + width, y, 1, height + 1, Color.DARK_GRAY); //RIGHT
 
-        drawRect(x, y, x + width / 10, y + 1, Color.DARK_GRAY); //TOP LEFT
-        drawRect(x + width / 10 + getStringWidth(label, 2) + offset, y, x + width, y + 1, Color.DARK_GRAY); //TOP RIGHT
+        drawRect(x, y, 30, 1, Color.DARK_GRAY); //TOP LEFT
+        drawRect(x + 30 + getStringWidth(label) * 2 + 4, y, width - 30 - getStringWidth(label) * 2 - 4, 1, Color.DARK_GRAY); //TOP RIGHT
 
         GL11.glPopMatrix();
 
         x *= 0.5f;
         y *= 0.5f;
-        width *= 0.5f;
 
         //label
-        RenderUtils.drawString(label, x + width / 10, y - 3.5,  Color.WHITE);
+        RenderUtils.drawString(label, x + 15, y - 3.5, Color.WHITE);
     }
 
-    public static void drawOutline(double width, double height, double x, double y, Color color) {
-        drawRect(x, y, x + 1, y + height, color); //LEFT
-        drawRect(x, y + height, x + width, y + height + 1, color); //BOTTOM
-        drawRect(x + width, y, x + width + 1, y + height + 1, color); //RIGHT
-        drawRect(x, y, x + width, y + 1, color); //TOP
+    public static void drawOutline(double x, double y, double width, double height, Color color) {
+        drawRect(x, y, 1, height, color); //LEFT
+        drawRect(x, y + height, width, 1, color); //BOTTOM
+        drawRect(x + width, y, 1, height + 1, color); //RIGHT
+        drawRect(x, y, width, 1, color); //TOP
     }
 
     public static void drawOutline(double width, double height, double x, double y, float scale, Color color) {
@@ -179,16 +186,16 @@ public class RenderUtils {
         width /= scale;
         height /= scale;
 
-        drawRect(x, y, x + 1, y + height, color); //LEFT
-        drawRect(x, y + height, x + width, y + height + 1, color); //BOTTOM
-        drawRect(x + width, y, x + width + 1, y + height + 1, color); //RIGHT
-        drawRect(x, y, x + width, y + 1, color); //TOP
+        drawRect(x, y, 1, height, color); //LEFT
+        drawRect(x, y + height, width, 1, color); //BOTTOM
+        drawRect(x + width, y, 1, height + 1, color); //RIGHT
+        drawRect(x, y, width, 1, color); //TOP
 
         GL11.glPopMatrix();
     }
 
     public static void drawRect(double x, double y, double width, double height, Color color) {
-        Gui.drawRect((int) x, (int) y, (int) width, (int) height, color.getRGB());
+        Gui.drawRect((int) x, (int) y, (int) (x + width), (int) (y + height), color.getRGB());
     }
 
     public static void drawTexture(double x, double y, double width, double height) {

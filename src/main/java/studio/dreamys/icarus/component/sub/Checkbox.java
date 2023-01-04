@@ -30,13 +30,14 @@ public class Checkbox extends Component {
         //update position
         super.render(mouseX, mouseY);
 
+        //toggle color
         Color color = isToggled() ? window.color : Color.DARK_GRAY;
 
         //background
-        RenderUtils.drawGradientRect(x, y, x + width, y + height, color, color.darker().darker());
+        RenderUtils.drawGradientRect(x, y, width, height, color, color.darker().darker());
 
         //label
-        RenderUtils.drawString(label, x + width * 2 - 1, y - height / 2 + 0.75,  Color.WHITE);
+        RenderUtils.drawString(label, x + width * 2 - 1, y - height / 2 + 0.75, Color.WHITE);
     }
 
     @Override

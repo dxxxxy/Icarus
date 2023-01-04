@@ -49,16 +49,16 @@ public class Slider extends Component {
         super.render(mouseX, mouseY);
 
         //unfilled background
-        RenderUtils.drawGradientRect(x, y, x + width, y + height, Color.DARK_GRAY, Color.DARK_GRAY.darker().darker());
+        RenderUtils.drawGradientRect(x, y, width, height, Color.DARK_GRAY, Color.DARK_GRAY.darker().darker());
 
         //filled background
-        RenderUtils.drawGradientRect(x, y, x + width * percent, y + height, window.color, window.color.darker().darker());
+        RenderUtils.drawGradientRect(x, y, width * percent, height, window.color, window.color.darker().darker());
 
         //label
-        RenderUtils.drawString(label, x - 1, y - height * 2.5, Color.WHITE);
+        RenderUtils.drawString(label, x - 1, y - height * 2 - 2, Color.WHITE);
 
         //value
-        RenderUtils.drawString((onlyInt ? Integer.toString((int) getValue()) : String.valueOf(getValue())) + units, x - 1 + width * percent, y + height - 1, Color.WHITE);
+        RenderUtils.drawXCenterString((onlyInt ? Integer.toString((int) getValue()) : String.valueOf(getValue())) + units,  x + width * percent, y + height - 1, Color.WHITE);
 
         update(mouseX);
     }
