@@ -352,13 +352,13 @@ public class Config {
         }
 
         for (Attachment attachment : Icarus.getWindow().attachments) {
-            JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel()); //get page object
+            JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel().replaceAll(" ", "_")); //get page object
             if (pageObject == null) continue;
-            JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel()); //get group object
+            JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel().replaceAll(" ", "_")); //get group object
             if (groupObject == null) continue;
 
             if (attachment instanceof Keybind) {
-                ((Keybind) attachment).setKey(groupObject.get(attachment.getChild().getLabel()).getAsInt());
+                ((Keybind) attachment).setKey(groupObject.get(attachment.getChild().getLabel().replaceAll(" ", "_")).getAsInt());
             }
         }
     }

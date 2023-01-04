@@ -19,7 +19,8 @@ public class Combat {
             System.out.println("Button pressed!");
         };
 
-        public static boolean Checkbox = true;
+        @IKeybind(Keyboard.KEY_7)
+        public static boolean Checkbox_Haha = true;
 
         @DropdownOptions({"Option 1", "Option 2", "Option 3"})
         public static String Choice = "Option 1";

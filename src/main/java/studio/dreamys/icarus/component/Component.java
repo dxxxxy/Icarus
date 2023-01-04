@@ -19,7 +19,7 @@ public abstract class Component {
     public Field configField;
 
     public Component(String label, double width, double height) {
-        this.label = label;
+        this.label = label.replaceAll("_", " ");
         this.width = width;
         this.height = height;
     }
