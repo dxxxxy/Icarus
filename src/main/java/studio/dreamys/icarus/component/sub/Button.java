@@ -7,7 +7,7 @@ import studio.dreamys.icarus.util.RenderUtils;
 import java.awt.*;
 
 public class Button extends Component {
-    private boolean held;
+    protected boolean held;
 
     public Button(String label) {
         super(label, 80, 12);

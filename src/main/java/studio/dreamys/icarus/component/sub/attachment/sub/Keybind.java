@@ -11,10 +11,10 @@ import studio.dreamys.icarus.util.RenderUtils;
 import java.awt.*;
 
 public class Keybind extends Attachment {
-    @Getter private int key;
+    @Getter protected int key;
 
-    private String keybind = "[NONE]";
-    private boolean capturing;
+    protected String keybind = "[NONE]";
+    protected boolean capturing;
 
     public Keybind(int key) {
         setKey(key);

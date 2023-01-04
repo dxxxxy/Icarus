@@ -13,7 +13,7 @@ import java.awt.Color;
 import java.util.regex.Pattern;
 
 public class Field extends Component {
-    private boolean focused;
+    protected boolean focused;
 
     public Field(String label) {
         super(label, 80, 12);

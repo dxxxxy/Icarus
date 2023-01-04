@@ -316,13 +316,13 @@ public class Config {
 
         for (Attachment attachment : Icarus.getWindow().attachments) {
             if (attachment instanceof Keybind) {
-                if (json.has(attachment.getChild().group.page.getLabel())) { //page already exists
+                if (json.has(attachment.getChild().getGroup().getPage().getLabel())) { //page already exists
                     //lets get it
-                    JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel());
+                    JsonObject pageObject = json.getAsJsonObject(attachment.getChild().getGroup().getPage().getLabel());
 
-                    if (pageObject.has(attachment.getChild().group.getLabel())) { //group already exists
+                    if (pageObject.has(attachment.getChild().getGroup().getLabel())) { //group already exists
                         //lets get it
-                        JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel());
+                        JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().getGroup().getLabel());
 
                         //add keybind to group
                         groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
@@ -334,7 +334,7 @@ public class Config {
                         groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
 
                         //add group to page
-                        pageObject.add(attachment.getChild().group.getLabel(), groupObject);
+                        pageObject.add(attachment.getChild().getGroup().getLabel(), groupObject);
                     }
                 } else { //page doesn't exist
                     //lets create a page
@@ -347,10 +347,10 @@ public class Config {
                     groupObject.addProperty(attachment.getChild().configField.getName(), ((Keybind) attachment).getKey());
 
                     //add group to page
-                    pageObject.add(attachment.getChild().group.getLabel(), groupObject);
+                    pageObject.add(attachment.getChild().getGroup().getLabel(), groupObject);
 
                     //add page to json
-                    json.add(attachment.getChild().group.page.getLabel(), pageObject);
+                    json.add(attachment.getChild().getGroup().getPage().getLabel(), pageObject);
                 }
             }
         }
@@ -376,9 +376,9 @@ public class Config {
         }
 
         for (Attachment attachment : Icarus.getWindow().attachments) {
-            JsonObject pageObject = json.getAsJsonObject(attachment.getChild().group.page.getLabel().replaceAll(" ", "_")); //get page object
+            JsonObject pageObject = json.getAsJsonObject(attachment.getChild().getGroup().getPage().getLabel().replaceAll(" ", "_")); //get page object
             if (pageObject == null) continue;
-            JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().group.getLabel().replaceAll(" ", "_")); //get group object
+            JsonObject groupObject = pageObject.getAsJsonObject(attachment.getChild().getGroup().getLabel().replaceAll(" ", "_")); //get group object
             if (groupObject == null) continue;
 
             if (attachment instanceof Keybind) {

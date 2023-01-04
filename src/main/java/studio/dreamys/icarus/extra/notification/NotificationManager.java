@@ -1,7 +1,5 @@
 package studio.dreamys.icarus.extra.notification;
 
-import net.minecraftforge.common.MinecraftForge;
-
 import java.util.ArrayList;
 
 public class NotificationManager {

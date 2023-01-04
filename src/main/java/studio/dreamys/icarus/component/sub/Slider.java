@@ -13,14 +13,14 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class Slider extends Component {
-    private double max;
-    private double min;
-    private boolean onlyInt;
-    private String units;
+    protected double max;
+    protected double min;
+    protected boolean onlyInt;
+    protected String units;
 
-    private double percent;
+    protected double percent;
 
-    private boolean dragging;
+    protected boolean dragging;
 
     public Slider(String label, double min, double max, boolean onlyInt, String units) {
         super(label, 80, 3);

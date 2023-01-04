@@ -11,7 +11,7 @@ import java.util.List;
 public class Page extends Component {
     @Getter private List<Group> groups = new ArrayList<>();
 
-    private char icon;
+    protected char icon;
 
     public Page(String label, char icon) {
         super(label, 37.5, 35);

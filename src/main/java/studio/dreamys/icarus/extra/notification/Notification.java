@@ -3,12 +3,10 @@ package studio.dreamys.icarus.extra.notification;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import org.lwjgl.opengl.GL11;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
@@ -50,16 +48,16 @@ public class Notification {
         if (RenderUtils.getStringWidth(message) + 20 > 150) {
             lines = new ArrayList<>();
             String[] words = message.split(" ");
-            String line = "";
+            StringBuilder line = new StringBuilder();
             for (String word : words) {
                 if (RenderUtils.getStringWidth(line + word) + 20 > 150) {
-                    lines.add(line);
-                    line = word + " ";
+                    lines.add(line.toString());
+                    line = new StringBuilder(word + " ");
                 } else {
-                    line += word + " ";
+                    line.append(word).append(" ");
                 }
             }
-            lines.add(line);
+            lines.add(line.toString());
             height = lines.size() * 10 + 20;
         } else {
             height = 30;

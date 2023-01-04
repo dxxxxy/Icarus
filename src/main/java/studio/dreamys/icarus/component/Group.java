@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Group extends Component {
-    public Page page;
+    @Getter protected Page page;
 
-    @Getter private List<Component> children = new ArrayList<>();
+    @Getter protected List<Component> children = new ArrayList<>();
 
     public Group(String label, double x, double y) {
         super(label, 150, 10);

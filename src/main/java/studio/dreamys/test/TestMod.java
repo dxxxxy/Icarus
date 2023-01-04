@@ -8,12 +8,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
+import studio.dreamys.icarus.component.Page;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.test.ui.component.CustomPage;
 import studio.dreamys.test.ui.page.Misc;
 import studio.dreamys.test.ui.page.Visuals;
 
@@ -29,6 +31,7 @@ public class TestMod {
         Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
 
 //        Icarus.provideComponent(CustomCheckbox.class, Checkbox.class);
+        Icarus.provideComponent(CustomPage.class, Page.class);
         Icarus.init(e.getModMetadata().modId, window);
 //        Icarus.provideTitleFont(getClass().getResourceAsStream("/assets/icarus/undefeated.ttf"), "undefeated", 50, false, false, false);
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "haha"));

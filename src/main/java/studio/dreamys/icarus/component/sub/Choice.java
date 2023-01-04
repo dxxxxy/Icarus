@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.List;
 
 public class Choice extends Component {
-    private List<String> options;
+    protected List<String> options;
 
     public Choice(String label, List<String> options) {
         super(label, 80, 12);

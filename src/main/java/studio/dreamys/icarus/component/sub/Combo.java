@@ -8,14 +8,13 @@ import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Combo extends Component {
-    private List<String> options;
+    protected List<String> options;
 
     public Combo(String label, List<String> options) {
         super(label, 80, 12);

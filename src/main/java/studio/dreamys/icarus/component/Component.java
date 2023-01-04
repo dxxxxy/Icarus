@@ -6,8 +6,8 @@ import studio.dreamys.icarus.util.position.Bounds;
 import java.lang.reflect.Field;
 
 public abstract class Component {
-    public Window window;
-    public Group group;
+    @Getter protected Window window;
+    @Getter protected Group group;
 
     @Getter protected double x, y;
     @Getter protected double width, height;

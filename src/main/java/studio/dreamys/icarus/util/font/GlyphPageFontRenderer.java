@@ -7,12 +7,11 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
 import java.awt.*;
 import java.util.Locale;
-import java.util.Random;
 
 import static org.lwjgl.opengl.GL11.*;
 
+@SuppressWarnings("DuplicatedCode")
 public class GlyphPageFontRenderer {
-    public Random fontRandom = new Random();
     /**
      * Current X coordinate at which to draw the next character.
      */
@@ -39,18 +38,10 @@ public class GlyphPageFontRenderer {
      */
     private float green;
     /**
-     * Used to speify new alpha value for the current color.
+     * Used to specify new alpha value for the current color.
      */
     private float alpha;
-    /**
-     * Text color of the currently rendering string.
-     */
-    private int textColor;
 
-    /**
-     * Set if the "k" style (random) is active in currently rendering string
-     */
-    private boolean randomStyle;
     /**
      * Set if the "l" style (bold) is active in currently rendering string
      */
@@ -216,7 +207,6 @@ public class GlyphPageFontRenderer {
                 int i1 = "0123456789abcdefklmnor".indexOf(text.toLowerCase(Locale.ENGLISH).charAt(i + 1));
 
                 if (i1 < 16) {
-                    randomStyle = false;
                     boldStyle = false;
                     strikethroughStyle = false;
                     underlineStyle = false;
@@ -231,11 +221,8 @@ public class GlyphPageFontRenderer {
                     }
 
                     int j1 = colorCode[i1];
-                    textColor = j1;
 
                     GlStateManager.color((float) (j1 >> 16) / 255.0F, (float) (j1 >> 8 & 255) / 255.0F, (float) (j1 & 255) / 255.0F, alpha);
-                } else if (i1 == 16) {
-                    randomStyle = true;
                 } else if (i1 == 17) {
                     boldStyle = true;
                 } else if (i1 == 18) {
@@ -245,7 +232,6 @@ public class GlyphPageFontRenderer {
                 } else if (i1 == 20) {
                     italicStyle = true;
                 } else {
-                    randomStyle = false;
                     boldStyle = false;
                     strikethroughStyle = false;
                     underlineStyle = false;
@@ -318,7 +304,6 @@ public class GlyphPageFontRenderer {
      * Reset all style flag fields in the class to false; called at the start of string rendering
      */
     private void resetStyles() {
-        randomStyle = false;
         boldStyle = false;
         italicStyle = false;
         underlineStyle = false;
@@ -375,68 +360,4 @@ public class GlyphPageFontRenderer {
         return width / 2;
     }
 
-    /**
-     * Trims a string to fit a specified Width.
-     */
-    public String trimStringToWidth(String text, int width) {
-        return trimStringToWidth(text, width, false);
-    }
-
-    /**
-     * Trims a string to a specified width, and will reverse it if par3 is set.
-     */
-    public String trimStringToWidth(String text, int maxWidth, boolean reverse) {
-        StringBuilder stringbuilder = new StringBuilder();
-
-        boolean on = false;
-
-        int j = reverse ? text.length() - 1 : 0;
-        int k = reverse ? -1 : 1;
-        int width = 0;
-
-        GlyphPage currentPage;
-
-        for (int i = j; i >= 0 && i < text.length() && i < maxWidth; i += k) {
-            char character = text.charAt(i);
-
-            if (character == '§')
-                on = true;
-            else if (on && character >= '0' && character <= 'r') {
-                int colorIndex = "0123456789abcdefklmnor".indexOf(character);
-                if (colorIndex < 16) {
-                    boldStyle = false;
-                    italicStyle = false;
-                } else if (colorIndex == 17) {
-                    boldStyle = true;
-                } else if (colorIndex == 20) {
-                    italicStyle = true;
-                } else if (colorIndex == 21) {
-                    boldStyle = false;
-                    italicStyle = false;
-                }
-                i++;
-                on = false;
-            } else {
-                if (on) i--;
-
-                character = text.charAt(i);
-
-                currentPage = getCurrentGlyphPage();
-
-                width += (currentPage.getWidth(character) - 8) / 2;
-            }
-
-            if (i > width) {
-                break;
-            }
-
-            if (reverse) {
-                stringbuilder.insert(0, character);
-            } else {
-                stringbuilder.append(character);
-            }
-        }
-
-        return stringbuilder.toString();
-    }
 }
