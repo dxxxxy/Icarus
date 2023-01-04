@@ -11,6 +11,5 @@ public class NotificationManager {
 
     public static void send(Notification notification) {
         notifications.add(notification);
-        MinecraftForge.EVENT_BUS.register(notification);
     }
 }

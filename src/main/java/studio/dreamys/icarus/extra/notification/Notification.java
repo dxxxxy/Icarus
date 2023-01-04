@@ -3,10 +3,12 @@ package studio.dreamys.icarus.extra.notification;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import org.lwjgl.opengl.GL11;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
@@ -42,7 +44,7 @@ public class Notification {
         tick = -20;
         x = Minecraft.getMinecraft().displayWidth / 2.0;
         width = 150;
-        maskWidth = x + width;
+        maskWidth = width;
 
         //basic end of word separation
         if (RenderUtils.getStringWidth(message) + 20 > 150) {
@@ -62,10 +64,12 @@ public class Notification {
         } else {
             height = 30;
         }
+
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @SubscribeEvent
-    public void onGameOverlay(RenderGameOverlayEvent e) {
+    public void onGameOverlay(RenderGameOverlayEvent.Text e) {
         y = NotificationManager.startY;
 
         //notification dynamic stacking
@@ -112,7 +116,7 @@ public class Notification {
             //parabola easing (thank you math classes)
             speed = (((tick / width) / 2) * Math.pow(tick, 2));
             x += speed;
-            maskWidth = x + 10 - speed * 4;
+            maskWidth = 10 - speed * 4;
             tick++;
         }
     }
