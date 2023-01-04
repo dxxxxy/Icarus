@@ -32,26 +32,4 @@ public class Combat {
         @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
         public static double Slider = 1;
     }
-
-    @IGroup(x = 200, y = 10)
-    public static class Reach {
-        public static Runnable Button = () -> {
-            NotificationManager.send(new Notification("Button", "You pressed the button!"));
-            System.out.println("Button pressed!");
-        };
-
-        @IKeybind(Keyboard.KEY_F5)
-        public static boolean Checkbox = true;
-
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String Choice = "Option 1";
-
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String[] Combo = {"Option 1", "Option 3"};
-
-        public static String Field = "Hello World!";
-
-        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
-        public static double Slider = 1;
-    }
 }

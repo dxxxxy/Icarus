@@ -9,13 +9,12 @@ import net.minecraftforge.fml.common.gameevent.InputEvent;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.component.Window;
-import studio.dreamys.icarus.component.sub.Checkbox;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.extra.Watermark;
 import studio.dreamys.icarus.extra.notification.Notification;
 import studio.dreamys.icarus.extra.notification.NotificationManager;
-import studio.dreamys.test.ui.component.CustomCheckbox;
+import studio.dreamys.test.ui.page.Misc;
 import studio.dreamys.test.ui.page.Visuals;
 
 import java.awt.*;
@@ -37,7 +36,7 @@ public class TestMod {
 //        System.out.println(Icarus.getConfig().getCheckbox("Visuals", "Checkbox"));
 
 //        new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms").enable();
-
+        watermark = new Watermark("dxxxxyware | uid 001 (dxxxxy) | mc.hypixel.net | 23ms");
         NotificationManager.startY = 20; //start below watermark
 
         //try all except top_right
@@ -63,6 +62,7 @@ public class TestMod {
         System.out.println(e.toggled);
 //        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
 
+        watermark.setEnabled(Misc.Watermark.Enabled);
     }
 
     @SubscribeEvent
@@ -81,6 +81,8 @@ public class TestMod {
     public void onComponentStateChange(ComponentEvent.FieldEvent e) {
         System.out.println(e.field);
         System.out.println(e.text);
+
+        watermark.setText(Misc.Watermark.Text);
     }
 
     @SubscribeEvent
