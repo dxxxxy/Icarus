@@ -91,6 +91,8 @@ public class Config {
                 for (Field iSetting : iSettings) { //for every setting
                     Component component = null; //create component object
 
+                    iSetting.setAccessible(true); //set accessible
+
                     //get additional annotations
                     DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
                     SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
@@ -191,6 +193,8 @@ public class Config {
                     DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
                     SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
 
+                    iSetting.setAccessible(true); //set accessible
+
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
                             groupObject.addProperty(iSetting.getName(), (boolean) iSetting.get(null));
@@ -258,6 +262,8 @@ public class Config {
                     //get additional annotations
                     DropdownOptions dropdownOptions = iSetting.getAnnotation(DropdownOptions.class);
                     SliderOptions sliderOptions = iSetting.getAnnotation(SliderOptions.class);
+
+                    iSetting.setAccessible(true); //set accessible
 
                     try {
                         if (iSetting.getType() == boolean.class) { //if checkbox
