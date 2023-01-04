@@ -56,6 +56,6 @@ public class Checkbox extends Component {
         setToggled(!isToggled());
 
         Config.save();
-        MinecraftForge.EVENT_BUS.post(new ComponentEvent.CheckboxEvent(this));
+        MinecraftForge.EVENT_BUS.post(new ComponentEvent.CheckboxEvent());
     }
 }

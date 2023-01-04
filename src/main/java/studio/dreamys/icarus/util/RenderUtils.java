@@ -14,9 +14,9 @@ import java.util.Objects;
 
 @SuppressWarnings({"unused", "DuplicatedCode", "JavadocReference"})
 public class RenderUtils {
-    public static GlyphPageFontRenderer iconRenderer;
     public static GlyphPageFontRenderer textRenderer;
     public static GlyphPageFontRenderer titleRenderer;
+    public static GlyphPageFontRenderer iconRenderer;
 
     public static void loadFonts() {
         //register font in jvm
@@ -27,9 +27,9 @@ public class RenderUtils {
         }
 
         //initialize font renderer
-        iconRenderer = GlyphPageFontRenderer.create("undefeated", 50, false, false, false);
         textRenderer = GlyphPageFontRenderer.create("Verdana", 11, false, false, false);
         titleRenderer = GlyphPageFontRenderer.create("Verdana", 20, true, false, false);
+        iconRenderer = GlyphPageFontRenderer.create("undefeated", 50, false, false, false);
     }
 
     /**

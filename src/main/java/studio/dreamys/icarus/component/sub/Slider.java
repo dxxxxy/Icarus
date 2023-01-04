@@ -97,7 +97,7 @@ public class Slider extends Component {
             //set and save
             setValue(onlyInt ? Math.round(min + (max - min) * percent) : roundToPlace(min + (max - min) * percent));
             Config.save();
-            MinecraftForge.EVENT_BUS.post(new ComponentEvent.SliderEvent(this));
+            MinecraftForge.EVENT_BUS.post(new ComponentEvent.SliderEvent());
         }
     }
 }

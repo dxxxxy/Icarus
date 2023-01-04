@@ -38,19 +38,19 @@ public class Icarus {
         }
     }
 
-    public static void provideIconFont(InputStream fontStream, String fontName, int fontSize, boolean bold, boolean italic, boolean boldItalic) {
+    public static void provideTitleFont(InputStream fontStream, String fontName, int fontSize, boolean bold, boolean italic, boolean boldItalic) {
         try {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT, fontStream));
-            RenderUtils.iconRenderer = GlyphPageFontRenderer.create(fontName, fontSize, bold, italic, boldItalic);
+            RenderUtils.titleRenderer = GlyphPageFontRenderer.create(fontName, fontSize, bold, italic, boldItalic);
         } catch (FontFormatException | IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static void provideTitleFont(InputStream fontStream, String fontName, int fontSize, boolean bold, boolean italic, boolean boldItalic) {
+    public static void provideIconFont(InputStream fontStream, String fontName, int fontSize, boolean bold, boolean italic, boolean boldItalic) {
         try {
             GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(Font.createFont(Font.TRUETYPE_FONT, fontStream));
-            RenderUtils.titleRenderer = GlyphPageFontRenderer.create(fontName, fontSize, bold, italic, boldItalic);
+            RenderUtils.iconRenderer = GlyphPageFontRenderer.create(fontName, fontSize, bold, italic, boldItalic);
         } catch (FontFormatException | IOException e) {
             throw new RuntimeException(e);
         }

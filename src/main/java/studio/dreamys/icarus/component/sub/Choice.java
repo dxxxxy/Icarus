@@ -71,7 +71,7 @@ public class Choice extends Component {
                 setSelected(options.get(index));
 
                 Config.save();
-                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ChoiceEvent(this));
+                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ChoiceEvent());
             } else open = false;
             return;
         }

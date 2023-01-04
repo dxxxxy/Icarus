@@ -64,7 +64,7 @@ public class Field extends Component {
             }
 
             Config.save();
-            MinecraftForge.EVENT_BUS.post(new ComponentEvent.FieldEvent(this));
+            MinecraftForge.EVENT_BUS.post(new ComponentEvent.FieldEvent());
         }
     }
 

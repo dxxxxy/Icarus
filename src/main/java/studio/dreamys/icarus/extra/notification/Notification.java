@@ -76,7 +76,7 @@ public class Notification {
         }
 
         //draw background
-        RenderUtils.drawRect(x, y, x + width, y + height, backgroundColor);
+        RenderUtils.drawRect(x, y, width, height, backgroundColor);
 
         //draw title
         RenderUtils.drawTitle(title, x + 10, y + 5, titleColor);
@@ -91,7 +91,7 @@ public class Notification {
         }
 
         //draw mask
-        RenderUtils.drawRect(x, y, maskWidth, y + height, maskColor);
+        RenderUtils.drawRect(x, y, maskWidth, height, maskColor);
     }
 
     @SubscribeEvent

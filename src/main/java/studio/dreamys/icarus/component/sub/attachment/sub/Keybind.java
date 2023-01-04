@@ -25,7 +25,7 @@ public class Keybind extends Attachment {
         keybind = "["+ Keyboard.getKeyName(key) +"]";
 
         Config.saveAttachments();
-        MinecraftForge.EVENT_BUS.post(new ComponentEvent.KeybindEvent(this));
+        MinecraftForge.EVENT_BUS.post(new ComponentEvent.KeybindEvent());
     }
 
     @Override

@@ -52,49 +52,36 @@ public class TestMod {
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent e) {
-        System.out.println(e.component);
-//        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.CheckboxEvent e) {
-        System.out.println(e.checkbox);
-        System.out.println(e.toggled);
-//        Icarus.getConfig().setSlider("AHSniper", "Sleep (ms)", 3000);
-
         watermark.setEnabled(Misc.Watermark.Enabled);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ChoiceEvent e) {
-        System.out.println(e.choice);
-        System.out.println(e.selected);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.ComboEvent e) {
-        System.out.println(e.combo);
-        System.out.println(e.active);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.FieldEvent e) {
-        System.out.println(e.field);
-        System.out.println(e.text);
-
         watermark.setText(Misc.Watermark.Text);
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.KeybindEvent e) {
-        System.out.println(e.keybind);
-        System.out.println(e.key);
+
     }
 
     @SubscribeEvent
     public void onComponentStateChange(ComponentEvent.SliderEvent e) {
-        System.out.println(e.slider);
-        System.out.println(e.value);
+
     }
 
     @SubscribeEvent

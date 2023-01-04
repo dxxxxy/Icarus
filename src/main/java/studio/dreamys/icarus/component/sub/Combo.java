@@ -86,7 +86,7 @@ public class Combo extends Component {
                 setActive(active);
 
                 Config.save();
-                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ComboEvent(this));
+                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ComboEvent());
             } else open = false;
             return;
         }

@@ -3,7 +3,7 @@
 
 A simple and extremely [lightweight](#lightweightness) Gui and config library for Minecraft Forge 1.8.9 modding heavily inspired by the GameSense/Skeet CS:GO cheat (not an exact copy). A fully working example mod using this library can be found at [test](src/main/java/studio/dreamys/test).
 
-## Importing
+## Setup
 ### Gradle
 ```
 repositories {
@@ -16,53 +16,35 @@ dependencies {
 }
 ```
 
-Replace $VERSION with any version from the [repo](https://github.com/DxxxxY/repo/tree/master/studio/dreamys/Icarus).
+Replace `$VERSION` with the latest from the [repo](https://github.com/DxxxxY/repo/tree/master/studio/dreamys/Icarus).
 
-## Components
-> Some components have secondary constructors with default values.
+## What's v2
+- **.json**
+- **Same look**
+- **Customizability**
+- **~90% code rewrite**
+- **New and redesigned config system**
+- **Complete separation of UI and Config**
+- **Enhanced and simplified developer experience**
+
+## [Wiki](https://github.com/DxxxxY/Icarus/wiki/)
+
+## UI Components
 - Button
 - Checkbox
 - Choice
 - ~~Color~~ (coming soon)
 - Combo
 - Field
-- Group
-- Keybind
 - Slider
+- Keybind
+- Group
 - Page
 - Window
 
 ## Extra
 - [Notification](https://www.youtube.com/watch?v=624J5kAZqNw&ab_channel=DxxxxY)
 - Watermark ![Watermark](.github/watermark.png)
-
-## Demo
-### Initializing Icarus
-
-We will be doing this in the `preInit` event of the test mod.
-
-
-```java
-@Mod(modid = "test", name = "Test", version = "1.0")
-public class TestMod {
-    @Mod.EventHandler
-    public void preInit(FMLPreInitializationEvent e) {
-        //...
-    }
-}
-```
-
-Create a window
-```java
-Window window = new Window(Minecraft.getMinecraft().displayWidth / 2.0, Minecraft.getMinecraft().displayHeight / 4.0, 731 / 2.0, 617 / 2.0, new Color(29, 122, 215));
-```
-
-Initialize Icarus.
-```java
-Icarus.init(e.getModMetadata().modid, window);
-```
-
-On the
 
 ## Lightweightness
 - Everything is created and stored on client init.
