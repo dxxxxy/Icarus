@@ -1,15 +1,13 @@
 package studio.dreamys.icarus.component.sub;
 
 import lombok.SneakyThrows;
-import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.regex.Pattern;
 
 public class Field extends Component {
@@ -64,7 +62,6 @@ public class Field extends Component {
             }
 
             Config.save();
-            MinecraftForge.EVENT_BUS.post(new ComponentEvent.FieldEvent());
         }
     }
 

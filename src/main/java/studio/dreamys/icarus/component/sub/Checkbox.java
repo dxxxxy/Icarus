@@ -1,28 +1,15 @@
 package studio.dreamys.icarus.component.sub;
 
-import lombok.SneakyThrows;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
-import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
 import java.awt.*;
 
-public class Checkbox extends Component {
+public class Checkbox extends Component<Boolean> {
     public Checkbox(String label) {
+        //build component
         super(label, 5, 5);
-    }
-
-    @SneakyThrows
-    public boolean isToggled() {
-        return configField.getBoolean(null);
-    }
-
-    @SneakyThrows
-    private void setToggled(boolean toggled) {
-        configField.set(null, toggled);
     }
 
     @Override
@@ -31,7 +18,7 @@ public class Checkbox extends Component {
         super.render(mouseX, mouseY);
 
         //toggle color
-        Color color = isToggled() ? window.color : Color.DARK_GRAY;
+        Color color = get() ? window.color : Color.DARK_GRAY;
 
         //background
         RenderUtils.drawGradientRect(x, y, width, height, color, color.darker().darker());
@@ -53,9 +40,6 @@ public class Checkbox extends Component {
     }
 
     public void toggle() {
-        setToggled(!isToggled());
-
-        Config.save();
-        MinecraftForge.EVENT_BUS.post(new ComponentEvent.CheckboxEvent());
+        set(!get());
     }
 }

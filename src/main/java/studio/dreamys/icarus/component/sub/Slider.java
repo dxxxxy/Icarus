@@ -1,10 +1,8 @@
 package studio.dreamys.icarus.component.sub;
 
 import lombok.SneakyThrows;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
@@ -97,7 +95,6 @@ public class Slider extends Component {
             //set and save
             setValue(onlyInt ? Math.round(min + (max - min) * percent) : roundToPlace(min + (max - min) * percent));
             Config.save();
-            MinecraftForge.EVENT_BUS.post(new ComponentEvent.SliderEvent());
         }
     }
 }

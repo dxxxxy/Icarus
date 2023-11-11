@@ -1,13 +1,16 @@
 package studio.dreamys.icarus;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
 import net.minecraftforge.common.MinecraftForge;
+import studio.dreamys.icarus.callback.CallbackManager;
 import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.handler.KeybindHandler;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.font.GlyphPageFontRenderer;
+import studio.dreamys.test.ui.page.Combat;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,6 +21,7 @@ public class Icarus {
     @Getter private static Window window;
     @Getter private static String modid;
 
+    @SneakyThrows
     public static void init(String modid, Window window) {
         RenderUtils.loadFonts();
 
@@ -27,6 +31,10 @@ public class Icarus {
         MinecraftForge.EVENT_BUS.register(new KeybindHandler());
 
         Config.init(modid);
+
+        CallbackManager.register(Combat.KillAura.class.getField("Checkbox_Haha"), () -> {
+            System.out.println("KillAura toggled!");
+        });
     }
 
     public static void provideTextFont(InputStream fontStream, String fontName, int fontSize, boolean bold, boolean italic, boolean boldItalic) {

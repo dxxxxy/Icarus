@@ -1,10 +1,8 @@
 package studio.dreamys.icarus.component.sub;
 
 import lombok.SneakyThrows;
-import net.minecraftforge.common.MinecraftForge;
 import studio.dreamys.icarus.component.Component;
 import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 import studio.dreamys.icarus.util.position.Bounds;
 
@@ -71,7 +69,6 @@ public class Choice extends Component {
                 setSelected(options.get(index));
 
                 Config.save();
-                MinecraftForge.EVENT_BUS.post(new ComponentEvent.ChoiceEvent());
             } else open = false;
             return;
         }

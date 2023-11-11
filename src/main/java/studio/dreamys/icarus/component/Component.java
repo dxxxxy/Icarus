@@ -1,11 +1,18 @@
 package studio.dreamys.icarus.component;
 
 import lombok.Getter;
+import lombok.SneakyThrows;
+import studio.dreamys.icarus.callback.CallbackManager;
+import studio.dreamys.icarus.component.sub.Button;
+import studio.dreamys.icarus.component.sub.Checkbox;
+import studio.dreamys.icarus.component.sub.Choice;
+import studio.dreamys.icarus.config.Config;
 import studio.dreamys.icarus.util.position.Bounds;
 
 import java.lang.reflect.Field;
 
-public abstract class Component {
+@SuppressWarnings("unused")
+public abstract class Component<T> {
     @Getter protected Window window;
     @Getter protected Group group;
 
@@ -26,6 +33,24 @@ public abstract class Component {
 
     public Component() {
 
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public T get() {
+        return (T) configField.get(null);
+    }
+
+    @SneakyThrows
+    public void set(T o) {
+        //set config field
+        configField.set(null, o);
+
+        //save config
+        Config.save();
+
+        //fire callbacks
+        CallbackManager.fire(configField);
     }
 
     public void render(int mouseX, int mouseY) {

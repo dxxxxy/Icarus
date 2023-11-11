@@ -1,11 +1,9 @@
 package studio.dreamys.icarus.component.sub.attachment.sub;
 
 import lombok.Getter;
-import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.input.Keyboard;
 import studio.dreamys.icarus.component.sub.attachment.Attachment;
 import studio.dreamys.icarus.config.Config;
-import studio.dreamys.icarus.event.ComponentEvent;
 import studio.dreamys.icarus.util.RenderUtils;
 
 import java.awt.*;
@@ -25,7 +23,6 @@ public class Keybind extends Attachment {
         keybind = "["+ Keyboard.getKeyName(key) +"]";
 
         Config.saveAttachments();
-        MinecraftForge.EVENT_BUS.post(new ComponentEvent.KeybindEvent());
     }
 
     @Override
