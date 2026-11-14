@@ -2,7 +2,8 @@ package studio.dreamys.icarus.ui;
 
 /**
  * What a platform's menu screen forwards to Icarus. Coordinates are Minecraft GUI units; key codes are
- * {@link studio.dreamys.icarus.input.Keys} codes.
+ * {@link studio.dreamys.icarus.input.Keys} codes; mouse buttons are numbered like LWJGL/GLFW (0 left, 1 right,
+ * 2 middle).
  */
 public interface MenuController {
     /** The screen was opened (or resized). */

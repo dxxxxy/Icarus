@@ -42,15 +42,25 @@ public class IcarusScreen extends Screen {
         menu.render(mouseX(), mouseY(), partialTick);
     }
 
+    /** 26.x numbers mouse buttons like SDL (left 1, middle 2, right 3); Icarus uses LWJGL's (left 0, right 1, middle 2). */
+    private static int button(MouseButtonEvent event) {
+        switch (event.button()) {
+            case InputConstants.MOUSE_BUTTON_LEFT: return 0;
+            case InputConstants.MOUSE_BUTTON_RIGHT: return 1;
+            case InputConstants.MOUSE_BUTTON_MIDDLE: return 2;
+            default: return event.button() - 1;
+        }
+    }
+
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        menu.mousePressed(event.x(), event.y(), event.button());
+        menu.mousePressed(event.x(), event.y(), button(event));
         return true;
     }
 
     @Override
     public boolean mouseReleased(MouseButtonEvent event) {
-        menu.mouseReleased(event.x(), event.y(), event.button());
+        menu.mouseReleased(event.x(), event.y(), button(event));
         return true;
     }
 

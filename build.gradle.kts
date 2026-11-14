@@ -45,7 +45,8 @@ gradle.projectsEvaluated {
 // IntelliJ run configurations. unimined's genIntellijRuns (run on sync) names the module after the Gradle path, e.g.
 // Icarus.platforms.mc-1.21.1.fabric.main, but IntelliJ turns dots inside a project name into underscores
 // (Icarus.platforms.mc-1_21_1.fabric.main), so every generated config says "Module not specified". Fix the names, and
-// add a config for Fabric 26.3, whose unimined 2.x build generates none.
+// add a config for Fabric 26.3, whose unimined 2.x build generates none. That one runs the 26.3 build on its own
+// (-p): run through the root build, Gradle would first configure every other target, about a minute.
 fun fixIdeaRunConfigs() {
     val dir = rootDir.resolve(".idea/runConfigurations")
     if (!dir.isDirectory) return
@@ -65,10 +66,10 @@ fun fixIdeaRunConfigs() {
             <ExternalSystemSettings>
               <option name="externalProjectPath" value="${'$'}PROJECT_DIR${'$'}" />
               <option name="externalSystemIdString" value="GRADLE" />
-              <option name="scriptParameters" value="" />
+              <option name="scriptParameters" value="-p platforms/mc-26.3" />
               <option name="taskNames">
                 <list>
-                  <option value=":mc-26.3:fabric:runTestmodClient" />
+                  <option value=":fabric:runTestmodClient" />
                 </list>
               </option>
             </ExternalSystemSettings>
