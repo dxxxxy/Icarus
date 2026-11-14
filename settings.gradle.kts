@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 rootProject.name = "Icarus"
 
 include("core", "testmod")
+include("platforms:mc-1.21.1:fabric", "platforms:mc-1.21.1:neoforge")
 
 // LWJGL2-era forge targets live in their own build (unimined 1.x), see legacy/settings.gradle.kts
 includeBuild("legacy")
