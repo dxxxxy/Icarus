@@ -1,29 +1,23 @@
 package studio.dreamys.icarus.platform;
 
+import studio.dreamys.icarus.render.DrawList;
+
 /**
- * The drawing primitives Icarus is built on. Coordinates are GUI-scaled and affected by the
- * current matrix; colors are ARGB ints. Every draw blends with (src alpha, 1 - src alpha).
+ * The drawing a platform has to provide: RGBA textures and rendering a {@link DrawList} (indexed triangles in
+ * framebuffer pixels, one texture per command). All methods are called on the render thread.
  */
 public interface Renderer {
-    /** Solid quad from (x1, y1) to (x2, y2), drawn exactly at the given (possibly fractional) coordinates. */
-    void fill(double x1, double y1, double x2, double y2, int color);
-
-    /** Quad with {@code topColor} along its top edge fading vertically into {@code bottomColor}. */
-    void fillGradient(double x, double y, double width, double height, int topColor, int bottomColor);
+    /** A new RGBA texture with nearest filtering and undefined contents. */
+    Texture createTexture(int width, int height);
 
     /**
-     * Uploads an ARGB image. Must be called on the render thread.
-     *
-     * @param linear use linear magnification filtering instead of nearest
+     * Replaces a region of a texture. {@code argb[offset + row * stride + column]} is the pixel at
+     * ({@code x + column}, {@code y + row}).
      */
-    Texture createTexture(int width, int height, int[] argb, boolean linear);
+    void upload(Texture texture, int x, int y, int width, int height, int[] argb, int offset, int stride);
 
-    /** Textured quad, with the texture's colors multiplied by {@code tint}. */
-    void drawTexture(Texture texture, double x, double y, double width, double height, float u0, float v0, float u1, float v1, int tint);
+    void deleteTexture(Texture texture);
 
-    void pushMatrix();
-
-    void scale(float x, float y);
-
-    void popMatrix();
+    /** Draws the list over whatever is on screen, with alpha blending, in the current GUI pass. */
+    void render(DrawList list);
 }

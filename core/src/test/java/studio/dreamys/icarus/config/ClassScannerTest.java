@@ -36,7 +36,8 @@ class ClassScannerTest {
     }
 
     private static List<String> names(List<Class<?>> classes) {
-        return classes.stream().map(Class::getSimpleName).sorted().collect(Collectors.toList());
+        //only this test's own fixtures (other tests declare pages too)
+        return classes.stream().filter(c -> c.getEnclosingClass() == ClassScannerTest.class).map(Class::getSimpleName).sorted().collect(Collectors.toList());
     }
 
     @Test

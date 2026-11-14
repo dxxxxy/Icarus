@@ -1,45 +1,48 @@
 package studio.dreamys.icarus.platform;
 
-import studio.dreamys.icarus.component.Window;
+import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 
 /**
- * Everything Icarus needs from the game. Each Minecraft version / mod loader ships exactly one
- * implementation named {@value #IMPLEMENTATION}, which {@link studio.dreamys.icarus.Icarus#getPlatform()}
- * looks up reflectively.
+ * Everything Icarus needs from the running Minecraft version and mod loader. Each Icarus build ships exactly one
+ * implementation, named {@link #IMPLEMENTATION}.
  */
 public interface Platform {
     String IMPLEMENTATION = "studio.dreamys.icarus.platform.PlatformImpl";
 
     /**
-     * Called once from {@link studio.dreamys.icarus.Icarus#init}. Registers the loader hooks that feed
-     * {@link studio.dreamys.icarus.Icarus#onKeyPressed(int)}, {@link studio.dreamys.icarus.Icarus#renderHud()}
+     * Called once, before the first mod is created. Registers the loader hooks that feed
+     * {@link studio.dreamys.icarus.Icarus#onKeyPressed(int)}, {@link studio.dreamys.icarus.Icarus#renderHud(float)}
      * and {@link studio.dreamys.icarus.Icarus#clientTick()}.
      */
     void install();
 
     Renderer getRenderer();
 
-    /** Framebuffer width in real pixels (not GUI-scaled). */
-    int getDisplayWidth();
+    /** Minecraft's GUI scale (GUI units to framebuffer pixels). */
+    double getGuiScale();
 
-    /** Framebuffer height in real pixels (not GUI-scaled). */
-    int getDisplayHeight();
+    int getFramebufferWidth();
 
-    /** Whether a world and player are loaded. */
+    int getFramebufferHeight();
+
+    /** Whether a world is loaded and the player exists. */
     boolean isInGame();
 
-    void openScreen(Window window);
+    /** Opens a Minecraft screen showing the menu; it forwards input and rendering to {@code menu}. */
+    void openScreen(MenuController menu);
 
-    /** The game directory (.minecraft or the dev run directory). */
     File getGameDir();
 
-    /** Directories and/or jars that make up the given mod, searched for {@code @IPage} classes. */
+    /** The roots (directories or jars) holding the classes of the given mod. */
     Collection<Path> getModRoots(String modid);
 
-    /** The class loader the given mod's classes are loaded with. */
     ClassLoader getModClassLoader(String modid);
+
+    String getClipboard();
+
+    void setClipboard(String text);
 }
