@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "icarus",
+  "version": "${version}",
+  "name": "Icarus",
+  "description": "GUI and config library",
+  "environment": "client",
+  "mixins": [
+    "icarus.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "1.20.1"
+  }
+}
