@@ -1,118 +1,126 @@
 package studio.dreamys.icarus.platform.forge1710;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+import org.lwjgl.opengl.GL15;
 import studio.dreamys.icarus.platform.Renderer;
 import studio.dreamys.icarus.platform.Texture;
+import studio.dreamys.icarus.render.DrawList;
 
-/** Fixed-function GL for 1.7.10, which predates GlStateManager: the 1.8.9 renderer's calls made directly. */
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.IntBuffer;
+
+/**
+ * Draws Icarus' draw lists with client-side vertex arrays (one glDrawElements per texture), with raw GL11 state calls
+ * (1.7.10 has no GlStateManager).
+ */
 public class LegacyRenderer implements Renderer {
+    private static final int STRIDE = 20; //x, y, u, v floats + RGBA bytes
+
+    private ByteBuffer vertices = BufferUtils.createByteBuffer(STRIDE * 4096);
+    private IntBuffer indices = BufferUtils.createIntBuffer(6144);
+    private IntBuffer pixels = BufferUtils.createIntBuffer(64 * 64);
+
     @Override
-    public void fill(double x1, double y1, double x2, double y2, int color) {
-        Tessellator tessellator = Tessellator.instance;
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        color(color);
-        tessellator.startDrawingQuads();
-        tessellator.addVertex(x1, y2, 0.0D);
-        tessellator.addVertex(x2, y2, 0.0D);
-        tessellator.addVertex(x2, y1, 0.0D);
-        tessellator.addVertex(x1, y1, 0.0D);
-        tessellator.draw();
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glDisable(GL11.GL_BLEND);
+    public Texture createTexture(int width, int height) {
+        int id = GL11.glGenTextures();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, width, height, 0, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, (IntBuffer) null);
+        return new GlTexture(id, width, height);
     }
 
     @Override
-    public void fillGradient(double x, double y, double width, double height, int topColor, int bottomColor) {
-        float f = (float) (topColor >> 24 & 255) / 255.0F;
-        float f1 = (float) (topColor >> 16 & 255) / 255.0F;
-        float f2 = (float) (topColor >> 8 & 255) / 255.0F;
-        float f3 = (float) (topColor & 255) / 255.0F;
-        float f4 = (float) (bottomColor >> 24 & 255) / 255.0F;
-        float f5 = (float) (bottomColor >> 16 & 255) / 255.0F;
-        float f6 = (float) (bottomColor >> 8 & 255) / 255.0F;
-        float f7 = (float) (bottomColor & 255) / 255.0F;
-        GL11.glDisable(GL11.GL_TEXTURE_2D);
+    public void upload(Texture texture, int x, int y, int width, int height, int[] argb, int offset, int stride) {
+        int count = width * height;
+        if (pixels.capacity() < count) pixels = BufferUtils.createIntBuffer(count);
+        pixels.clear();
+        for (int row = 0; row < height; row++) pixels.put(argb, offset + row * stride, width);
+        pixels.flip();
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((GlTexture) texture).id);
+        GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 4);
+        GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, x, y, width, height, GL12.GL_BGRA, GL12.GL_UNSIGNED_INT_8_8_8_8_REV, pixels);
+    }
+
+    @Override
+    public void deleteTexture(Texture texture) {
+        GL11.glDeleteTextures(((GlTexture) texture).id);
+    }
+
+    @Override
+    public void render(DrawList list) {
+        int vertexCount = list.getVertexCount();
+        if (vertices.capacity() < vertexCount * STRIDE) vertices = BufferUtils.createByteBuffer(vertexCount * STRIDE * 2).order(ByteOrder.nativeOrder());
+        vertices.clear();
+        float[] xy = list.getPositions(), uv = list.getUvs();
+        int[] colors = list.getColors();
+        for (int i = 0; i < vertexCount; i++) {
+            int c = colors[i];
+            vertices.putFloat(xy[i * 2]).putFloat(xy[i * 2 + 1]).putFloat(uv[i * 2]).putFloat(uv[i * 2 + 1])
+                    .put((byte) (c >> 16)).put((byte) (c >> 8)).put((byte) c).put((byte) (c >>> 24));
+        }
+        int indexCount = 0;
+        for (int i = 0; i < list.getCommandCount(); i++) indexCount = Math.max(indexCount, list.getCommandIndexStart(i) + list.getCommandIndexCount(i));
+        if (indices.capacity() < indexCount) indices = BufferUtils.createIntBuffer(indexCount * 2);
+        indices.clear();
+        indices.put(list.getIndices(), 0, indexCount);
+
+        double scale = new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight).getScaleFactor();
+        GL11.glPushMatrix();
+        GL11.glScaled(1 / scale, 1 / scale, 1);
         GL11.glEnable(GL11.GL_BLEND);
+        OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
-        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glShadeModel(GL11.GL_SMOOTH);
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.setColorRGBA_F(f1, f2, f3, f);
-        tessellator.addVertex(x + width, y, 0);
-        tessellator.addVertex(x, y, 0);
-        tessellator.setColorRGBA_F(f5, f6, f7, f4);
-        tessellator.addVertex(x, y + height, 0);
-        tessellator.addVertex(x + width, y + height, 0);
-        tessellator.draw();
-        GL11.glShadeModel(GL11.GL_FLAT);
-        GL11.glDisable(GL11.GL_BLEND);
-        GL11.glEnable(GL11.GL_ALPHA_TEST);
+        GL11.glDisable(GL11.GL_LIGHTING);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glDisable(GL11.GL_CULL_FACE);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
-    }
+        GL11.glShadeModel(GL11.GL_SMOOTH);
+        GL11.glColor4f(1, 1, 1, 1);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-    @Override
-    public Texture createTexture(int width, int height, int[] argb, boolean linear) {
-        DynamicTexture texture = new DynamicTexture(width, height);
-        System.arraycopy(argb, 0, texture.getTextureData(), 0, width * height);
-        texture.updateDynamicTexture();
+        GL11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+        GL11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+        GL11.glEnableClientState(GL11.GL_COLOR_ARRAY);
+        vertices.position(0);
+        GL11.glVertexPointer(2, GL11.GL_FLOAT, STRIDE, vertices);
+        vertices.position(8);
+        GL11.glTexCoordPointer(2, GL11.GL_FLOAT, STRIDE, vertices);
+        vertices.position(16);
+        GL11.glColorPointer(4, true, STRIDE, vertices);
 
-        if (linear) {
-            GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getGlTextureId());
-            GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        for (int i = 0; i < list.getCommandCount(); i++) {
+            int start = list.getCommandIndexStart(i), count = list.getCommandIndexCount(i);
+            if (count == 0) continue;
+            GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((GlTexture) list.getCommandTexture(i)).id);
+            indices.limit(start + count).position(start);
+            GL11.glDrawElements(GL11.GL_TRIANGLES, indices);
         }
 
-        return new LegacyTexture(texture, width, height);
-    }
-
-    @Override
-    public void drawTexture(Texture texture, double x, double y, double width, double height, float u0, float v0, float u1, float v1, int tint) {
+        GL11.glDisableClientState(GL11.GL_COLOR_ARRAY);
+        GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+        GL11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+        GL11.glShadeModel(GL11.GL_FLAT);
         GL11.glEnable(GL11.GL_ALPHA_TEST);
-        GL11.glEnable(GL11.GL_BLEND);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
-        GL11.glBindTexture(GL11.GL_TEXTURE_2D, ((LegacyTexture) texture).texture.getGlTextureId());
-        color(tint);
-
-        Tessellator tessellator = Tessellator.instance;
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(x, y + height, 0.0D, u0, v1);
-        tessellator.addVertexWithUV(x + width, y + height, 0.0D, u1, v1);
-        tessellator.addVertexWithUV(x + width, y, 0.0D, u1, v0);
-        tessellator.addVertexWithUV(x, y, 0.0D, u0, v0);
-        tessellator.draw();
-    }
-
-    @Override
-    public void pushMatrix() {
-        GL11.glPushMatrix();
-    }
-
-    @Override
-    public void scale(float x, float y) {
-        GL11.glScalef(x, y, 1);
-    }
-
-    @Override
-    public void popMatrix() {
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glColor4f(1, 1, 1, 1);
         GL11.glPopMatrix();
     }
 
-    private static void color(int argb) {
-        GL11.glColor4f((float) (argb >> 16 & 255) / 255.0F, (float) (argb >> 8 & 255) / 255.0F, (float) (argb & 255) / 255.0F, (float) (argb >> 24 & 255) / 255.0F);
-    }
+    private static final class GlTexture implements Texture {
+        final int id, width, height;
 
-    private static final class LegacyTexture implements Texture {
-        private final DynamicTexture texture;
-        private final int width, height;
-
-        LegacyTexture(DynamicTexture texture, int width, int height) {
-            this.texture = texture;
+        GlTexture(int id, int width, int height) {
+            this.id = id;
             this.width = width;
             this.height = height;
         }

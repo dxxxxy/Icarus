@@ -23,10 +23,10 @@ public class PlatformImpl extends ModernPlatform {
     }
 
     /** Called by HudMixin at the end of the HUD render. */
-    public static void renderHud(GuiGraphicsExtractor graphics) {
+    public static void renderHud(GuiGraphicsExtractor graphics, float partialTick) {
         if (installed == null) return;
         installed.renderer.begin(graphics);
-        Icarus.renderHud();
+        Icarus.renderHud(partialTick);
     }
 
     /** Called by MinecraftMixin at the start of every client tick. */

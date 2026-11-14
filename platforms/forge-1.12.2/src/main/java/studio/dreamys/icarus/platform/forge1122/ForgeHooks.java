@@ -17,7 +17,7 @@ public class ForgeHooks {
 
     @SubscribeEvent
     public void onOverlayText(RenderGameOverlayEvent.Text e) {
-        Icarus.renderHud();
+        Icarus.renderHud(e.getPartialTicks());
     }
 
     @SubscribeEvent

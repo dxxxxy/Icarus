@@ -207,11 +207,15 @@ public class SkeetStyleTheme extends BaseTheme {
                 c.hline(b.x, b.bottom() - 1, b.w + 1, 0xFF000000);
             }
             boolean hovered = !active && b.contains(menu.getMouseX(), menu.getMouseY());
+            int iconColor = active ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE;
+            if (tab.getPage() == null) {
+                floppy(c, b.centerX(), b.centerY(), iconColor, active ? Colors.rgb(0x131313) : TAB_BG);
+                continue;
+            }
             String icon = iconString(tab.getIcon());
             Font iconFont = icon(c);
             double iconW = c.measure(iconFont, icon);
-            c.text(iconFont, icon, Math.round(b.centerX() - iconW / 2), centeredTextY(c, iconFont, b.centerY()),
-                    active ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE);
+            c.text(iconFont, icon, Math.round(b.centerX() - iconW / 2), centeredTextY(c, iconFont, b.centerY()), iconColor);
         }
 
         //sub-tabs
@@ -234,6 +238,17 @@ public class SkeetStyleTheme extends BaseTheme {
             double tw = c.measure(text(c), menu.getFooterRight());
             c.text(text(c), menu.getFooterRight(), contentArea.right() - tw, fy, TEXT_HINT);
         }
+    }
+
+    /** The config tab's icon: a floppy disk drawn with shapes (the icon font has none). */
+    protected void floppy(Canvas c, double cx, double cy, int color, int background) {
+        double size = 30, x = Math.round(cx - size / 2), y = Math.round(cy - size / 2);
+        c.rect(x, y, size - 6, size, color);
+        c.rect(x + size - 6, y + 6, 6, size - 6, color);
+        c.triangle(x + size - 6, y, x + size, y + 6, x + size - 6, y + 6, color);
+        c.rect(x + 6, y + 3, size - 15, 8, background);
+        c.rect(x + size - 14, y + 4, 3, 6, color);
+        c.rect(x + 5, y + size - 12, size - 10, 9, background);
     }
 
     private final char[] iconChars = new char[1];

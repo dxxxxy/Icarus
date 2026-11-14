@@ -1,56 +1,49 @@
 package studio.dreamys.test.ui.page;
 
-import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.annotation.field.DropdownOptions;
-import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
-import studio.dreamys.icarus.extra.notification.Notification;
-import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.icarus.annotation.type.ISubPage;
 
-@IPage('v')
+import java.awt.Color;
+
+@IPage(value = 't', order = 1)
 public class Visuals {
-    @IGroup(x = 47.5, y = 10)
+    @ISubPage(order = 0)
     public static class ESP {
-        public static Runnable Button = () -> {
-            NotificationManager.send(new Notification("Button", "You pressed the button!"));
-            System.out.println("Button pressed!");
-        };
+        @IGroup(column = 0)
+        public static class Players {
+            public static boolean Boxes = true;
+            public static Color Box_color = new Color(29, 122, 215);
+            public static boolean Names = true;
+            public static boolean Health = false;
+            public static Color Health_color = new Color(120, 200, 60);
 
-        public static boolean Checkbox = true;
+            @DropdownOptions({"Off", "Normal", "Flat", "Contour"})
+            public static String Glow = "Off";
+        }
 
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String Choice = "Option 1";
+        @IGroup(column = 1)
+        public static class World {
+            public static boolean Dropped_items = false;
+            public static Color Item_color = new Color(255, 255, 255, 160);
 
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String[] Combo = {"Option 1", "Option 3"};
-
-        public static String Field = "Hello World!";
-
-        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
-        public static double Slider = 1;
+            @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
+            public static int Brightness = 100;
+        }
     }
 
-    @IGroup(x = 200, y = 10)
-    public static class Chams {
-        @IKeybind(Keys.KEY_ESCAPE)
-        public static Runnable Button = () -> {
-            NotificationManager.send(new Notification("Button", "You pressed the button!"));
-            System.out.println("Button pressed!");
-        };
+    @ISubPage(order = 1)
+    public static class Models {
+        @IGroup(column = 0)
+        public static class Chams {
+            public static boolean Enabled = false;
+            public static Color Visible = new Color(212, 6, 90);
+            public static Color Hidden = new Color(60, 40, 180, 140);
 
-        public static boolean Checkbox = true;
-
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String Choice = "Option 1";
-
-        @DropdownOptions({"Option 1", "Option 2", "Option 3"})
-        public static String[] Combo = {"Option 1", "Option 3"};
-
-        public static String Field = "Hello World!";
-
-        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
-        public static double Slider = 1;
+            @DropdownOptions({"Normal", "Flat", "Glow"})
+            public static String Material = "Normal";
+        }
     }
 }

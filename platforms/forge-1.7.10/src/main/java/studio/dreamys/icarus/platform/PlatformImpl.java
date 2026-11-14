@@ -1,14 +1,15 @@
 package studio.dreamys.icarus.platform;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.platform.forge1710.ForgeHooks;
 import studio.dreamys.icarus.platform.forge1710.IcarusScreen;
 import studio.dreamys.icarus.platform.forge1710.LegacyRenderer;
+import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -24,7 +25,7 @@ public class PlatformImpl implements Platform {
     public void install() {
         ForgeHooks hooks = new ForgeHooks();
         MinecraftForge.EVENT_BUS.register(hooks); //render overlay events
-        FMLCommonHandler.instance().bus().register(hooks); //input and tick events
+        cpw.mods.fml.common.FMLCommonHandler.instance().bus().register(hooks); //input and tick events
     }
 
     @Override
@@ -33,12 +34,17 @@ public class PlatformImpl implements Platform {
     }
 
     @Override
-    public int getDisplayWidth() {
+    public double getGuiScale() {
+        return new ScaledResolution(Minecraft.getMinecraft(), Minecraft.getMinecraft().displayWidth, Minecraft.getMinecraft().displayHeight).getScaleFactor();
+    }
+
+    @Override
+    public int getFramebufferWidth() {
         return Minecraft.getMinecraft().displayWidth;
     }
 
     @Override
-    public int getDisplayHeight() {
+    public int getFramebufferHeight() {
         return Minecraft.getMinecraft().displayHeight;
     }
 
@@ -48,8 +54,8 @@ public class PlatformImpl implements Platform {
     }
 
     @Override
-    public void openScreen(Window window) {
-        Minecraft.getMinecraft().displayGuiScreen(new IcarusScreen(window));
+    public void openScreen(MenuController menu) {
+        Minecraft.getMinecraft().displayGuiScreen(new IcarusScreen(menu));
     }
 
     @Override
@@ -65,6 +71,16 @@ public class PlatformImpl implements Platform {
     @Override
     public ClassLoader getModClassLoader(String modid) {
         return container(modid).getMod().getClass().getClassLoader();
+    }
+
+    @Override
+    public String getClipboard() {
+        return GuiScreen.getClipboardString();
+    }
+
+    @Override
+    public void setClipboard(String text) {
+        GuiScreen.setClipboardString(text);
     }
 
     private static ModContainer container(String modid) {

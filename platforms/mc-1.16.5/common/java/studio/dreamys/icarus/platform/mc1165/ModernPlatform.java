@@ -1,9 +1,9 @@
 package studio.dreamys.icarus.platform.mc1165;
 
 import net.minecraft.client.Minecraft;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.platform.Platform;
 import studio.dreamys.icarus.platform.Renderer;
+import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
 
@@ -17,12 +17,17 @@ public abstract class ModernPlatform implements Platform {
     }
 
     @Override
-    public int getDisplayWidth() {
+    public double getGuiScale() {
+        return Minecraft.getInstance().getWindow().getGuiScale();
+    }
+
+    @Override
+    public int getFramebufferWidth() {
         return Minecraft.getInstance().getWindow().getWidth();
     }
 
     @Override
-    public int getDisplayHeight() {
+    public int getFramebufferHeight() {
         return Minecraft.getInstance().getWindow().getHeight();
     }
 
@@ -32,12 +37,22 @@ public abstract class ModernPlatform implements Platform {
     }
 
     @Override
-    public void openScreen(Window window) {
-        Minecraft.getInstance().setScreen(new IcarusScreen(window, renderer));
+    public void openScreen(MenuController menu) {
+        Minecraft.getInstance().setScreen(new IcarusScreen(menu, renderer));
     }
 
     @Override
     public File getGameDir() {
         return Minecraft.getInstance().gameDirectory;
+    }
+
+    @Override
+    public String getClipboard() {
+        return Minecraft.getInstance().keyboardHandler.getClipboard();
+    }
+
+    @Override
+    public void setClipboard(String text) {
+        Minecraft.getInstance().keyboardHandler.setClipboard(text);
     }
 }

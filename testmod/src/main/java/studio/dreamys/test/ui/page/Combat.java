@@ -1,21 +1,20 @@
 package studio.dreamys.test.ui.page;
 
-import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.annotation.field.DropdownOptions;
 import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
-import studio.dreamys.icarus.extra.notification.Notification;
-import studio.dreamys.icarus.extra.notification.NotificationManager;
+import studio.dreamys.icarus.input.Keys;
+import studio.dreamys.test.TestModCommon;
 
-@IPage('v')
+@IPage(value = 's', order = 0)
 public class Combat {
-    @IGroup(x = 47.5, y = 10)
+    @IGroup(column = 0)
     public static class KillAura {
         @IKeybind(Keys.KEY_6)
         public static Runnable Button = () -> {
-            NotificationManager.send(new Notification("Button", "You pressed the button!"));
+            TestModCommon.notify("Button", "You pressed the button!");
             System.out.println("Button pressed!");
         };
 
@@ -32,5 +31,19 @@ public class Combat {
 
         @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
         public static double Slider = 1;
+    }
+
+    @IGroup(column = 1)
+    public static class Accuracy {
+        @SliderOptions(min = 0, max = 100, onlyInt = true, units = "%")
+        public static int Hit_chance = 60;
+
+        @SliderOptions(min = 0, max = 10)
+        public static double Smoothing = 2.5;
+
+        public static boolean Auto_fire = false;
+
+        @DropdownOptions({"Head", "Chest", "Stomach", "Arms", "Legs"})
+        public static String[] Hitboxes = {"Head", "Chest"};
     }
 }

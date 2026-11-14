@@ -28,7 +28,7 @@ public class PlatformImpl extends ModernPlatform {
         });
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) -> {
             renderer.begin(e.getGuiGraphics());
-            Icarus.renderHud();
+            Icarus.renderHud(e.getPartialTick().getGameTimeDeltaPartialTick(false));
         });
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Pre e) -> Icarus.clientTick());
     }

@@ -13,6 +13,6 @@ import studio.dreamys.icarus.platform.PlatformImpl;
 public class GuiMixin {
     @Inject(method = "render", at = @At("TAIL"))
     private void icarus$render(PoseStack poseStack, float partialTick, CallbackInfo ci) {
-        PlatformImpl.renderHud(poseStack);
+        PlatformImpl.renderHud(poseStack, partialTick);
     }
 }

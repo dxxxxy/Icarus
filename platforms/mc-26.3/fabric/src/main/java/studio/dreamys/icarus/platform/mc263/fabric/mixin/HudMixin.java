@@ -14,6 +14,6 @@ import studio.dreamys.icarus.platform.PlatformImpl;
 public class HudMixin {
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void icarus$extractRenderState(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        PlatformImpl.renderHud(graphics);
+        PlatformImpl.renderHud(graphics, deltaTracker.getGameTimeDeltaPartialTick(false));
     }
 }

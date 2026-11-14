@@ -28,7 +28,7 @@ public class PlatformImpl extends ModernPlatform {
         });
         MinecraftForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) -> {
             renderer.begin(e.getGuiGraphics());
-            Icarus.renderHud();
+            Icarus.renderHud(e.getPartialTick());
         });
         MinecraftForge.EVENT_BUS.addListener((TickEvent.ClientTickEvent e) -> {
             if (e.phase == TickEvent.Phase.START) Icarus.clientTick();

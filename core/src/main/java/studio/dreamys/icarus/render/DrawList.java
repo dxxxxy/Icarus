@@ -111,8 +111,9 @@ public final class DrawList {
         vertex(x1, y0, u1, v0, topRight);
         vertex(x1, y1, u1, v1, bottomRight);
         vertex(x0, y1, u0, v1, bottomLeft);
-        index(base, base + 1, base + 2);
-        index(base, base + 2, base + 3);
+        //counter-clockwise on screen (y down), the winding GUI renderers treat as front-facing
+        index(base, base + 3, base + 2);
+        index(base, base + 2, base + 1);
     }
 
     /** A triangle; kept whole if its bounds are inside the clip, dropped otherwise. */
@@ -120,6 +121,14 @@ public final class DrawList {
         float minX = Math.min(x0, Math.min(x1, x2)), maxX = Math.max(x0, Math.max(x1, x2));
         float minY = Math.min(y0, Math.min(y1, y2)), maxY = Math.max(y0, Math.max(y1, y2));
         if (minX < clipX0 || minY < clipY0 || maxX > clipX1 || maxY > clipY1) return;
+        //same winding as quads (counter-clockwise on screen), so renderers that cull back faces keep it
+        if ((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0) > 0) {
+            float tx = x1, ty = y1;
+            x1 = x2;
+            y1 = y2;
+            x2 = tx;
+            y2 = ty;
+        }
         ensureCommand();
         ensureVertices(3);
         ensureIndices(3);

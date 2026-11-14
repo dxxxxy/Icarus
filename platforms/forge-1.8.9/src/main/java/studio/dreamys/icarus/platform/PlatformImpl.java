@@ -1,13 +1,15 @@
 package studio.dreamys.icarus.platform;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
-import studio.dreamys.icarus.component.Window;
 import studio.dreamys.icarus.platform.forge189.ForgeHooks;
 import studio.dreamys.icarus.platform.forge189.IcarusScreen;
 import studio.dreamys.icarus.platform.forge189.LegacyRenderer;
+import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -21,7 +23,7 @@ public class PlatformImpl implements Platform {
 
     @Override
     public void install() {
-        MinecraftForge.EVENT_BUS.register(new ForgeHooks());
+        MinecraftForge.EVENT_BUS.register(new ForgeHooks()); //1.8.9's FML bus is the same bus
     }
 
     @Override
@@ -30,12 +32,17 @@ public class PlatformImpl implements Platform {
     }
 
     @Override
-    public int getDisplayWidth() {
+    public double getGuiScale() {
+        return new ScaledResolution(Minecraft.getMinecraft()).getScaleFactor();
+    }
+
+    @Override
+    public int getFramebufferWidth() {
         return Minecraft.getMinecraft().displayWidth;
     }
 
     @Override
-    public int getDisplayHeight() {
+    public int getFramebufferHeight() {
         return Minecraft.getMinecraft().displayHeight;
     }
 
@@ -45,8 +52,8 @@ public class PlatformImpl implements Platform {
     }
 
     @Override
-    public void openScreen(Window window) {
-        Minecraft.getMinecraft().displayGuiScreen(new IcarusScreen(window));
+    public void openScreen(MenuController menu) {
+        Minecraft.getMinecraft().displayGuiScreen(new IcarusScreen(menu));
     }
 
     @Override
@@ -62,6 +69,16 @@ public class PlatformImpl implements Platform {
     @Override
     public ClassLoader getModClassLoader(String modid) {
         return container(modid).getMod().getClass().getClassLoader();
+    }
+
+    @Override
+    public String getClipboard() {
+        return GuiScreen.getClipboardString();
+    }
+
+    @Override
+    public void setClipboard(String text) {
+        GuiScreen.setClipboardString(text);
     }
 
     private static ModContainer container(String modid) {

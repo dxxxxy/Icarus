@@ -3,26 +3,34 @@ package studio.dreamys.icarus.platform.mc1165;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
-import studio.dreamys.icarus.component.Window;
+import org.lwjgl.glfw.GLFW;
 import studio.dreamys.icarus.input.Keys;
+import studio.dreamys.icarus.ui.MenuController;
 
-/**
- * The Minecraft screen showing an Icarus {@link Window}. GLFW splits LWJGL2's keyTyped(char, key) into
- * keyPressed (key code, no char) and charTyped (char, no key code); both are forwarded as keyTyped.
- */
+/** The Minecraft screen showing an Icarus menu; forwards everything to the {@link MenuController}. */
 public class IcarusScreen extends Screen {
-    private final Window window;
+    private final MenuController menu;
     private final ModernRenderer renderer;
+    private char highSurrogate;
 
-    public IcarusScreen(Window window, ModernRenderer renderer) {
+    public IcarusScreen(MenuController menu, ModernRenderer renderer) {
         super(new TextComponent(""));
-        this.window = window;
+        this.menu = menu;
         this.renderer = renderer;
     }
 
     @Override
     protected void init() {
-        window.initGui();
+        menu.opened();
+    }
+
+    /** Mouse position in fractional GUI units (the int arguments are rounded). */
+    private double mouseX() {
+        return minecraft.mouseHandler.xpos() * width / minecraft.getWindow().getScreenWidth();
+    }
+
+    private double mouseY() {
+        return minecraft.mouseHandler.ypos() * height / minecraft.getWindow().getScreenHeight();
     }
 
     @Override
@@ -30,31 +38,59 @@ public class IcarusScreen extends Screen {
         renderBackground(poseStack); //1.16.5's Screen#render doesn't draw the background itself
         super.render(poseStack, mouseX, mouseY, partialTick);
         renderer.begin(poseStack);
-        window.drawScreen(mouseX, mouseY, partialTick);
+        menu.render(mouseX(), mouseY(), partialTick);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        window.mouseClicked((int) mouseX, (int) mouseY, button);
+        menu.mousePressed(mouseX, mouseY, button);
         return true;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        window.mouseReleased((int) mouseX, (int) mouseY, button);
+        menu.mouseReleased(mouseX, mouseY, button);
+        return true;
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
+        menu.mouseScrolled(mouseX, mouseY, delta);
         return true;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        super.keyPressed(keyCode, scanCode, modifiers); //closes on escape
-        window.keyTyped('\0', Keys.fromGlfw(keyCode));
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            if (!menu.keyPressed(Keys.KEY_ESCAPE)) onClose();
+            return true;
+        }
+        menu.keyPressed(Keys.fromGlfw(keyCode));
         return true;
     }
 
     @Override
-    public boolean charTyped(char codePoint, int modifiers) {
-        window.keyTyped(codePoint, Keys.KEY_NONE);
+    public boolean charTyped(char c, int modifiers) {
+        if (Character.isHighSurrogate(c)) {
+            highSurrogate = c;
+            return true;
+        }
+        if (Character.isLowSurrogate(c) && highSurrogate != 0) {
+            menu.charTyped(Character.toCodePoint(highSurrogate, c));
+        } else {
+            menu.charTyped(c);
+        }
+        highSurrogate = 0;
         return true;
+    }
+
+    @Override
+    public void removed() {
+        menu.closed();
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }
