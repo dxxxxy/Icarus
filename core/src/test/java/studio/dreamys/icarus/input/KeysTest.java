@@ -25,4 +25,17 @@ class KeysTest {
         assertEquals(Keys.KEY_F12, Keys.fromGlfw(301));
         assertEquals(Keys.KEY_NONE, Keys.fromGlfw(-1));
     }
+
+    @Test
+    void translatesSdlScancodes() {
+        assertEquals(Keys.KEY_RSHIFT, Keys.fromSdl(229));
+        assertEquals(Keys.KEY_A, Keys.fromSdl(4));
+        assertEquals(Keys.KEY_0, Keys.fromSdl(39));
+        assertEquals(Keys.KEY_6, Keys.fromSdl(35));
+        assertEquals(Keys.KEY_BACK, Keys.fromSdl(42));
+        assertEquals(Keys.KEY_ESCAPE, Keys.fromSdl(41));
+        assertEquals(Keys.KEY_F12, Keys.fromSdl(69));
+        assertEquals(Keys.KEY_PRIOR, Keys.fromSdl(75));
+        assertEquals(Keys.KEY_NONE, Keys.fromSdl(-1));
+    }
 }

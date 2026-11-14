@@ -16,3 +16,11 @@ subprojects {
         mavenCentral()
     }
 }
+
+// `./gradlew build` also builds the separate Minecraft 26.x build (see settings.gradle.kts)
+tasks.register("build") {
+    group = "build"
+    description = "Builds every target, including the included Minecraft 26.x build."
+    dependsOn(gradle.includedBuild("mc-26.3").task(":fabric:build"))
+    dependsOn(gradle.includedBuild("mc-26.3").task(":neoforge:build"))
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "testmod",
+  "version": "1.0.0",
+  "name": "Icarus Test Mod",
+  "environment": "client",
+  "mixins": [
+    "testmod.mixins.json"
+  ],
+  "depends": {
+    "icarus": "*"
+  }
+}
