@@ -14,4 +14,4 @@ plugins {
 
 rootProject.name = "icarus-legacy"
 
-include("forge-1.8.9")
+include("forge-1.7.10", "forge-1.8.9")

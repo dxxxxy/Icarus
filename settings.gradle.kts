@@ -21,6 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Icarus"
 
+include("core", "testmod")
 
 // LWJGL2-era forge targets live in their own build (unimined 1.x), see legacy/settings.gradle.kts
 includeBuild("legacy")
