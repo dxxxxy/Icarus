@@ -342,7 +342,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 4, icon = 'g')
+    @ISubPage(order = 4, icon = 'f')
     public static class Machine_gun {
         @IGroup(column = 0)
         public static class Aimbot {

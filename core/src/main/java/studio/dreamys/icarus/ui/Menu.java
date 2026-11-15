@@ -429,9 +429,17 @@ public final class Menu implements MenuController {
                 heights[i] = h;
             }
         } else {
+            //fixed-height groups keep their size; the others share what's left in proportion and scroll
+            double fixedTotal = 0, flexTotal = 0;
+            for (GroupView g : column) {
+                if (g.getGroup().getHeight() > 0) fixedTotal += g.getGroup().getHeight();
+                else flexTotal += natural(g, m);
+            }
+            double flexSpace = Math.max(0, available - fixedTotal);
             for (int i = 0; i < column.size(); i++) {
                 GroupView g = column.get(i);
-                heights[i] = g.getGroup().getHeight() > 0 ? g.getGroup().getHeight() : Math.max(m.minHeight, natural(g, m) * available / total);
+                double fixed = g.getGroup().getHeight();
+                heights[i] = fixed > 0 ? fixed : Math.max(m.minHeight, flexTotal > 0 ? natural(g, m) * flexSpace / flexTotal : 0);
             }
         }
 

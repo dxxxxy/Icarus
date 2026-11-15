@@ -209,6 +209,16 @@ class MenuTest {
     }
 
     @Test
+    void rightClickLabelKeybindOpensModes() {
+        Menu menu = mod(IcarusOptions.builder().configUi(false), Fixture.Tall.class).getMenu();
+        frame(menu, 0, 0);
+        KeybindWidget keybind = null;
+        for (Widget w : menu.getCurrentSubTab().getGroups().get(0).getWidgets()) if (w.getKeybind() != null) keybind = w.getKeybind();
+        menu.mousePressed(keybind.label.centerX() / 2, keybind.label.centerY() / 2, 1);
+        assertTrue(menu.getPopup() instanceof ContextPopup, "labels with a key have modes too");
+    }
+
+    @Test
     void rightClickColourCopiesAndPastes() {
         IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
         Menu menu = mod.getMenu();
@@ -271,6 +281,19 @@ class MenuTest {
         assertSame(null, b.getModel().find(Fixture.Combat.Kill_Aura.class, "Enabled"));
         assertTrue(game.resolve("config/a/configs/default.json").toFile().exists());
         assertFalse(game.resolve("config/b/configs/default.json").toFile().exists());
+    }
+
+    @Test
+    void groupsNeverLeaveTheirColumn() {
+        Menu menu = mod(IcarusOptions.builder().configUi(false), Fixture.Tall.class).getMenu();
+        frame(menu, 0, 0);
+        Rect area = menu.content;
+        for (GroupView g : menu.getCurrentSubTab().getGroups()) {
+            assertTrue(g.frame.y + g.frame.h <= area.y + area.h + 0.01, g.getLabel() + " ends at " + (g.frame.y + g.frame.h) + ", past " + (area.y + area.h));
+        }
+        GroupView fixed = menu.getCurrentSubTab().getGroups().get(0), tall = menu.getCurrentSubTab().getGroups().get(1);
+        assertEquals(300, fixed.frame.h, 0.01);
+        assertTrue(tall.isScrollable());
     }
 
     @Test

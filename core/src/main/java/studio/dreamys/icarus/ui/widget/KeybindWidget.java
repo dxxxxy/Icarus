@@ -42,9 +42,9 @@ public final class KeybindWidget extends Widget {
         this.modes = new ContextPopup(this, labels, () -> getMode().ordinal(), index -> keybinds.setMode(setting, KeybindMode.values()[index]));
     }
 
-    /** Whether the binding has modes the user can pick (checkboxes). */
+    /** Whether the binding has modes the user can pick (everything but buttons, which just run). */
     public boolean hasModes() {
-        return setting.getType() == SettingTypes.CHECKBOX;
+        return setting.getType() != SettingTypes.BUTTON;
     }
 
     public KeybindMode getMode() {

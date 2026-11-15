@@ -86,6 +86,8 @@ public class SkeetStyleTheme extends BaseTheme {
     protected static final double BOX_H = 25, BUTTON_H = 32, TRACK_H = 10, CHECK = 10;
     /** Sub-tabs: a full-width header group with an icon per sub-tab (the "Weapon type" row). */
     protected static final double SUBTAB_H = 57, SUBTAB_GAP = 23, SUBTAB_X = 6, SUBTAB_PITCH = 82, SUBTAB_SLOT_H = 40, WEAPON_ICON = 31;
+    /** Where a weapon bitmap's cell starts, left of and above its slot (the bitmaps are 90x44 cells). */
+    protected static final double WEAPON_CELL_X = 4, WEAPON_CELL_Y = 3;
     protected static final int TEXT_DISABLED = 0xFF5C5C5C;
     protected static final double KEYBIND_RIGHT = 33, SWATCH_RIGHT = 31, SWATCH_W = 21, SWATCH_H = 12;
 
@@ -305,9 +307,16 @@ public class SkeetStyleTheme extends BaseTheme {
             studio.dreamys.icarus.settings.SubPageNode node = subs.get(j).getSubPage();
             char icon = node == null ? ' ' : node.getIcon();
             String text = icon == ' ' ? subs.get(j).getLabel() : String.valueOf(icon);
+            int color = active ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE;
+            //skeet's own weapon bitmaps (cut from the reference, named by code point) replace the font glyphs it has
+            AtlasImage bitmap = icon == ' ' ? null : icon("weapon_" + (int) icon);
+            if (bitmap != null) {
+                c.image(bitmap, snap(c, b.x - P(WEAPON_CELL_X)), snap(c, b.y - P(WEAPON_CELL_Y)), P(bitmap.getWidth()), P(bitmap.getHeight()), color);
+                continue;
+            }
             Font f2 = icon == ' ' ? bold(c) : iconFont;
             double tw = c.measure(f2, text);
-            c.text(f2, text, snap(c, b.x + (b.w - tw) / 2), centeredTextY(c, f2, b.centerY()), active ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE);
+            c.text(f2, text, snap(c, b.x + (b.w - tw) / 2), centeredTextY(c, f2, b.centerY() + (icon == ' ' ? 0 : P(3))), color);
         }
     }
 

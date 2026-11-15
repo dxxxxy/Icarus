@@ -4,6 +4,7 @@ import studio.dreamys.icarus.config.ConfigStore;
 import studio.dreamys.icarus.hud.HudContext;
 import studio.dreamys.icarus.hud.HudElement;
 import studio.dreamys.icarus.hud.Notifications;
+import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.platform.Platform;
 import studio.dreamys.icarus.render.FrameRenderer;
 import studio.dreamys.icarus.settings.KeybindMode;
@@ -49,6 +50,9 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     private final List<IntConsumer> keyListeners = new CopyOnWriteArrayList<>();
     private final List<HudElement> hud = new CopyOnWriteArrayList<>();
     private final Notifications notifications = new Notifications();
+    /** Bound non-checkbox settings whose key is down, and those toggled on (see {@link #isKeybindActive(Setting)}). */
+    private final java.util.Set<Setting<?>> held = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
+    private final java.util.Set<Setting<?>> toggled = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
 
     private Theme theme;
     private ConfigPanel configPanel;
@@ -235,7 +239,10 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
             if (setting.getType() == SettingTypes.BUTTON) {
                 Runnable action = (Runnable) setting.get();
                 if (action != null) action.run();
-            } else if (setting.getType() == SettingTypes.CHECKBOX) {
+            } else if (setting.getType() != SettingTypes.CHECKBOX) {
+                held.add(setting);
+                if (keybinds.getMode(setting) == KeybindMode.TOGGLE && !toggled.remove(setting)) toggled.add(setting);
+            } else {
                 @SuppressWarnings("unchecked") Setting<Boolean> toggle = (Setting<Boolean>) setting;
                 switch (keybinds.getMode(setting)) {
                     case TOGGLE:
@@ -257,12 +264,41 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     void onKeyReleased(int key) {
         for (Map.Entry<Setting<?>, Integer> binding : keybinds.asMap().entrySet()) {
-            if (binding.getValue() != key || binding.getKey().getType() != SettingTypes.CHECKBOX) continue;
+            if (binding.getValue() != key) continue;
+            held.remove(binding.getKey());
+            if (binding.getKey().getType() != SettingTypes.CHECKBOX) continue;
             @SuppressWarnings("unchecked") Setting<Boolean> toggle = (Setting<Boolean>) binding.getKey();
             KeybindMode mode = keybinds.getMode(toggle);
             if (mode == KeybindMode.ON_HOTKEY) toggle.set(false);
             else if (mode == KeybindMode.OFF_HOTKEY) toggle.set(true);
         }
+    }
+
+    /**
+     * Whether a bound setting is active by its keybind mode: always on, held (on hotkey), not held (off hotkey) or
+     * toggled by presses. For checkboxes that's simply their value; for other rows (e.g. an "Activation type" label)
+     * the mod asks here. A setting without a key counts as active.
+     */
+    public boolean isKeybindActive(Setting<?> setting) {
+        if (setting.getType() == SettingTypes.CHECKBOX) return Boolean.TRUE.equals(setting.get());
+        if (keybinds.get(setting) == Keys.KEY_NONE) return true;
+        switch (keybinds.getMode(setting)) {
+            case ALWAYS_ON:
+                return true;
+            case ON_HOTKEY:
+                return held.contains(setting);
+            case OFF_HOTKEY:
+                return !held.contains(setting);
+            default:
+                return toggled.contains(setting);
+        }
+    }
+
+    /** {@link #isKeybindActive(Setting)} for the field {@code name} in a page or group class. */
+    public boolean isKeybindActive(Class<?> owner, String name) {
+        Setting<?> setting = model.find(owner, name);
+        if (setting == null) throw new IllegalArgumentException("No setting " + name + " in " + owner.getName());
+        return isKeybindActive(setting);
     }
 
     /** Puts a bound checkbox in the resting state of its mode (after the user picked a mode). */

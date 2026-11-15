@@ -83,4 +83,25 @@ class KeybindModeTest {
         assertTrue(Fixture.Combat.Kill_Aura.Enabled);
         assertEquals("M5", Keys.getKeyName(Keys.MOUSE_5));
     }
+
+    @Test
+    void labelKeybindsReportTheirMode() {
+        IcarusMod tall = Icarus.createDetached("tall", Themes.SKEET, IcarusOptions.builder().configUi(false),
+                Collections.<Class<?>>singletonList(Fixture.Tall.class), game.resolve("config-tall"), game.resolve("legacy-tall"));
+        Setting<?> label = tall.getModel().find(Fixture.Tall.Fixed.class, "Activation");
+        assertFalse(tall.isKeybindActive(label), "toggle starts off");
+        tall.onKeyPressed(Keys.KEY_8);
+        assertTrue(tall.isKeybindActive(label));
+        tall.onKeyPressed(Keys.KEY_8);
+        assertFalse(tall.isKeybindActive(label));
+
+        tall.getKeybinds().setMode(label, KeybindMode.ON_HOTKEY);
+        tall.onKeyPressed(Keys.KEY_8);
+        assertTrue(tall.isKeybindActive(label));
+        tall.onKeyReleased(Keys.KEY_8);
+        assertFalse(tall.isKeybindActive(label));
+
+        tall.getKeybinds().setMode(label, KeybindMode.ALWAYS_ON);
+        assertTrue(tall.isKeybindActive(label));
+    }
 }

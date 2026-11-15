@@ -49,6 +49,62 @@ public final class Fixture {
         }
     }
 
+    /** One column: a fixed-height group above a group too tall to fit. */
+    @IPage(value = 'c', order = 2)
+    public static class Tall {
+        @IGroup(column = 0, order = 0, height = 300)
+        public static class Fixed {
+            @IKeybind(Keys.KEY_8)
+            public static studio.dreamys.icarus.settings.Label Activation;
+
+            public static boolean A, B, C;
+        }
+
+        @IGroup(column = 0, order = 1)
+        public static class Long {
+            public static boolean Row0;
+            public static boolean Row1;
+            public static boolean Row2;
+            public static boolean Row3;
+            public static boolean Row4;
+            public static boolean Row5;
+            public static boolean Row6;
+            public static boolean Row7;
+            public static boolean Row8;
+            public static boolean Row9;
+            public static boolean Row10;
+            public static boolean Row11;
+            public static boolean Row12;
+            public static boolean Row13;
+            public static boolean Row14;
+            public static boolean Row15;
+            public static boolean Row16;
+            public static boolean Row17;
+            public static boolean Row18;
+            public static boolean Row19;
+            public static boolean Row20;
+            public static boolean Row21;
+            public static boolean Row22;
+            public static boolean Row23;
+            public static boolean Row24;
+            public static boolean Row25;
+            public static boolean Row26;
+            public static boolean Row27;
+            public static boolean Row28;
+            public static boolean Row29;
+            public static boolean Row30;
+            public static boolean Row31;
+            public static boolean Row32;
+            public static boolean Row33;
+            public static boolean Row34;
+            public static boolean Row35;
+            public static boolean Row36;
+            public static boolean Row37;
+            public static boolean Row38;
+            public static boolean Row39;
+        }
+    }
+
     @IPage(value = 'b', order = 1)
     public static class Visuals {
         @ISubPage(order = 0)
