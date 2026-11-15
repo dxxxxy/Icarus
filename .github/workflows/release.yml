@@ -1,0 +1,97 @@
+name: Release
+
+# Push a tag like v3.0.0 to:
+#   1. build and test every target with the tag's version,
+#   2. deploy each jar as studio.dreamys:icarus-<loader>-<minecraft>:<version> to DxxxxY/repo (served at
+#      https://repo.dreamys.studio/),
+#   3. create a GitHub release with the jars attached and .github/release-notes/<tag>.md as its notes.
+# The tag sets the version; gradle.properties' icarus_version is only for local builds.
+#
+# Needs the secret MAVEN_REPO_DEPLOY_KEY: the private half of a deploy key with write access on DxxxxY/repo.
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: write # the GitHub release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: true
+
+      - name: Set version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # the root build and the included Minecraft 26.x build each read their own gradle.properties
+          sed -i "s/^icarus_version=.*/icarus_version=$VERSION/" gradle.properties platforms/mc-26.3/gradle.properties
+          grep -H icarus_version gradle.properties platforms/mc-26.3/gradle.properties
+
+      # Build and test before touching the maven repository, so a failing build deploys nothing.
+      - name: Build and test
+        run: ./gradlew build --stacktrace
+
+      - name: Collect jars
+        run: |
+          mkdir -p dist
+          find platforms -path "*/build/libs/icarus-*-$VERSION.jar" -exec cp {} dist/ \;
+          ls -l dist
+          # one jar per target: 14 at the time of writing
+          test "$(ls dist | wc -l)" -ge 14
+
+      - uses: actions/checkout@v4
+        with:
+          repository: DxxxxY/repo
+          ssh-key: ${{ secrets.MAVEN_REPO_DEPLOY_KEY }}
+          path: maven-repo
+
+      - name: Deploy to DxxxxY/repo
+        run: |
+          for jar in dist/*.jar; do
+            artifact="$(basename "$jar" "-$VERSION.jar")"
+            mvn -B -ntp org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
+              -Dfile="$jar" -DgroupId=studio.dreamys -DartifactId="$artifact" -Dversion="$VERSION" \
+              -Dpackaging=jar -DgeneratePom=true -Durl="file://$GITHUB_WORKSPACE/maven-repo"
+          done
+
+      - name: Push DxxxxY/repo
+        working-directory: maven-repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to deploy: this version is already there."
+            exit 0
+          fi
+          git commit -m "deploy[auto]: studio.dreamys:icarus-*:$VERSION"
+          # other projects deploy to this repository too
+          git pull --rebase
+          git push
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=".github/release-notes/$GITHUB_REF_NAME.md"
+          if [ -f "$notes" ]; then set -- --notes-file "$notes"; else set -- --generate-notes; fi
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dist/*.jar --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dist/*.jar --title "Icarus $VERSION" "$@"
+          fi
