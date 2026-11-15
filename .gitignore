@@ -1,26 +1,14 @@
-# eclipse
-bin
-*.launch
-.settings
-.metadata
-.classpath
-.project
-
 # idea
 out
-*.ipr
-*.iws
 *.iml
-/.idea/*
-!/.idea/artifacts
+/.idea/
 
 # gradle
 build
 .gradle
 
-# other
-eclipse
+# minecraft dev runs
 run
-# minecraft runs
-run
+
+# local reference footage
 references
