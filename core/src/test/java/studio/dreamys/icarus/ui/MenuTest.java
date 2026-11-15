@@ -284,6 +284,17 @@ class MenuTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void loadingAnEmptySlotResetsToDefaults() {
+        IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
+        Setting<?> enabled = mod.getModel().find(Fixture.Combat.Kill_Aura.class, "Enabled");
+        ((Setting<Boolean>) enabled).set(false);
+        assertTrue(mod.getConfigStore().load("Slot 4"), "a never-saved slot loads");
+        assertTrue(Fixture.Combat.Kill_Aura.Enabled, "back to its default");
+        assertEquals("Slot 4", mod.getConfigStore().getProfile());
+    }
+
+    @Test
     void groupsNeverLeaveTheirColumn() {
         Menu menu = mod(IcarusOptions.builder().configUi(false), Fixture.Tall.class).getMenu();
         frame(menu, 0, 0);

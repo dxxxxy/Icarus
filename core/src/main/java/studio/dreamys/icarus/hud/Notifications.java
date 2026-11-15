@@ -32,6 +32,10 @@ public final class Notifications implements HudElement {
         return active;
     }
 
+    public boolean hasActive() {
+        return !active.isEmpty();
+    }
+
     @Override
     public void tick() {
         Iterator<Notification> it = active.iterator();

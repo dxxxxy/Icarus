@@ -7,7 +7,7 @@ import studio.dreamys.icarus.ui.widget.ColorWidget;
 
 import java.awt.Color;
 
-/** Saturation/value square, hue bar and alpha bar for a {@link ColorWidget}. Edits are kept in HSV. */
+/** Saturation/value square, hue bar, alpha bar (and optional Copy/Paste buttons) for a {@link ColorWidget}. Edits are kept in HSV. */
 public final class ColorPopup extends Popup {
     private enum Drag { NONE, SV, HUE, ALPHA }
 
@@ -16,6 +16,11 @@ public final class ColorPopup extends Popup {
     public final Rect svSquare = new Rect();
     public final Rect hueBar = new Rect();
     public final Rect alphaBar = new Rect();
+    /** Copy/Paste buttons inside the picker, for themes that have them (empty otherwise). */
+    public final Rect copyButton = new Rect();
+    public final Rect pasteButton = new Rect();
+    /** Set by the theme when its hue bar runs backwards (red, magenta, blue, ... from the start). */
+    public boolean hueReversed;
 
     private float hue, saturation, brightness;
     private int alpha = 255;
@@ -64,6 +69,14 @@ public final class ColorPopup extends Popup {
     @Override
     public boolean mousePressed(double x, double y, int button) {
         if (button != 0) return false;
+        if (copyButton.contains(x, y)) {
+            widget.copy();
+            return false;
+        }
+        if (pasteButton.contains(x, y)) {
+            if (widget.paste()) syncFromColor();
+            return false;
+        }
         if (svSquare.contains(x, y)) drag = Drag.SV;
         else if (hueBar.contains(x, y)) drag = Drag.HUE;
         else if (alphaBar.contains(x, y)) drag = Drag.ALPHA;
@@ -80,7 +93,9 @@ public final class ColorPopup extends Popup {
                 brightness = 1 - clamp((y - svSquare.y) / svSquare.h);
                 break;
             case HUE:
-                hue = Math.min(0.9999f, clamp((y - hueBar.y) / hueBar.h));
+                //a wide bar runs left to right, a tall one top to bottom
+                float along = hueBar.w > hueBar.h ? clamp((x - hueBar.x) / hueBar.w) : clamp((y - hueBar.y) / hueBar.h);
+                hue = Math.min(0.9999f, hueReversed ? 1 - along : along);
                 break;
             case ALPHA:
                 alpha = Math.round(255 * clamp((x - alphaBar.x) / alphaBar.w));

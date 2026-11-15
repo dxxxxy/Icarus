@@ -35,6 +35,7 @@ public class IcarusScreen extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         menu.render(mouseX(), mouseY(), partialTicks);
+        if (menu.isFadedOut()) mc.displayGuiScreen(null);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class IcarusScreen extends GuiScreen {
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
         if (keyCode == Keys.KEY_ESCAPE) {
-            if (!menu.keyPressed(keyCode)) super.keyTyped(typedChar, keyCode); //closes
+            if (!menu.keyPressed(keyCode)) menu.requestClose(); //fades out, then closes in drawScreen
             return;
         }
         menu.keyPressed(keyCode);

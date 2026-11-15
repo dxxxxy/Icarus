@@ -791,20 +791,28 @@ public class SkeetStyleTheme extends BaseTheme {
         }
     }
 
+    /**
+     * Colour picker (reference pixels): black and grey rings, 2px padding, then the SV square and the hue bar (red at
+     * the top, running backwards) side by side and the alpha bar below, each in a dark inset with 3px between them.
+     */
+    protected static final double PICKER_SV = 188, PICKER_HUE_W = 19, PICKER_ALPHA_H = 13, PICKER_GAP = 3;
+
     @Override
     public void layoutColorPicker(Canvas c, ColorPopup popup) {
         Rect swatch = popup.getWidget().swatch;
-        double p = px(c, 1);
-        double pad = P(3), square = P(186), bar = P(14);
-        double w = 2 * p + pad + square + pad + bar + pad, h = 2 * p + pad + square + pad + bar + pad;
+        double edge = P(4); //black ring, grey ring, 2px padding
+        double w = 2 * edge + P(1 + PICKER_SV + 1 + PICKER_GAP + 1 + PICKER_HUE_W + 1);
+        double h = 2 * edge + P(1 + PICKER_SV + 1 + PICKER_GAP + 1 + PICKER_ALPHA_H + 1);
         Menu menu = popup.getOwner().getMenu();
-        double x = swatch.x, y = swatch.bottom() + P(2);
+        double x = swatch.x - P(2), y = swatch.bottom() + P(2);
         if (x + w > menu.getViewWidth()) x = menu.getViewWidth() - w;
         if (y + h > menu.getViewHeight()) y = swatch.y - h - P(2);
         popup.bounds.set(x, Math.max(0, y), w, h);
-        popup.svSquare.set(popup.bounds.x + p + pad, popup.bounds.y + p + pad, square, square);
-        popup.hueBar.set(popup.svSquare.right() + pad, popup.svSquare.y, bar, square);
-        popup.alphaBar.set(popup.svSquare.x, popup.svSquare.bottom() + pad, square, bar);
+        Rect b = popup.bounds;
+        popup.svSquare.set(b.x + edge + P(1), b.y + edge + P(1), P(PICKER_SV), P(PICKER_SV));
+        popup.hueBar.set(popup.svSquare.right() + P(1 + PICKER_GAP + 1), popup.svSquare.y, P(PICKER_HUE_W), P(PICKER_SV));
+        popup.alphaBar.set(popup.svSquare.x, popup.svSquare.bottom() + P(1 + PICKER_GAP + 1), P(PICKER_SV), P(PICKER_ALPHA_H));
+        popup.hueReversed = true;
     }
 
     @Override
@@ -812,8 +820,37 @@ public class SkeetStyleTheme extends BaseTheme {
         Rect b = p.bounds;
         double px = px(c, 1);
         c.rect(b.x, b.y, b.w, b.h, BLACK);
-        c.rect(b.x + px, b.y + px, b.w - 2 * px, b.h - 2 * px, 0xFF232323);
-        paintPickerParts(c, p, BLACK);
+        c.rect(b.x + px, b.y + px, b.w - 2 * px, b.h - 2 * px, 0xFF393939);
+        c.rect(b.x + 2 * px, b.y + 2 * px, b.w - 4 * px, b.h - 4 * px, 0xFF262626);
+
+        Rect sv = p.svSquare;
+        c.rect(sv.x - px, sv.y - px, sv.w + 2 * px, sv.h + 2 * px, 0xFF0D0D0D);
+        c.gradientH(sv.x, sv.y, sv.w, sv.h, 0xFFFFFFFF, p.hueColor());
+        c.gradientV(sv.x, sv.y, sv.w, sv.h, 0x00000000, 0xFF000000);
+        double mx = snap(c, sv.x + p.getSaturation() * (sv.w - px)), my = snap(c, sv.y + (1 - p.getBrightness()) * (sv.h - px));
+        c.outline(mx - 2 * px, my - 2 * px, 5 * px, 5 * px, BLACK);
+        c.outline(mx - px, my - px, 3 * px, 3 * px, 0xFFE6E6E6);
+
+        //hue: red at the top, then magenta, blue, cyan, green, yellow, red again
+        Rect hue = p.hueBar;
+        c.rect(hue.x - px, hue.y - px, hue.w + 2 * px, hue.h + 2 * px, 0xFF0D0D0D);
+        for (int i = 0; i < 6; i++) {
+            int top = 0xFF000000 | Color.HSBtoRGB(1 - i / 6f, 1, 1), bottom = 0xFF000000 | Color.HSBtoRGB(1 - (i + 1) / 6f, 1, 1);
+            double y0 = snap(c, hue.y + hue.h * i / 6), y1 = snap(c, hue.y + hue.h * (i + 1) / 6);
+            c.gradientV(hue.x, y0, hue.w, y1 - y0, top, bottom);
+        }
+        double hy = snap(c, hue.y + (1 - p.getHue()) * (hue.h - 2 * px));
+        c.rect(hue.x, hy, hue.w, 2 * px, 0xFFE6E6E6);
+
+        //alpha: filled with the colour up to its alpha, like a slider, with a small handle at the end
+        Rect alpha = p.alphaBar;
+        c.rect(alpha.x - px, alpha.y - px, alpha.w + 2 * px, alpha.h + 2 * px, 0xFF0D0D0D);
+        c.rect(alpha.x, alpha.y, alpha.w, alpha.h, 0xFF262626);
+        int rgb = p.getWidget().getColor().getRGB() | 0xFF000000;
+        double fill = snap(c, alpha.w * p.getAlpha() / 255.0);
+        c.rect(alpha.x, alpha.y, fill, alpha.h, rgb);
+        double hx = Math.min(alpha.right() - 3 * px, alpha.x + fill - 2 * px);
+        c.rect(hx, alpha.y, 3 * px, alpha.h, 0xFFB4B4B4);
     }
 
     /* ---- HUD ---- */

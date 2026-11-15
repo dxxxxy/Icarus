@@ -79,6 +79,11 @@ public final class Menu implements MenuController {
     private final Canvas layoutCanvas = new Canvas();
     private final Runnable paintPass = this::paint;
 
+    /** Open/close fade: ease-out over {@link #FADE_NANOS}; reversed when closing. */
+    private static final long FADE_NANOS = 150_000_000L;
+    private long fadeStart;
+    private boolean closing;
+
     public Menu(IcarusMod mod, Theme theme, ConfigPanel configPanel) {
         this.mod = mod;
         this.theme = theme;
@@ -377,7 +382,7 @@ public final class Menu implements MenuController {
 
         double innerWidth = columnWidth - metrics.padLeft - metrics.padRight;
         for (GroupView g : groups) {
-            g.contentHeight = measureRows(canvas, g, innerWidth, metrics.rowGap);
+            g.contentHeight = metrics.rowOffset + measureRows(canvas, g, innerWidth, metrics.rowGap);
             int hint = g.getGroup().getColumn();
             int column;
             if (ConfigPanel.isLastColumn(hint)) column = columns - 1;
@@ -393,7 +398,7 @@ public final class Menu implements MenuController {
         for (int c = 0; c < columns; c++) {
             double x = area.x + c * (columnWidth + gap);
             double offset = topOffsets != null && c < topOffsets.length ? topOffsets[c] : 0;
-            placeColumn(canvas, perColumn[c], x, area.y + offset, columnWidth, area.h - offset, gap, metrics);
+            placeColumn(canvas, perColumn[c], x, area.y + offset, columnWidth, area.h - offset, metrics.stackGap >= 0 ? metrics.stackGap : gap, metrics);
         }
     }
 
@@ -462,7 +467,7 @@ public final class Menu implements MenuController {
         for (GroupView g : column) {
             g.content.set(g.frame.x + m.padLeft, g.frame.y + m.padTop, g.frame.w - m.padLeft - m.padRight, g.frame.h - m.padTop - m.padBottom);
             g.scrollBy(0); //clamp to the new size
-            positionRows(canvas, g, m.rowGap);
+            positionRows(canvas, g, m);
         }
     }
 
@@ -470,8 +475,8 @@ public final class Menu implements MenuController {
         return stackRows(canvas, g, 0, 0, width, rowGap);
     }
 
-    private void positionRows(Canvas canvas, GroupView g, double rowGap) {
-        stackRows(canvas, g, g.content.x, g.content.y - g.scroll, g.content.w, rowGap);
+    private void positionRows(Canvas canvas, GroupView g, GroupMetrics m) {
+        stackRows(canvas, g, g.content.x, g.content.y + m.rowOffset - g.scroll, g.content.w, m.rowGap);
     }
 
     /** Lays rows out top-down from {@code y}; returns the total height. */
@@ -500,6 +505,9 @@ public final class Menu implements MenuController {
 
     @Override
     public void opened() {
+        mod.setMenuOpen(true);
+        if (closing || fadeStart == 0) fadeStart = System.nanoTime(); //a resize re-opens without fading again
+        closing = false;
         if (configPanel != null) configPanel.refresh();
         lastFrame = 0;
     }
@@ -560,8 +568,9 @@ public final class Menu implements MenuController {
             popup.animate(dt);
         }
 
-        //4. paint
+        //4. paint, then the notifications on top
         frame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, paintPass);
+        mod.renderOverMenu(partialTick);
     }
 
     /** Keeps part of the window on screen; returns whether it moved. */
@@ -577,6 +586,7 @@ public final class Menu implements MenuController {
 
     private void paint() {
         Canvas canvas = frame.getCanvas();
+        canvas.setAlpha(fadeAlpha());
         theme.paintWindow(canvas, this);
         for (GroupView g : getCurrentSubTab().groups) {
             if (g.frame.isEmpty()) continue;
@@ -595,6 +605,47 @@ public final class Menu implements MenuController {
             popup.paint(theme, canvas);
             canvas.popClip();
         }
+        canvas.setAlpha(1);
+    }
+
+    private double fadeProgress() {
+        if (fadeStart == 0) return 1;
+        return Math.max(0, Math.min(1, (System.nanoTime() - fadeStart) / (double) FADE_NANOS));
+    }
+
+    /** The whole menu's opacity: eased in after opening, out after {@link #requestClose()}. */
+    public double fadeAlpha() {
+        double t = fadeProgress();
+        double eased = 1 - (1 - t) * (1 - t) * (1 - t);
+        return closing ? 1 - eased : eased;
+    }
+
+    @Override
+    public void requestClose() {
+        if (closing) return;
+        //reverse from wherever the fade-in got to
+        double shown = fadeAlpha();
+        closing = true;
+        double t = 1 - Math.cbrt(shown); //the closing progress whose eased value leaves "shown" visible
+        fadeStart = System.nanoTime() - (long) (t * FADE_NANOS);
+        closePopup();
+        focus(null);
+    }
+
+    @Override
+    public boolean isFadedOut() {
+        return closing && fadeProgress() >= 1;
+    }
+
+    /** Whether the menu is fading out (input is ignored). */
+    public boolean isClosing() {
+        return closing;
+    }
+
+    /** Shows the menu fully at once (no fade), e.g. for snapshots. */
+    public void skipFade() {
+        fadeStart = 0;
+        closing = false;
     }
 
     private Widget hitWidget(double x, double y) {
@@ -621,6 +672,7 @@ public final class Menu implements MenuController {
     @Override
     public void mousePressed(double guiX, double guiY, int button) {
         updateMouse(guiX, guiY);
+        if (closing) return;
         double x = mouseX, y = mouseY;
 
         if (focused instanceof KeybindWidget && ((KeybindWidget) focused).bindMouse(button)) return;
@@ -698,6 +750,7 @@ public final class Menu implements MenuController {
 
     @Override
     public boolean keyPressed(int key) {
+        if (closing) return true;
         if (key == Keys.KEY_ESCAPE && popup != null) {
             closePopup();
             return true;
@@ -713,6 +766,9 @@ public final class Menu implements MenuController {
 
     @Override
     public void closed() {
+        mod.setMenuOpen(false);
+        fadeStart = 0; //the next open fades in again
+        closing = false;
         closePopup();
         focus(null);
         if (captured != null) {

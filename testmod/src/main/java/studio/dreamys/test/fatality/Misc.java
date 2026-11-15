@@ -63,7 +63,7 @@ public class Misc {
     @IGroup(column = 2)
     public static class Lua {
         @ILabel("")
-        public static final ListModel Scripts = new ListModel("slowwalk.lua").height(136);
+        public static final ListModel Scripts = new ListModel("slowwalk.lua").height(137);
 
         static {
             Scripts.select("slowwalk.lua");
@@ -72,7 +72,7 @@ public class Misc {
         public static Runnable Load = () -> TestModCommon.notify("Lua", "Loaded " + Scripts.getSelected() + ".");
 
         @ILabel("")
-        public static final ListModel Loaded = new ListModel().height(136);
+        public static final ListModel Loaded = new ListModel().height(137);
 
         public static Runnable Unload = () -> TestModCommon.notify("Lua", "Unloaded.");
 

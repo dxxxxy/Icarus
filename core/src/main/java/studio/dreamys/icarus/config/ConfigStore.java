@@ -174,10 +174,14 @@ public final class ConfigStore {
         return true;
     }
 
-    /** Switches to a saved profile, discarding unsaved changes. Settings it doesn't mention keep their defaults. */
+    /**
+     * Switches to a saved profile, discarding unsaved changes. Settings it doesn't mention keep their defaults, and a
+     * profile that was never saved (an empty slot) loads as all defaults. Returns false for an unreadable file.
+     */
     public boolean load(String name) {
         if (!isValidName(name)) return false;
-        JsonObject json = JsonFiles.read(profileFile(name));
+        Path file = profileFile(name);
+        JsonObject json = Files.exists(file) ? JsonFiles.read(file) : new JsonObject();
         if (json == null) return false;
         resetValues();
         ProfileCodec.apply(json, model, keybinds);

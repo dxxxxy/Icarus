@@ -40,6 +40,7 @@ public class IcarusScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         renderer.begin(graphics);
         menu.render(mouseX(), mouseY(), partialTick);
+        if (menu.isFadedOut()) onClose();
     }
 
     /** 26.x numbers mouse buttons like SDL (left 1, middle 2, right 3); Icarus uses LWJGL's (left 0, right 1, middle 2). */
@@ -73,7 +74,7 @@ public class IcarusScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (event.key() == InputConstants.KEY_ESCAPE) {
-            if (!menu.keyPressed(Keys.KEY_ESCAPE)) onClose();
+            if (!menu.keyPressed(Keys.KEY_ESCAPE)) menu.requestClose(); //fades out, then closes below
             return true;
         }
         menu.keyPressed(Keys.fromSdl(event.key()));

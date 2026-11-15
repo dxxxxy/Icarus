@@ -54,6 +54,7 @@ public final class Snapshot {
         Menu menu = mod.getMenu();
         if (themeId.equals("fatality")) menu.setTitle("FATALITY");
         menu.opened();
+        menu.skipFade();
 
         //first frame positions the window; then pin it near the origin
         renderer.clear(platform.width, platform.height, 0xFF404040);
@@ -76,6 +77,10 @@ public final class Snapshot {
             menu.render(gx, gy, 0);
         }
         int w = (int) Math.ceil((menu.window.w + 2 / scale) * scale) + 1, h = (int) Math.ceil((menu.window.h + 2 / scale) * scale) + 1;
+        if (System.getenv("SNAPSHOT_FULL") != null) { //popups may reach past the window
+            w = platform.width;
+            h = platform.height;
+        }
         ImageIO.write(renderer.finish().getSubimage(0, 0, Math.min(w, platform.width), Math.min(h, platform.height)), "png", out);
         System.out.println("wrote " + out + " window " + menu.window.w * scale + "x" + menu.window.h * scale);
     }

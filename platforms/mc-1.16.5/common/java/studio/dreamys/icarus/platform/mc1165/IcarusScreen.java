@@ -39,6 +39,7 @@ public class IcarusScreen extends Screen {
         super.render(poseStack, mouseX, mouseY, partialTick);
         renderer.begin(poseStack);
         menu.render(mouseX(), mouseY(), partialTick);
+        if (menu.isFadedOut()) onClose();
     }
 
     @Override
@@ -62,7 +63,7 @@ public class IcarusScreen extends Screen {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
-            if (!menu.keyPressed(Keys.KEY_ESCAPE)) onClose();
+            if (!menu.keyPressed(Keys.KEY_ESCAPE)) menu.requestClose(); //fades out, then closes below
             return true;
         }
         menu.keyPressed(Keys.fromGlfw(keyCode));

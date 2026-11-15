@@ -458,10 +458,13 @@ public class Rage {
             public static boolean Freestand_fake = false;
 
             @DropdownOptions({"Always on", "On enemy visible", "On peek", "Off"})
-            public static String Fake_lag = "Always on";
+            public static String Fake_lag = "On enemy visible";
 
             @SliderOptions(min = 0, max = 14, onlyInt = true)
-            public static int Base_amount = 6;
+            public static int Base_amount = 14;
+
+            @SliderOptions(min = 0, max = 14, onlyInt = true)
+            public static int Limit = 14;
 
             public static boolean Spin = false;
             public static boolean Jitter = false;

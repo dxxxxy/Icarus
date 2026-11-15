@@ -62,6 +62,9 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     private final FrameRenderer hudFrame = new FrameRenderer();
     private final HudContext hudContext = new HudContext();
     private final Runnable hudPaint = this::paintHud;
+    private final FrameRenderer overlayFrame = new FrameRenderer();
+    private final Runnable overlayPaint = () -> notifications.render(overlayFrame.getCanvas(), hudContext);
+    private volatile boolean menuOpen;
 
     IcarusMod(String modid, Theme theme, IcarusOptions options, List<Class<?>> pageClasses, Path configDir, Path legacyDir) {
         this.modid = modid;
@@ -124,6 +127,17 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     /** Accent colour (ARGB): the one from the options, or the theme's. */
     public int getAccent() {
         return options.accent != null ? options.accent : theme.getDefaultAccent();
+    }
+
+    /** Changes the accent colour (ARGB) at runtime, e.g. from a "Menu color" setting. */
+    public void setAccent(int argb) {
+        options.accent = argb;
+    }
+
+    /** Changes the menu scale at runtime (1 = the theme's natural size), e.g. from a "DPI scale" setting. */
+    public void setMenuScale(double scale) {
+        if (!(scale > 0)) throw new IllegalArgumentException("menu scale must be positive");
+        options.menuScale = scale;
     }
 
     /** Design units to framebuffer pixels: 1 at Minecraft GUI scale 2, times the menu scale option. */
@@ -325,7 +339,26 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     }
 
     private void paintHud() {
-        for (HudElement element : hud) element.render(hudFrame.getCanvas(), hudContext);
+        for (HudElement element : hud) {
+            //while the menu is open its own frame draws the notifications on top of it
+            if (element == notifications && menuOpen) continue;
+            element.render(hudFrame.getCanvas(), hudContext);
+        }
+    }
+
+    /** Draws the notifications over the open menu (called by the menu after it paints). */
+    public void renderOverMenu(float partialTick) {
+        if (!notifications.hasActive()) return;
+        Platform platform = Icarus.getPlatform();
+        double scale = renderScale(platform.getGuiScale());
+        int fbWidth = platform.getFramebufferWidth(), fbHeight = platform.getFramebufferHeight();
+        hudContext.set(theme, getAccent(), fbWidth / scale, fbHeight / scale, partialTick);
+        overlayFrame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, overlayPaint);
+    }
+
+    /** Whether this mod's menu is on screen (set by the menu). */
+    public void setMenuOpen(boolean open) {
+        menuOpen = open;
     }
 
     /* ---- called by the menu ---- */

@@ -28,6 +28,18 @@ public interface MenuController {
     /** A character was typed (any Unicode code point). */
     void charTyped(int codePoint);
 
+    /**
+     * Escape found nothing left to dismiss: the menu starts fading out, ignoring input meanwhile. The screen closes
+     * itself once {@link #isFadedOut()} says so (checked after each {@link #render}).
+     */
+    default void requestClose() {
+    }
+
+    /** Whether a requested close has finished fading, so the screen can go. */
+    default boolean isFadedOut() {
+        return true;
+    }
+
     /** The screen was closed. */
     void closed();
 }

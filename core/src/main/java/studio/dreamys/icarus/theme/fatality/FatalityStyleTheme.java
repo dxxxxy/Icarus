@@ -2,6 +2,7 @@ package studio.dreamys.icarus.theme.fatality;
 
 import studio.dreamys.icarus.hud.Notification;
 import studio.dreamys.icarus.hud.Watermark;
+import studio.dreamys.icarus.render.AtlasImage;
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.render.Font;
 import studio.dreamys.icarus.render.FontAtlas;
@@ -48,6 +49,9 @@ public class FatalityStyleTheme extends BaseTheme {
     protected static final int HEADER_TOP = 0xFF231844, HEADER_BOTTOM = 0xFF181330;
     protected static final int SHADOW_TOP = 0xFF090516, SHADOW_BOTTOM = 0xFF110C29;
     protected static final int LINE_LEFT = 0xFF2E2280, LINE_RIGHT = 0xFF711654;
+    /** The window's header line at full brightness; it pulses between 62% and 100% about once a second. */
+    protected static final int PULSE_LEFT = 0xFF4130AD, PULSE_RIGHT = 0xFFA31660;
+    protected static final double PULSE_PERIOD = 1.1, PULSE_LOW = 0.62;
     protected static final int PANEL_EDGE = 0xFF393153;
     protected static final int PANEL_BG = 0xFF191337;
     protected static final int SUBTAB_BG = 0xFF1F193F;
@@ -71,17 +75,28 @@ public class FatalityStyleTheme extends BaseTheme {
     protected static final double GROUPS_X = 33, GROUPS_Y = 135, GROUPS_BOTTOM = 621, GROUP_W = 236, GAP = 16;
 
     /* rows, from the row top = the label's capital line */
-    protected static final double ROW_CHECK = 21, ROW_LABEL = 21, ROW_SLIDER = 32, ROW_DROPDOWN = 39, ROW_BUTTON = 21;
+    protected static final double ROW_CHECK = 21, ROW_LABEL = 21, ROW_SLIDER = 33, ROW_DROPDOWN = 38, ROW_BUTTON = 21;
     protected static final double CHECK_X = 10, LABEL_X = 32, CONTROL_X = 10, CONTROL_W = 118, CHECK = 13;
-    protected static final double BOX_H = 18, SLIDER_H = 14, BUTTON_H = 15, SWATCH_W = 36, SWATCH_H = 14, RIGHT = 10;
+    protected static final double BOX_H = 18, SLIDER_H = 14, BUTTON_H = 18, SWATCH_W = 36, SWATCH_H = 14, RIGHT = 10;
 
-    private final GroupMetrics groupMetrics = new GroupMetrics(15, 10, 0, 0, 0, 40);
+    private final GroupMetrics groupMetrics = new GroupMetrics(12, 6, 0, 0, 0, 40);
+
+    {
+        //rows draw from 3 above their y; start the clip there so the first row's outline isn't cut
+        groupMetrics.rowOffset = 3;
+        //stacked groups sit a pixel closer than the columns
+        groupMetrics.stackGap = GAP - 1;
+    }
     private final Rect panel = new Rect();
     /** The small text of keybind boxes ("NONE"). */
     private Font keybindFont;
     private final Rect columns = new Rect();
     /** Weapon row (sub-pages of the active text tab, shown as icons). */
-    protected static final double WEAPONS_X = 36, WEAPONS_H = 38, WEAPONS_SHIFT = 41;
+    protected static final double WEAPONS_X = 33, WEAPONS_H = 38, WEAPONS_SHIFT = 40;
+    /** Weapon bitmaps (cut from the reference as whole slots, named by code point): top, underline, the active lift. */
+    protected static final double WEAPONS_CELL_Y = 129, WEAPONS_UNDERLINE_Y = 156, WEAPON_LIFT = 3;
+    protected static final int WEAPON_IDLE = 0xFF76719A;
+    private final java.util.Map<Character, AtlasImage> weaponBitmaps = new java.util.HashMap<>();
     private boolean weaponRow;
     private final java.util.Map<String, double[]> textSlots = new java.util.LinkedHashMap<>();
 
@@ -89,6 +104,8 @@ public class FatalityStyleTheme extends BaseTheme {
     private final java.util.Random glitch = new java.util.Random();
     private long glitchUntil;
     private int glitchOffset;
+    private long tabGlitchUntil;
+    private final int[] tabGlitch = new int[4];
 
     public FatalityStyleTheme() {
         textRow = ROW_LABEL;
@@ -194,9 +211,11 @@ public class FatalityStyleTheme extends BaseTheme {
                     weaponRow = true;
                     double ix = w.x + WEAPONS_X;
                     for (int j = i; j <= end; j++) {
-                        double iw = c.measure(icon(c), String.valueOf(iconOf(subs.get(j))));
-                        subs.get(j).bounds.set(ix, w.y + SUBTAB_DIVIDER + 1, iw + 34, WEAPONS_H);
-                        ix += iw + 34;
+                        //a reference bitmap is its whole slot; a font glyph gets the same padding around it
+                        AtlasImage bitmap = weaponBitmap(iconOf(subs.get(j)));
+                        double sw = bitmap != null ? bitmap.getWidth() : c.measure(icon(c), String.valueOf(iconOf(subs.get(j)))) + 30;
+                        subs.get(j).bounds.set(ix, w.y + SUBTAB_DIVIDER + 1, sw, WEAPONS_H);
+                        ix += sw;
                     }
                 } else {
                     subs.get(i).bounds.set(sx, panel.y + 1, slot, SUBTAB_DIVIDER - PANEL_Y - 1);
@@ -212,6 +231,13 @@ public class FatalityStyleTheme extends BaseTheme {
 
         columns.set(w.x + GROUPS_X, top, 3 * GROUP_W + 2 * GAP, w.y + GROUPS_BOTTOM + 1 - top);
         menu.layoutColumns(c, columns, 3, GAP, groupMetrics, weaponRow ? new double[]{WEAPONS_SHIFT, WEAPONS_SHIFT, 0} : null);
+    }
+
+    /** Fatality's own weapon icon for a sub-page glyph, or null to draw the font glyph. */
+    protected AtlasImage weaponBitmap(char icon) {
+        if (icon == ' ') return null;
+        if (!weaponBitmaps.containsKey(icon)) weaponBitmaps.put(icon, resourceImage("/assets/icarus/fatality/weapon_" + (int) icon + ".png"));
+        return weaponBitmaps.get(icon);
     }
 
     private static char iconOf(SubTabView sub) {
@@ -231,7 +257,9 @@ public class FatalityStyleTheme extends BaseTheme {
 
         //top bar, the accent line, the header with title and tabs, and the shadow under it
         c.gradientV(w.x + 1, w.y + 1, w.w - 2, LINE_Y - 1, TOPBAR_TOP, TOPBAR_BOTTOM);
-        c.gradientH(w.x + 1, w.y + LINE_Y, w.w - 2, 2, LINE_LEFT, Colors.mix(LINE_RIGHT, accent, 0.25));
+        double phase = (System.nanoTime() / 1e9) * 2 * Math.PI / PULSE_PERIOD;
+        double pulse = PULSE_LOW + (1 - PULSE_LOW) * (0.5 + 0.5 * Math.cos(phase));
+        c.gradientH(w.x + 1, w.y + LINE_Y, w.w - 2, 2, Colors.shade(PULSE_LEFT, pulse), Colors.shade(Colors.mix(PULSE_RIGHT, accent, 0.15), pulse));
         c.gradientV(w.x + 1, w.y + HEADER_Y, w.w - 2, HEADER_BOTTOM_Y - HEADER_Y, HEADER_TOP, HEADER_BOTTOM);
         c.gradientV(w.x + 1, w.y + HEADER_BOTTOM_Y, w.w - 2, SHADOW_BOTTOM_Y - HEADER_BOTTOM_Y, SHADOW_TOP, SHADOW_BOTTOM);
 
@@ -245,6 +273,7 @@ public class FatalityStyleTheme extends BaseTheme {
             boolean active = i == menu.getTabIndex();
             boolean hovered = !active && b.contains(menu.getMouseX(), menu.getMouseY());
             String label = upper(tab.getLabel());
+            if (hovered) paintTabGlitch(c, tabFont, label, b.x + TAB_PAD, w.y + 40);
             double tw = capText(c, tabFont, label, b.x + TAB_PAD, w.y + 40, active ? TEXT_BRIGHT : hovered ? TAB_HOVER : TAB_IDLE);
             if (active) c.rect(b.x + TAB_PAD, w.y + UNDERLINE_Y, tw, 2, accent);
         }
@@ -272,13 +301,36 @@ public class FatalityStyleTheme extends BaseTheme {
                     Rect b = subs.get(i).bounds;
                     boolean active = i == menu.getSubTabIndex();
                     boolean hovered = !active && b.contains(menu.getMouseX(), menu.getMouseY());
-                    String glyph = String.valueOf(iconOf(subs.get(i)));
-                    double gw = c.measure(iconFont, glyph);
-                    c.text(iconFont, glyph, Math.round(b.centerX() - gw / 2), centeredTextY(c, iconFont, w.y + 143), active ? TEXT_BRIGHT : hovered ? TAB_HOVER : TAB_IDLE);
-                    if (active) c.rect(b.x, w.y + 155, b.w, 3, accent);
+                    //idle grey, hovered pink, active white and lifted 3px over its underline
+                    int color = active ? TEXT_BRIGHT : hovered ? accent : WEAPON_IDLE;
+                    double lift = active ? WEAPON_LIFT : 0;
+                    AtlasImage bitmap = weaponBitmap(iconOf(subs.get(i)));
+                    if (bitmap != null) {
+                        c.image(bitmap, b.x, w.y + WEAPONS_CELL_Y - lift, bitmap.getWidth(), bitmap.getHeight(), color);
+                    } else {
+                        String glyph = String.valueOf(iconOf(subs.get(i)));
+                        double gw = c.measure(iconFont, glyph);
+                        c.text(iconFont, glyph, Math.round(b.centerX() - gw / 2), centeredTextY(c, iconFont, w.y + 143 - lift), color);
+                    }
+                    if (active) c.rect(b.x, w.y + WEAPONS_UNDERLINE_Y, b.w, 3, accent);
                 }
             }
         }
+    }
+
+    /** A hovered tab keeps glitching: red and blue copies jitter around it every frame or two (stronger than the title). */
+    protected void paintTabGlitch(Canvas c, Font font, String label, double x, double capTop) {
+        long now = System.nanoTime();
+        if (now > tabGlitchUntil) {
+            tabGlitch[0] = 1 + glitch.nextInt(2);
+            if (glitch.nextBoolean()) tabGlitch[0] = -tabGlitch[0];
+            tabGlitch[1] = glitch.nextInt(3) - 1;
+            tabGlitch[2] = -tabGlitch[0] + (glitch.nextInt(3) - 1);
+            tabGlitch[3] = glitch.nextInt(3) - 1;
+            tabGlitchUntil = now + (25 + glitch.nextInt(25)) * 1_000_000L;
+        }
+        capText(c, font, label, x + tabGlitch[0], capTop + tabGlitch[1], 0xC0FF2050);
+        capText(c, font, label, x + tabGlitch[2], capTop + tabGlitch[3], 0xC02080FF);
     }
 
     /** The title with its chromatic glitch: red and blue copies jump left/right every few frames. */
@@ -350,7 +402,7 @@ public class FatalityStyleTheme extends BaseTheme {
     @Override
     public double layoutCheckbox(Canvas c, CheckboxWidget w, double x, double y, double width) {
         w.bounds.set(x, y - 3, width, ROW_CHECK);
-        w.box.set(x + CHECK_X, y - 2, CHECK, CHECK);
+        w.box.set(x + CHECK_X, y - 3, CHECK, CHECK);
         keybindRow(c, w, x, y, width);
         return ROW_CHECK;
     }
@@ -365,7 +417,7 @@ public class FatalityStyleTheme extends BaseTheme {
     @Override
     public double layoutButton(Canvas c, ButtonWidget w, double x, double y, double width) {
         w.bounds.set(x, y - 3, width, ROW_BUTTON);
-        w.button.set(x + CONTROL_X, y - 3, Math.min(CONTROL_W, width - 2 * CONTROL_X), BUTTON_H);
+        w.button.set(x + CONTROL_X, y - 5, Math.min(CONTROL_W, width - 2 * CONTROL_X), BUTTON_H);
         return ROW_BUTTON;
     }
 
@@ -427,7 +479,7 @@ public class FatalityStyleTheme extends BaseTheme {
         double searchH = w.isSearchable() ? 17 : 0;
         if (w.isSearchable()) w.search.set(x + CONTROL_X, y - 3, width - 2 * CONTROL_X, searchH);
         else w.search.clear();
-        w.bounds.set(x, y - 3, width, h + 8);
+        w.bounds.set(x, y - 3, width, h + 7);
         w.box.set(x + CONTROL_X, y - 3 + searchH, width - 2 * CONTROL_X, h - searchH);
         w.itemHeight = listItemHeight;
         w.visibleRows = Math.max(1, (int) Math.floor((h - 2) / listItemHeight));
@@ -441,18 +493,23 @@ public class FatalityStyleTheme extends BaseTheme {
         capText(c, text(c), w.getLabel(), x, capTop, w.getSetting().isDisabled() ? TAB_IDLE : color);
     }
 
-    /** Pink control fill: a lighter outline, a dark gap, then the accent gradient. */
+    /** Pink control fill (buttons): a grey edge tinted pink, a dark ring, then the accent gradient. */
     protected void accentBox(Canvas c, double x, double y, double w, double h, int accent, double hover) {
-        c.rect(x, y, w, h, Colors.shade(accent, 0.72));
+        accentBox(c, x, y, w, h, accent, hover, 0.2);
+    }
+
+    /** {@link #accentBox(Canvas, double, double, double, double, int, double)} with how pink the edge is (checkboxes 0.5). */
+    protected void accentBox(Canvas c, double x, double y, double w, double h, int accent, double hover, double edgePink) {
+        c.rect(x, y, w, h, Colors.mix(GROUP_EDGE, accent, Math.min(1, edgePink + 0.25 * hover)));
         c.rect(x + 1, y + 1, w - 2, h - 2, Colors.shade(accent, 0.42));
-        c.gradientV(x + 2, y + 2, w - 4, h - 4, Colors.shade(accent, 1.0 + 0.1 * hover), Colors.shade(accent, 0.62));
+        c.gradientV(x + 2, y + 2, w - 4, h - 4, Colors.shade(accent, 1.02 + 0.08 * hover), Colors.shade(accent, 0.7));
     }
 
     @Override
     public void paintCheckbox(Canvas c, CheckboxWidget w) {
         Rect b = w.box;
         int accent = w.getMenu().getAccent();
-        if (w.isChecked()) accentBox(c, b.x, b.y, b.w, b.h, accent, w.getHover());
+        if (w.isChecked()) accentBox(c, b.x, b.y, b.w, b.h, accent, w.getHover(), 0.5);
         else {
             c.rect(b.x, b.y, b.w, b.h, Colors.mix(GROUP_EDGE, accent, 0.35 * w.getHover()));
             c.rect(b.x + 1, b.y + 1, b.w - 2, b.h - 2, CONTROL_BG);
@@ -473,30 +530,34 @@ public class FatalityStyleTheme extends BaseTheme {
         Font font = text(c);
         String label = c.fit(font, w.getLabel(), b.w - 6);
         double tw = c.measure(font, label);
-        capText(c, font, label, Math.round(b.centerX() - tw / 2), b.y + 4, TEXT_BRIGHT);
+        capText(c, font, label, Math.round(b.centerX() - tw / 2), b.y + 5, TEXT_BRIGHT);
     }
 
     @Override
     public void paintSlider(Canvas c, SliderWidget w) {
         Rect t = w.track;
         int accent = w.getMenu().getAccent();
-        label(c, w, t.x, w.bounds.y + 3, TEXT);
+        double hover = w.getHover();
+        //the label sits a pixel lower than a dropdown's
+        label(c, w, t.x, w.bounds.y + 4, TEXT);
 
         //"-  +" to the right of the label
         Font font = text(c);
-        double py = w.bounds.y + 3;
+        double py = w.bounds.y + 4;
         capText(c, font, "-", t.right() - 19, py, TEXT_DIM);
-        capText(c, font, "+", t.right() - 8, py, TEXT_DIM);
+        capText(c, font, "+", t.right() - 10, py, TEXT_DIM);
 
-        //value box: pink outline, dark inside, the filled part in pink, the value centred
-        c.rect(t.x, t.y, t.w, t.h, Colors.mix(GROUP_EDGE, accent, 0.45));
-        c.rect(t.x + 1, t.y + 1, t.w - 2, t.h - 2, Colors.mix(0xFF19133B, accent, 0.18));
-        c.rect(t.x + 2, t.y + 2, t.w - 4, t.h - 4, 0xFF19133B);
-        double fill = (t.w - 4) * w.getFraction();
-        if (fill > 0) c.gradientV(t.x + 2, t.y + 2, fill, t.h - 4, Colors.shade(accent, 0.9 + 0.1 * w.getHover()), Colors.shade(accent, 0.6));
+        //value box: a grey edge (pink only on hover), the filled part pink with a darker rim, the value centred
+        c.rect(t.x, t.y, t.w, t.h, Colors.mix(GROUP_EDGE, accent, 0.12 + 0.4 * hover));
+        c.rect(t.x + 1, t.y + 1, t.w - 2, t.h - 2, CONTROL_BG);
+        double fill = Math.round((t.w - 2) * w.getFraction());
+        if (fill > 0) {
+            c.rect(t.x + 1, t.y + 1, fill, t.h - 2, Colors.shade(accent, 0.45));
+            if (fill > 2) c.gradientV(t.x + 2, t.y + 2, fill - 2, t.h - 4, Colors.shade(accent, 1.0 + 0.08 * hover), Colors.shade(accent, 0.75));
+        }
         String value = w.getValueText();
         double vw = c.measure(font, value);
-        capText(c, font, value, Math.round(t.centerX() - vw / 2), t.y + 3, TEXT_DIM);
+        capText(c, font, value, Math.round(t.centerX() - vw / 2), t.y + 3, TEXT);
     }
 
     protected void dropdown(Canvas c, Widget w, Rect b, String value, boolean open) {
@@ -546,8 +607,10 @@ public class FatalityStyleTheme extends BaseTheme {
         if (!w.isAttached()) label(c, w, w.bounds.x + LABEL_X, w.bounds.y + 3, TEXT);
         Rect s = w.swatch;
         Color color = w.getColor();
-        c.rect(s.x, s.y, s.w, s.h, GROUP_EDGE);
-        c.rect(s.x + 1, s.y + 1, s.w - 2, s.h - 2, CONTROL_GAP);
+        int accent = w.getMenu().getAccent();
+        //an open picker rings its swatch in dark pink
+        c.rect(s.x, s.y, s.w, s.h, w.isOpen() ? Colors.shade(accent, 0.62) : GROUP_EDGE);
+        c.rect(s.x + 1, s.y + 1, s.w - 2, s.h - 2, w.isOpen() ? Colors.shade(accent, 0.4) : CONTROL_GAP);
         if (color.getAlpha() < 255) paintChecker(c, s.x + 2, s.y + 2, s.w - 4, s.h - 4);
         c.rect(s.x + 2, s.y + 2, s.w - 4, s.h - 4, color.getRGB());
     }
@@ -574,9 +637,10 @@ public class FatalityStyleTheme extends BaseTheme {
             if (index >= items.size()) break;
             String item = items.get(index);
             double y = b.y + 1 + row * w.itemHeight;
-            if (index == w.getHoveredIndex()) c.rect(b.x + 1, y, b.w - 2, w.itemHeight, 0xFF241D4E);
+            //no hover fill: a hovered row's text just turns a dull pink
             boolean selected = item.equals(w.getSelected());
-            capText(c, font, c.fit(font, item, b.w - 14), b.x + 6, y + 5, selected ? accent : TEXT_DIM);
+            int color = selected ? accent : index == w.getHoveredIndex() ? Colors.mix(CONTROL_BG, accent, 0.4) : TEXT_DIM;
+            capText(c, font, c.fit(font, item, b.w - 14), b.x + 6, y + 5, color);
         }
         c.popClip();
     }
@@ -667,43 +731,67 @@ public class FatalityStyleTheme extends BaseTheme {
         }
     }
 
+    /** Colour picker (measured 1:1): the box opens over the swatch's lower right; no alpha bar, Copy/Paste and the hex below. */
+    protected static final double PICKER_X = 19, PICKER_Y = 12, PICKER_W = 241, PICKER_H = 269;
+    protected static final double PICKER_PAD = 11, PICKER_SV_TOP = 12, PICKER_SV_W = 220, PICKER_SV_H = 200;
+    protected static final double PICKER_HUE_Y = 221, PICKER_HUE_H = 14, PICKER_BUTTON_Y = 243, PICKER_BUTTON_W = 68, PICKER_BUTTON_H = 16, PICKER_BUTTON_GAP = 7;
+    protected static final int PICKER_EDGE = 0xFF393357, PICKER_TOP = 0xFF201443, PICKER_BOTTOM = 0xFF150F3A, PICKER_INSET = 0xFF1B1530;
+
     @Override
     public void layoutColorPicker(Canvas c, ColorPopup popup) {
         Rect swatch = popup.getWidget().swatch;
-        double pad = 6, square = 110, bar = 8;
-        double w = pad + square + pad, h = pad + square + pad + bar + pad + bar + pad;
         Menu menu = popup.getOwner().getMenu();
-        double x = Math.min(swatch.right() - w, menu.getViewWidth() - w);
-        double y = swatch.bottom() + 2;
-        if (y + h > menu.getViewHeight()) y = swatch.y - h - 2;
-        popup.bounds.set(Math.max(0, x), Math.max(0, y), w, h);
-        popup.svSquare.set(popup.bounds.x + pad, popup.bounds.y + pad, square, square);
-        popup.hueBar.set(popup.svSquare.x, popup.svSquare.bottom() + pad, square, bar);
-        popup.alphaBar.set(popup.svSquare.x, popup.hueBar.bottom() + pad, square, bar);
+        double x = Math.min(swatch.x + PICKER_X, menu.getViewWidth() - PICKER_W);
+        double y = swatch.y + PICKER_Y;
+        if (y + PICKER_H > menu.getViewHeight()) y = swatch.y - PICKER_H;
+        popup.bounds.set(Math.max(0, x), Math.max(0, y), PICKER_W, PICKER_H);
+        Rect b = popup.bounds;
+        popup.svSquare.set(b.x + PICKER_PAD + 1, b.y + PICKER_SV_TOP + 1, PICKER_SV_W - 2, PICKER_SV_H - 2);
+        popup.hueBar.set(b.x + PICKER_PAD + 1, b.y + PICKER_HUE_Y + 1, PICKER_SV_W - 2, PICKER_HUE_H - 2);
+        popup.alphaBar.clear();
+        popup.copyButton.set(b.x + PICKER_PAD, b.y + PICKER_BUTTON_Y, PICKER_BUTTON_W, PICKER_BUTTON_H);
+        popup.pasteButton.set(popup.copyButton.right() + PICKER_BUTTON_GAP, b.y + PICKER_BUTTON_Y, PICKER_BUTTON_W, PICKER_BUTTON_H);
     }
 
     @Override
     public void paintColorPicker(Canvas c, ColorPopup p) {
         Rect b = p.bounds;
-        c.rect(b.x, b.y, b.w, b.h, GROUP_EDGE);
-        c.rect(b.x + 1, b.y + 1, b.w - 2, b.h - 2, 0xFF1C1645);
+        int accent = p.getOwner().getMenu().getAccent();
+        c.rect(b.x, b.y, b.w, b.h, PICKER_EDGE);
+        c.gradientV(b.x + 1, b.y + 1, b.w - 2, b.h - 2, PICKER_TOP, PICKER_BOTTOM);
+        c.gradientH(b.x + 1, b.y + 2, b.w - 2, 2, LINE_LEFT, LINE_RIGHT);
+
         Rect sv = p.svSquare;
+        c.rect(sv.x - 1, sv.y - 1, sv.w + 2, sv.h + 2, PICKER_INSET);
         c.gradientH(sv.x, sv.y, sv.w, sv.h, 0xFFFFFFFF, p.hueColor());
         c.gradientV(sv.x, sv.y, sv.w, sv.h, 0x00000000, 0xFF000000);
-        double mx = sv.x + p.getSaturation() * sv.w, my = sv.y + (1 - p.getBrightness()) * sv.h;
-        c.outline(mx - 2, my - 2, 5, 5, 0xFFFFFFFF);
-        //horizontal hue bar
+        double mx = Math.round(sv.x + p.getSaturation() * (sv.w - 1)), my = Math.round(sv.y + (1 - p.getBrightness()) * (sv.h - 1));
+        c.outline(mx - 3, my - 3, 6, 6, 0xFF201A30);
+        c.outline(mx - 2, my - 2, 4, 4, 0xFFE0E0E0);
+
+        //horizontal hue bar with a white marker
         Rect hue = p.hueBar;
+        c.rect(hue.x - 1, hue.y - 1, hue.w + 2, hue.h + 2, PICKER_INSET);
         for (int i = 0; i < 6; i++) {
             int left = 0xFF000000 | Color.HSBtoRGB(i / 6f, 1, 1), right = 0xFF000000 | Color.HSBtoRGB((i + 1) / 6f, 1, 1);
-            c.gradientH(hue.x + hue.w * i / 6, hue.y, hue.w / 6, hue.h, left, right);
+            double x0 = Math.round(hue.x + hue.w * i / 6), x1 = Math.round(hue.x + hue.w * (i + 1) / 6);
+            c.gradientH(x0, hue.y, x1 - x0, hue.h, left, right);
         }
-        c.rect(hue.x + p.getHue() * hue.w - 1, hue.y - 1, 2, hue.h + 2, 0xFFFFFFFF);
-        Rect alpha = p.alphaBar;
-        paintChecker(c, alpha.x, alpha.y, alpha.w, alpha.h);
-        int rgb = p.getWidget().getColor().getRGB() & 0xFFFFFF;
-        c.gradientH(alpha.x, alpha.y, alpha.w, alpha.h, rgb, 0xFF000000 | rgb);
-        c.rect(alpha.x + p.getAlpha() / 255.0 * alpha.w - 1, alpha.y - 1, 2, alpha.h + 2, 0xFFFFFFFF);
+        double hx = Math.round(hue.x + p.getHue() * (hue.w - 2));
+        c.rect(hx, hue.y, 2, hue.h, 0xFFFFFFFF);
+
+        Font font = text(c);
+        Rect[] buttons = {p.copyButton, p.pasteButton};
+        String[] labels = {"Copy", "Paste"};
+        for (int i = 0; i < 2; i++) {
+            Rect r = buttons[i];
+            boolean hovered = r.contains(p.getOwner().getMenu().getMouseX(), p.getOwner().getMenu().getMouseY());
+            accentBox(c, r.x, r.y, r.w, r.h, accent, hovered ? 1 : 0);
+            double tw = c.measure(font, labels[i]);
+            capText(c, font, labels[i], Math.round(r.centerX() - tw / 2), r.y + 4, TEXT_BRIGHT);
+        }
+        String hex = ColorWidget.format(p.getWidget().getColor()).substring(0, 7);
+        capText(c, font, hex, p.pasteButton.right() + 17, p.copyButton.y + 4, TEXT_DIM);
     }
 
     /* ---- HUD ---- */

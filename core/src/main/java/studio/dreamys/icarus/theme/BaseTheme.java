@@ -1,6 +1,7 @@
 package studio.dreamys.icarus.theme;
 
 import studio.dreamys.icarus.input.Keys;
+import studio.dreamys.icarus.render.AtlasImage;
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.render.Font;
 import studio.dreamys.icarus.render.FontAtlas;
@@ -27,6 +28,19 @@ import studio.dreamys.icarus.ui.widget.Widget;
  * their constructor and implement painting. Fonts are created lazily from the shared atlas.
  */
 public abstract class BaseTheme implements Theme {
+    /** An image from the classpath as a white alpha mask for tinting (e.g. icons cut from a reference), or null. */
+    protected static AtlasImage resourceImage(String path) {
+        try (java.io.InputStream in = BaseTheme.class.getResourceAsStream(path)) {
+            if (in == null) return null;
+            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(in);
+            if (img == null) return null;
+            int[] argb = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
+            return new AtlasImage(argb, img.getWidth(), img.getHeight());
+        } catch (java.io.IOException e) {
+            return null;
+        }
+    }
+
     /** Row metrics in design units. */
     protected double textRow = 13;
     /** Height of the label line above sliders, dropdowns and fields. */

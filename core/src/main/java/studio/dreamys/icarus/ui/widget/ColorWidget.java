@@ -24,12 +24,23 @@ public final class ColorWidget extends Widget {
         this.value = setting;
         this.popup = new ColorPopup(this);
         this.context = new ContextPopup(this, index -> {
-            if (index == 0) Icarus.getPlatform().setClipboard(format(getColor()));
-            else {
-                Color pasted = parse(Icarus.getPlatform().getClipboard());
-                if (pasted != null) setColor(pasted);
-            }
+            if (index == 0) copy();
+            else paste();
         }, "Copy", "Paste");
+    }
+
+    /** Puts the colour on the clipboard as {@code #RRGGBBAA}. */
+    public void copy() {
+        Icarus.getPlatform().setClipboard(format(getColor()));
+    }
+
+    /** Takes the colour from the clipboard; returns false (keeping the colour) if it isn't one. */
+    public boolean paste() {
+        Color pasted = parse(Icarus.getPlatform().getClipboard());
+        if (pasted == null) return false;
+        setColor(pasted);
+        menu.interactionEnded();
+        return true;
     }
 
     /** Clipboard form: {@code #RRGGBBAA}. */
