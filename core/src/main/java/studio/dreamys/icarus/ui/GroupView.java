@@ -20,6 +20,8 @@ public final class GroupView {
 
     double scroll;
     double contentHeight;
+    /** Height counted in {@link #contentHeight} that rows don't draw into (the theme's row offset), so it never scrolls. */
+    double slack;
 
     GroupView(GroupNode group) {
         this.group = group;
@@ -52,10 +54,10 @@ public final class GroupView {
     }
 
     public boolean isScrollable() {
-        return contentHeight > content.h + 0.5;
+        return contentHeight - slack > content.h + 0.5;
     }
 
     void scrollBy(double amount) {
-        scroll = Math.max(0, Math.min(Math.max(0, contentHeight - content.h), scroll + amount));
+        scroll = Math.max(0, Math.min(Math.max(0, contentHeight - slack - content.h), scroll + amount));
     }
 }

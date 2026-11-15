@@ -383,6 +383,7 @@ public final class Menu implements MenuController {
         double innerWidth = columnWidth - metrics.padLeft - metrics.padRight;
         for (GroupView g : groups) {
             g.contentHeight = metrics.rowOffset + measureRows(canvas, g, innerWidth, metrics.rowGap);
+            g.slack = metrics.rowOffset; //rows start that far down but also end that far above their height
             int hint = g.getGroup().getColumn();
             int column;
             if (ConfigPanel.isLastColumn(hint)) column = columns - 1;

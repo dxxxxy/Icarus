@@ -55,6 +55,7 @@ public class FatalityStyleTheme extends BaseTheme {
     protected static final int PANEL_EDGE = 0xFF393153;
     protected static final int PANEL_BG = 0xFF191337;
     /** The panel and the groups darken a little toward the bottom. */
+    protected static final int LIST_TOP = 0xFF1C1641, LIST_BOTTOM = 0xFF18123A, SEARCH_BG = 0xFF150E3C, SEARCH_HINT = 0xFF2C2654;
     protected static final int PANEL_FILL_TOP = 0xFF181334, PANEL_FILL_BOTTOM = 0xFF14112D;
     protected static final int SUBTAB_BG = 0xFF1F193F;
     protected static final int DIVIDER = 0xFF373155;
@@ -107,6 +108,8 @@ public class FatalityStyleTheme extends BaseTheme {
     private long glitchUntil;
     private int glitchOffset;
     private long tabGlitchUntil;
+    /** Layout runs row by row: whether the last row that wasn't a button was a checkbox (see layoutButton). */
+    private boolean afterCheckbox;
     private final int[] tabGlitch = new int[4];
 
     public FatalityStyleTheme() {
@@ -406,11 +409,13 @@ public class FatalityStyleTheme extends BaseTheme {
         w.bounds.set(x, y - 3, width, ROW_CHECK);
         w.box.set(x + CHECK_X, y - 3, CHECK, CHECK);
         keybindRow(c, w, x, y, width);
+        afterCheckbox = true;
         return ROW_CHECK;
     }
 
     @Override
     public double layoutLabel(Canvas c, LabelWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         w.bounds.set(x, y - 3, width, ROW_LABEL);
         keybindRow(c, w, x, y, width);
         return ROW_LABEL;
@@ -419,12 +424,14 @@ public class FatalityStyleTheme extends BaseTheme {
     @Override
     public double layoutButton(Canvas c, ButtonWidget w, double x, double y, double width) {
         w.bounds.set(x, y - 3, width, ROW_BUTTON);
-        w.button.set(x + CONTROL_X, y - 5, Math.min(CONTROL_W, width - 2 * CONTROL_X), BUTTON_H);
+        //measured: buttons below a checkbox sit 2px lower than below a dropdown or list (a run of buttons keeps it)
+        w.button.set(x + CONTROL_X, y - (afterCheckbox ? 3 : 5), Math.min(CONTROL_W, width - 2 * CONTROL_X), BUTTON_H);
         return ROW_BUTTON;
     }
 
     @Override
     public double layoutSlider(Canvas c, SliderWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         w.bounds.set(x, y - 3, width, ROW_SLIDER);
         w.track.set(x + CONTROL_X, y + 12, Math.min(CONTROL_W, width - 2 * CONTROL_X), SLIDER_H);
         w.minus.set(w.track.right() - 22, y - 3, 10, 12);
@@ -445,21 +452,25 @@ public class FatalityStyleTheme extends BaseTheme {
 
     @Override
     public double layoutChoice(Canvas c, ChoiceWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         return dropdownRow(c, w.box, w, x, y, width);
     }
 
     @Override
     public double layoutCombo(Canvas c, ComboWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         return dropdownRow(c, w.box, w, x, y, width);
     }
 
     @Override
     public double layoutField(Canvas c, FieldWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         return dropdownRow(c, w.box, w, x, y, width);
     }
 
     @Override
     public double layoutColor(Canvas c, ColorWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         w.bounds.set(x, y - 3, width, ROW_LABEL);
         w.swatch.set(x + width - RIGHT - SWATCH_W, y - 2, SWATCH_W, SWATCH_H);
         return ROW_LABEL;
@@ -477,6 +488,7 @@ public class FatalityStyleTheme extends BaseTheme {
 
     @Override
     public double layoutList(Canvas c, ListWidget w, double x, double y, double width) {
+        afterCheckbox = false;
         double h = w.getModel().getHeight() > 0 ? w.getModel().getHeight() : listRows * listItemHeight + 2;
         double searchH = w.isSearchable() ? 17 : 0;
         if (w.isSearchable()) w.search.set(x + CONTROL_X, y - 3, width - 2 * CONTROL_X, searchH);
@@ -621,17 +633,19 @@ public class FatalityStyleTheme extends BaseTheme {
     public void paintList(Canvas c, ListWidget w) {
         Rect b = w.box;
         double sh = w.search.h;
+        int accent = w.getMenu().getAccent();
         c.rect(b.x, b.y - sh, b.w, b.h + sh, GROUP_EDGE);
-        c.rect(b.x + 1, b.y + 1 - sh, b.w - 2, b.h - 2 + sh, CONTROL_BG);
+        c.gradientV(b.x + 1, b.y + 1, b.w - 2, b.h - 2, LIST_TOP, LIST_BOTTOM);
         if (w.isSearchable()) {
+            //a darker search strip over a separator, which turns pink while typing
             Rect s = w.search;
-            c.rect(s.x + 1, s.y + 1, s.w - 2, s.h - 2, w.isSearchFocused() ? 0xFF231C4C : 0xFF1F1946);
+            c.rect(s.x + 1, s.y + 1, s.w - 2, s.h - 1, SEARCH_BG);
+            c.hline(s.x + 1, s.bottom(), s.w - 2, w.isSearchFocused() ? Colors.mix(GROUP_EDGE, accent, 0.5) : GROUP_EDGE);
             String q = w.getQuery();
             boolean empty = q.isEmpty() && !w.isSearchFocused();
-            capText(c, text(c), empty ? "Search..." : q + (w.isSearchFocused() ? "_" : ""), s.x + 6, s.y + 5, empty ? 0xFF4E4874 : TEXT);
+            capText(c, text(c), empty ? "Search" : q + (w.isSearchFocused() ? "_" : ""), s.x + 6, s.y + 5, empty ? SEARCH_HINT : TEXT);
         }
         List<String> items = w.getItems();
-        int accent = w.getMenu().getAccent();
         Font font = text(c);
         c.pushClip(b.x + 1, b.y + 1, b.w - 2, b.h - 2);
         for (int row = 0; row < w.visibleRows; row++) {
@@ -645,6 +659,11 @@ public class FatalityStyleTheme extends BaseTheme {
             capText(c, font, c.fit(font, item, b.w - 14), b.x + 6, y + 5, color);
         }
         c.popClip();
+        //a small arrow in the corner while more items are below
+        if (w.getScroll() + w.visibleRows < items.size()) {
+            double ax = b.right() - 11, ay = b.bottom() - 14;
+            c.triangle(ax - 3.5, ay, ax + 3.5, ay, ax, ay + 3.5, GROUP_EDGE);
+        }
     }
 
     @Override

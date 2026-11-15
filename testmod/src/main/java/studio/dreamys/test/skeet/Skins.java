@@ -10,7 +10,7 @@ import studio.dreamys.icarus.settings.ListModel;
 /** The SKINS tab, as in the reference. */
 @IPage(icon = "skins", order = 5)
 public class Skins {
-    @IGroup(column = 0, order = 0, height = 148 / 1.25)
+    @IGroup(column = 0, order = 0, height = 147 / 1.25)
     public static class Knife_options {
         public static boolean Override_knife = false;
 
@@ -56,7 +56,7 @@ public class Skins {
         public static final ListModel Skin = new ListModel("-", "Abyss", "Acheron", "Acid Fade", "Acid Wash", "Aerial", "Afterimage",
                 "Agent", "Airlock", "Akihabara Accept", "Akoben", "Akoben", "Aloha", "Aloha", "Amber Fade", "Amber Fade", "Ancient Earth",
                 "Ancient Lore", "Ancient Visions", "Anodized Gunmetal", "Anodized Navy", "Antique", "Apocalypto", "Aquamarine Revenge")
-                .searchable(true).height(392 / 1.25);
+                .searchable(true).height(379 / 1.25);
 
         static {
             Skin.select("-");

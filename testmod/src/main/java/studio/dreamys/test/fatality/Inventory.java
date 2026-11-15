@@ -23,8 +23,11 @@ public class Inventory {
         public static final ListModel Weapon = new ListModel("Sporty Gloves", "Driver Gloves", "Handwraps", "Motorcycle Gloves",
                 "Specialist Gloves", "Hydra Gloves", "Bayonet", "Flip Knife", "Gut Knife", "Karambit", "M9 Bayonet", "Huntsman Knife",
                 "Falchion Knife", "Bowie Knife", "Butterfly Knife", "Shadow Daggers", "Ursus Knife", "Navaja Knife", "Stiletto Knife",
-                "Talon Knife", "Paracord Knife", "Survival Knife", "Nomad Knife", "Skeleton Knife", "Classic Knife", "AK-47", "AUG", "AWP")
-                .searchable(true).height(493);
+                "Talon Knife", "Paracord Knife", "Survival Knife", "Nomad Knife", "Skeleton Knife", "Classic Knife", "AK-47", "AUG", "AWP",
+                "CZ75-Auto", "Desert Eagle", "Dual Berettas", "FAMAS", "Five-SeveN", "G3SG1", "Galil AR", "Glock-18", "M249", "M4A1-S",
+                "M4A4", "MAC-10", "MAG-7", "MP5-SD", "MP7", "MP9", "Negev", "Nova", "P2000", "P250", "P90", "PP-Bizon", "R8 Revolver",
+                "SCAR-20", "SG 553", "SSG 08", "Sawed-Off", "Tec-9", "UMP-45", "USP-S", "XM1014")
+                .searchable(true).height(494);
 
         static {
             Weapon.select("Karambit");
@@ -35,12 +38,12 @@ public class Inventory {
     @IGroup(column = 1)
     public static class Paint_kit {
         @ILabel("")
-        public static final ListModel Kit = new ListModel("Arctic Camo", "Arctic Wolf", "Arctic Wolf", "Arid", "Aristocrat", "Armor Core",
-                "Army Mesh", "Army Recon", "Army Sheen", "Ash Wood", "Asiimov", "Asiimov", "Asiimov", "Asiimov", "Asiimov", "Assault",
-                "Asterion", "Atheris", "Atlas").searchable(true).height(311);
+        public static final ListModel Kit = new ListModel("-", "Abyss", "Acheron", "Acid Etched", "Acid Fade", "Acid Wash", "Acient",
+                "Afterimage", "Agent", "Airlock", "Akihabara Accept", "Akoben", "Akoben", "Aloha", "Aloha", "Amber Fade", "Amber Fade",
+                "Amber Slipstream", "Angry Mob", "Anodized Gunmetal", "Anodized Navy").searchable(true).height(307);
 
         static {
-            Kit.select("Asiimov");
+            Kit.select("-");
         }
 
         @SliderOptions(min = 0, max = 1000, onlyInt = true, units = "")
@@ -66,7 +69,7 @@ public class Inventory {
     @IGroup(column = 2)
     public static class Inventory_items {
         @ILabel("")
-        public static final ListModel Items = new ListModel().searchable(true).height(356);
+        public static final ListModel Items = new ListModel().searchable(true).height(358);
 
         public static Runnable Remove = () -> TestModCommon.notify("Inventory", "Removed.");
     }

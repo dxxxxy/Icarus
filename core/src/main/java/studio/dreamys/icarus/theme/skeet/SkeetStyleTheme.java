@@ -493,13 +493,13 @@ public class SkeetStyleTheme extends BaseTheme {
     @Override
     public double layoutList(Canvas c, ListWidget w, double x, double y, double width) {
         double cw = controlWidth(c, width, CONTROL_W);
-        double top = P(2);
-        double searchH = w.isSearchable() ? P(22) : 0;
+        double top = P(1);
+        double searchH = w.isSearchable() ? P(LIST_SEARCH_H) : 0;
         if (w.isSearchable()) w.search.set(x + P(LABEL_X), y + top, cw, searchH);
         else w.search.clear();
         double boxH = w.getModel().getHeight() > 0 ? w.getModel().getHeight() : P(156);
         w.box.set(x + P(LABEL_X), y + top + searchH, cw, boxH);
-        w.itemHeight = P(23);
+        w.itemHeight = P(LIST_ITEM_H);
         w.visibleRows = Math.max(1, (int) Math.ceil(boxH / w.itemHeight));
         w.bounds.set(x, y, width, top + searchH + boxH + P(5));
         keybindRow(c, w, x, y - P(5), width);
@@ -649,37 +649,52 @@ public class SkeetStyleTheme extends BaseTheme {
     public void paintList(Canvas c, ListWidget w) {
         Rect b = w.box;
         double p = px(c, 1);
-        if (w.isSearchable()) {
+        boolean search = w.isSearchable();
+        if (search) {
+            //a text field (black, grey and dark rings) sitting on top of the list
             Rect s = w.search;
             c.rect(s.x, s.y, s.w, s.h, BLACK);
-            c.rect(s.x + p, s.y + p, s.w - 2 * p, s.h - 2 * p, w.isSearchFocused() ? 0xFF232323 : 0xFF1D1D1D);
+            c.rect(s.x + p, s.y + p, s.w - 2 * p, s.h - p, 0xFF2F2F2F);
+            c.rect(s.x + 2 * p, s.y + 2 * p, s.w - 4 * p, s.h - 3 * p, 0xFF111111);
+            c.rect(s.x + 3 * p, s.y + 3 * p, s.w - 6 * p, s.h - 5 * p, w.isSearchFocused() ? 0xFF1D1D1D : 0xFF181818);
             Font sf = text(c);
             double qw = c.measure(sf, w.getQuery());
-            double ty = capsTop(c, sf, s.y + P(6));
+            double ty = capsTop(c, sf, s.y + P(8));
             c.text(sf, w.getQuery(), s.x + P(7), ty, TEXT);
             c.text(sf, "_", s.x + P(7) + qw, ty, TEXT);
         }
-        c.rect(b.x, b.y, b.w, b.h, BLACK);
-        c.rect(b.x + p, b.y + p, b.w - 2 * p, b.h - 2 * p, 0xFF232323);
+        //the list: black sides and bottom (and top without a search field), dark grey inside
+        c.rect(b.x, b.y - (search ? 0 : p), b.w, b.h + (search ? 0 : p), BLACK);
+        c.rect(b.x + p, b.y, b.w - 2 * p, b.h - p, 0xFF222222);
         List<String> items = w.getItems();
+        boolean scrolls = items.size() > w.visibleRows;
+        double textW = b.w - P(20) - (scrolls ? P(6) : 0);
         Font font = text(c);
-        c.pushClip(b.x + p, b.y + p, b.w - 2 * p, b.h - 2 * p);
+        c.pushClip(b.x + p, b.y, b.w - 2 * p, b.h - p);
         for (int row = 0; row < w.visibleRows; row++) {
             int index = w.getScroll() + row;
             if (index >= items.size()) break;
             String item = items.get(index);
-            double y = b.y + p + row * w.itemHeight;
+            double y = b.y + row * w.itemHeight;
             boolean selected = item.equals(w.getSelected());
             boolean hovered = index == w.getHoveredIndex();
-            if (hovered || selected) c.rect(b.x + p, y, b.w - 2 * p, w.itemHeight, 0xFF1A1A1A);
+            if (hovered || selected) c.rect(b.x + p, y, b.w - 2 * p, w.itemHeight - 2 * p, 0xFF191919);
             Font f = selected || hovered ? bold(c) : font;
-            c.text(f, c.fit(f, item, b.w - P(20)), b.x + P(10), capsTop(c, f, y + P(8)), selected ? w.getMenu().getAccent() : TEXT);
+            c.text(f, c.fit(f, item, textW), b.x + P(10), capsTop(c, f, y + P(LIST_TEXT_Y)), selected ? w.getMenu().getAccent() : TEXT);
         }
         c.popClip();
-        if (items.size() > w.visibleRows) {
-            double thumbH = Math.max(P(14), b.h * w.visibleRows / items.size());
-            double thumbY = b.y + (b.h - thumbH) * w.getScroll() / (items.size() - w.visibleRows);
-            c.rect(b.right() - P(6), thumbY + p, P(5), thumbH - 2 * p, 0xFF404040);
+        if (scrolls) {
+            //scrollbar track along the right edge, a small thumb, and the "more below" arrow
+            double tx = b.right() - p - P(6);
+            c.rect(tx, b.y, P(6), b.h - p, 0xFF2D2D2D);
+            double thumbH = Math.max(P(20), (b.h - p) * w.visibleRows / items.size());
+            double thumbY = b.y + (b.h - p - thumbH) * w.getScroll() / (items.size() - w.visibleRows);
+            c.rect(tx + p, snap(c, thumbY), P(4), thumbH, 0xFF404040);
+            if (w.getScroll() + w.visibleRows < items.size()) {
+                double ax = snap(c, b.right() - P(17)), ay = snap(c, b.bottom() - P(9));
+                c.rect(ax - P(2), ay, P(5), p, BLACK);
+                c.triangle(ax - P(2), ay + p, ax + P(3), ay + p, ax + P(0.5), ay + p + P(2.5), 0xFFCCCCCC);
+            }
         }
     }
 
@@ -795,6 +810,8 @@ public class SkeetStyleTheme extends BaseTheme {
      * Colour picker (reference pixels): black and grey rings, 2px padding, then the SV square and the hue bar (red at
      * the top, running backwards) side by side and the alpha bar below, each in a dark inset with 3px between them.
      */
+    /** Lists (reference pixels): search field height, row pitch, text offset in a row. */
+    protected static final double LIST_SEARCH_H = 24, LIST_ITEM_H = 23, LIST_TEXT_Y = 6;
     protected static final double PICKER_SV = 188, PICKER_HUE_W = 19, PICKER_ALPHA_H = 13, PICKER_GAP = 3;
 
     @Override
