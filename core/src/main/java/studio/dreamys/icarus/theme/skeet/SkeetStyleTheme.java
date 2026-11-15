@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The classic dark menu: icon tabs on the left, a thin multi-colour strip, a striped background, bevelled frame
+ * The skeet (gamesense) menu: icon tabs on the left, a thin multi-colour strip, a striped background, bevelled frame
  * and gradient controls.
  * <p>
  * Every measurement was taken from the reference footage, where the menu is drawn at 125%; constants are written

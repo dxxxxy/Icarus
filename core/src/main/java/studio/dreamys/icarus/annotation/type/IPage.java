@@ -16,7 +16,7 @@ public @interface IPage {
     char value() default ' ';
 
     /**
-     * Named tab icon provided by the theme (e.g. the classic theme's "rage", "antiaim", "legit", "visuals", "misc",
+     * Named tab icon provided by the theme (e.g. the skeet theme's "rage", "antiaim", "legit", "visuals", "misc",
      * "skins", "players", "config"); takes precedence over {@link #value()} when the theme has it.
      */
     String icon() default "";

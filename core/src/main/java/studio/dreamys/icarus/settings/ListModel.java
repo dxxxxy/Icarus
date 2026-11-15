@@ -33,7 +33,7 @@ public final class ListModel {
         return height;
     }
 
-    /** Shows a search box above the list that filters it as the user types (classic theme). */
+    /** Shows a search box above the list that filters it as the user types. */
     public ListModel searchable(boolean searchable) {
         this.searchable = searchable;
         return this;
