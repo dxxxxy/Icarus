@@ -1,6 +1,6 @@
 package studio.dreamys.icarus.theme.fatality;
 
-import studio.dreamys.icarus.hud.Notification;
+import studio.dreamys.icarus.hud.Toast;
 import studio.dreamys.icarus.hud.Watermark;
 import studio.dreamys.icarus.render.AtlasImage;
 import studio.dreamys.icarus.render.Canvas;
@@ -843,17 +843,17 @@ public class FatalityStyleTheme extends BaseTheme {
     }
 
     @Override
-    public double notificationWidth(Canvas c, Notification n) {
+    public double toastWidth(Canvas c, Toast n) {
         return 220;
     }
 
     @Override
-    public double notificationHeight(Canvas c, Notification n) {
+    public double toastHeight(Canvas c, Toast n) {
         return 28 + n.lines(c, text(c), 196).size() * 15 + 6;
     }
 
     @Override
-    public void paintNotification(Canvas c, Notification n, double x, double y, double w, double h, double visibility, int accent) {
+    public void paintToast(Canvas c, Toast n, double x, double y, double w, double h, double visibility, int accent) {
         c.setAlpha(visibility);
         c.rect(x, y, w, h, WINDOW_EDGE);
         c.gradientV(x + 1, y + 1, w - 2, h - 2, HEADER_TOP, HEADER_BOTTOM);

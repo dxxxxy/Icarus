@@ -71,6 +71,10 @@ public final class Snapshot {
             menu.mouseReleased(cx * scale / platform.guiScale, cy * scale / platform.guiScale, 0);
         }
 
+        //optional typed text into whatever the clicks focused
+        String typed = System.getenv("SNAPSHOT_TYPE");
+        if (typed != null) typed.codePoints().forEach(menu::charTyped);
+
         double gx = mouseX * scale / platform.guiScale, gy = mouseY * scale / platform.guiScale;
         for (int i = 0; i < 3; i++) {
             renderer.clear(platform.width, platform.height, 0xFF404040);

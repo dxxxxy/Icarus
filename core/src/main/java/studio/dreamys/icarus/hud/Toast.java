@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A toast that slides in, stays for a while and slides out. Send it with {@code IcarusMod#notifications()}.
+ * A toast that slides in, stays for a while and slides out. Send it with {@code IcarusMod#toasts()}.
  * Timing is in client ticks; drawing interpolates between ticks.
  */
-public final class Notification {
+public final class Toast {
     public static final int SLIDE_TICKS = 6;
 
     private final String title;
@@ -23,11 +23,11 @@ public final class Notification {
     private double linesWidth = -1;
     private Font linesFont;
 
-    public Notification(String title, String message) {
+    public Toast(String title, String message) {
         this(title, message, 40);
     }
 
-    public Notification(String title, String message, int stayTicks) {
+    public Toast(String title, String message, int stayTicks) {
         this.title = title == null ? "" : title;
         this.message = message == null ? "" : message;
         this.stayTicks = stayTicks;

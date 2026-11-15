@@ -19,8 +19,6 @@ import studio.dreamys.icarus.platform.Texture;
 import studio.dreamys.icarus.render.DrawList;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 26.3: the GUI is retained-mode, so a draw list is submitted as GUI elements (one per texture) whose vertices are
@@ -40,7 +38,6 @@ public class ModernRenderer implements Renderer {
     }
 
     private GuiGraphicsExtractor graphics;
-    private final List<DrawListElement> elements = new ArrayList<>();
 
     /** Binds the renderer to the frame's extractor; must be called before Icarus draws anything. */
     public void begin(GuiGraphicsExtractor graphics) {
@@ -84,8 +81,9 @@ public class ModernRenderer implements Renderer {
 
         for (int command = 0; command < list.getCommandCount(); command++) {
             if (list.getCommandIndexCount(command) == 0) continue;
-            while (elements.size() <= command) elements.add(new DrawListElement());
-            DrawListElement element = elements.get(command);
+            //a fresh element per submit: the state keeps them until the frame is drawn, and several draw lists
+            //(HUD, menu, toasts over the menu) are submitted in the same frame
+            DrawListElement element = new DrawListElement();
             AtlasTexture texture = (AtlasTexture) list.getCommandTexture(command);
             element.set(list, list.getCommandIndexStart(command), list.getCommandIndexCount(command), inverseScale, pose, bounds,
                     TextureSetup.singleTexture(texture.texture.getTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST)));

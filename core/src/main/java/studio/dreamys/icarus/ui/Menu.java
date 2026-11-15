@@ -17,6 +17,7 @@ import studio.dreamys.icarus.ui.popup.ContextPopup;
 import studio.dreamys.icarus.ui.popup.Popup;
 import studio.dreamys.icarus.ui.widget.ButtonWidget;
 import studio.dreamys.icarus.ui.widget.ColorWidget;
+import studio.dreamys.icarus.ui.widget.FieldWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
 import studio.dreamys.icarus.ui.widget.ListWidget;
 import studio.dreamys.icarus.ui.widget.Widget;
@@ -294,6 +295,11 @@ public final class Menu implements MenuController {
 
     public Widget getFocused() {
         return focused;
+    }
+
+    @Override
+    public boolean isTyping() {
+        return !closing && (focused instanceof FieldWidget || focused instanceof ListWidget);
     }
 
     public Widget getHovered() {
@@ -578,7 +584,7 @@ public final class Menu implements MenuController {
             popup.animate(dt);
         }
 
-        //4. paint, then the notifications on top
+        //4. paint, then the toasts on top
         frame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, paintPass);
         mod.renderOverMenu(partialTick);
     }

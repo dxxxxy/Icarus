@@ -40,6 +40,14 @@ public interface MenuController {
         return true;
     }
 
+    /**
+     * Whether a text field (or list search) has keyboard focus. Platforms that only deliver typed characters while
+     * OS text input is on (26.x, SDL) start it while this is true.
+     */
+    default boolean isTyping() {
+        return false;
+    }
+
     /** The screen was closed. */
     void closed();
 }

@@ -1,6 +1,6 @@
 package studio.dreamys.icarus.theme.skeet;
 
-import studio.dreamys.icarus.hud.Notification;
+import studio.dreamys.icarus.hud.Toast;
 import studio.dreamys.icarus.hud.Watermark;
 import studio.dreamys.icarus.render.AtlasImage;
 import studio.dreamys.icarus.render.Canvas;
@@ -905,17 +905,17 @@ public class SkeetStyleTheme extends BaseTheme {
     }
 
     @Override
-    public double notificationWidth(Canvas c, Notification n) {
+    public double toastWidth(Canvas c, Toast n) {
         return P(280);
     }
 
     @Override
-    public double notificationHeight(Canvas c, Notification n) {
+    public double toastHeight(Canvas c, Toast n) {
         return P(24) + P(20) + n.lines(c, text(c), P(280 - 36)).size() * P(17) + P(12);
     }
 
     @Override
-    public void paintNotification(Canvas c, Notification n, double x, double y, double w, double h, double visibility, int accent) {
+    public void paintToast(Canvas c, Toast n, double x, double y, double w, double h, double visibility, int accent) {
         c.setAlpha(visibility);
         hudFrame(c, x, y, w, h);
         double ty = y + P(18);

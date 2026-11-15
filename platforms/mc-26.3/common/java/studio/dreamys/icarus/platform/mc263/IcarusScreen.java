@@ -14,6 +14,7 @@ import studio.dreamys.icarus.ui.MenuController;
 public class IcarusScreen extends Screen {
     private final MenuController menu;
     private final ModernRenderer renderer;
+    private boolean textInput;
 
     public IcarusScreen(MenuController menu, ModernRenderer renderer) {
         super(Component.empty());
@@ -40,7 +41,17 @@ public class IcarusScreen extends Screen {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         renderer.begin(graphics);
         menu.render(mouseX(), mouseY(), partialTick);
+        updateTextInput();
         if (menu.isFadedOut()) onClose();
+    }
+
+    /** SDL only sends typed characters while text input is on, which vanilla's EditBox does on focus; mirror that. */
+    private void updateTextInput() {
+        boolean typing = menu.isTyping();
+        if (typing == textInput) return;
+        textInput = typing;
+        if (typing) minecraft.textInputManager().startTextInput(this);
+        else minecraft.textInputManager().stopTextInput(this);
     }
 
     /** 26.x numbers mouse buttons like SDL (left 1, middle 2, right 3); Icarus uses LWJGL's (left 0, right 1, middle 2). */
@@ -89,6 +100,10 @@ public class IcarusScreen extends Screen {
 
     @Override
     public void removed() {
+        if (textInput) {
+            textInput = false;
+            minecraft.textInputManager().stopTextInput(this);
+        }
         menu.closed();
     }
 

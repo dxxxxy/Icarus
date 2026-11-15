@@ -116,7 +116,7 @@ Settings live in `config/<modid>/`. By default the menu has a config UI (named c
 
 ```java
 mod.onChange(Combat.KillAura.class, "Enabled", (Boolean enabled) -> System.out.println("KillAura: " + enabled));
-mod.addKeyListener(key -> { if (key == Keys.KEY_K) mod.notifications().send("Hello", "World"); });
+mod.addKeyListener(key -> { if (key == Keys.KEY_K) mod.toasts().send("Hello", "World"); });
 mod.addHud(new Watermark("yourmod | v1.0"));
 mod.setFooter("left", "center", "right"); // footer text in the menu (empty by default)
 ```
@@ -127,7 +127,7 @@ Use `studio.dreamys.icarus.input.Keys` instead of LWJGL's `Keyboard`. The codes 
 
 - `Icarus.init(modid, window)` → `Icarus.create(modid, theme)`; the menu window is created and placed by the theme.
 - `@IGroup(x, y)` → `@IGroup(column, order)`; groups are laid out by the theme.
-- `NotificationManager.send(...)` → `mod.notifications().send(...)`, `CallbackManager.register(...)` → `mod.onChange(...)`, `Icarus.provideComponent(...)` → `mod.replaceWidget(...)`.
+- `NotificationManager.send(...)` → `mod.toasts().send(...)`, `CallbackManager.register(...)` → `mod.onChange(...)`, `Icarus.provideComponent(...)` → `mod.replaceWidget(...)`.
 - Replace `org.lwjgl.input.Keyboard` with `Keys`. The Reflections library is no longer needed.
 
 ## [Wiki](https://github.com/DxxxxY/Icarus/wiki/)

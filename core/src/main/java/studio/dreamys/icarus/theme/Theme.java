@@ -1,6 +1,6 @@
 package studio.dreamys.icarus.theme;
 
-import studio.dreamys.icarus.hud.Notification;
+import studio.dreamys.icarus.hud.Toast;
 import studio.dreamys.icarus.hud.Watermark;
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.ui.GroupView;
@@ -133,10 +133,10 @@ public interface Theme {
 
     void paintWatermark(Canvas canvas, Watermark watermark, double x, double y, double width, double height, int accent);
 
-    double notificationWidth(Canvas canvas, Notification notification);
+    double toastWidth(Canvas canvas, Toast toast);
 
-    double notificationHeight(Canvas canvas, Notification notification);
+    double toastHeight(Canvas canvas, Toast toast);
 
     /** {@code visibility} is the slide-in/out progress, 0 (hidden) to 1 (fully shown). */
-    void paintNotification(Canvas canvas, Notification notification, double x, double y, double width, double height, double visibility, int accent);
+    void paintToast(Canvas canvas, Toast toast, double x, double y, double width, double height, double visibility, int accent);
 }

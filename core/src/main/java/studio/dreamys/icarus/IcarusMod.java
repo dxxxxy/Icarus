@@ -3,7 +3,7 @@ package studio.dreamys.icarus;
 import studio.dreamys.icarus.config.ConfigStore;
 import studio.dreamys.icarus.hud.HudContext;
 import studio.dreamys.icarus.hud.HudElement;
-import studio.dreamys.icarus.hud.Notifications;
+import studio.dreamys.icarus.hud.Toasts;
 import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.platform.Platform;
 import studio.dreamys.icarus.render.FrameRenderer;
@@ -34,7 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * One mod's Icarus: its settings, configs, keybinds, menu, theme, notifications and HUD. Create it with
+ * One mod's Icarus: its settings, configs, keybinds, menu, theme, toasts and HUD. Create it with
  * {@link Icarus#create}. Several mods can each have their own instance in the same game.
  */
 public final class IcarusMod implements SettingListener, Keybinds.Listener {
@@ -49,7 +49,7 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     private final Map<Setting<?>, List<Consumer<Object>>> callbacks = new IdentityHashMap<>();
     private final List<IntConsumer> keyListeners = new CopyOnWriteArrayList<>();
     private final List<HudElement> hud = new CopyOnWriteArrayList<>();
-    private final Notifications notifications = new Notifications();
+    private final Toasts toasts = new Toasts();
     /** Bound non-checkbox settings whose key is down, and those toggled on (see {@link #isKeybindActive(Setting)}). */
     private final java.util.Set<Setting<?>> held = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
     private final java.util.Set<Setting<?>> toggled = java.util.Collections.newSetFromMap(new IdentityHashMap<>());
@@ -63,7 +63,7 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     private final HudContext hudContext = new HudContext();
     private final Runnable hudPaint = this::paintHud;
     private final FrameRenderer overlayFrame = new FrameRenderer();
-    private final Runnable overlayPaint = () -> notifications.render(overlayFrame.getCanvas(), hudContext);
+    private final Runnable overlayPaint = () -> toasts.render(overlayFrame.getCanvas(), hudContext);
     private volatile boolean menuOpen;
 
     IcarusMod(String modid, Theme theme, IcarusOptions options, List<Class<?>> pageClasses, Path configDir, Path legacyDir) {
@@ -80,7 +80,7 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
         Theme preferred = options.themeSelector ? Themes.byId(store.getPrefs().getTheme()) : null;
         this.theme = preferred != null ? preferred : theme;
-        hud.add(notifications);
+        hud.add(toasts);
     }
 
     private Menu menu() {
@@ -228,8 +228,8 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
         hud.remove(element);
     }
 
-    public Notifications notifications() {
-        return notifications;
+    public Toasts toasts() {
+        return toasts;
     }
 
     /** Listens for key presses in game while no screen is open ({@link studio.dreamys.icarus.input.Keys} codes). */
@@ -340,15 +340,15 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     private void paintHud() {
         for (HudElement element : hud) {
-            //while the menu is open its own frame draws the notifications on top of it
-            if (element == notifications && menuOpen) continue;
+            //while the menu is open its own frame draws the toasts on top of it
+            if (element == toasts && menuOpen) continue;
             element.render(hudFrame.getCanvas(), hudContext);
         }
     }
 
-    /** Draws the notifications over the open menu (called by the menu after it paints). */
+    /** Draws the toasts over the open menu (called by the menu after it paints). */
     public void renderOverMenu(float partialTick) {
-        if (!notifications.hasActive()) return;
+        if (!toasts.hasActive()) return;
         Platform platform = Icarus.getPlatform();
         double scale = renderScale(platform.getGuiScale());
         int fbWidth = platform.getFramebufferWidth(), fbHeight = platform.getFramebufferHeight();
