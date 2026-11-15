@@ -9,13 +9,17 @@ public final class PageNode {
     private final Class<?> type;
     private final String name;
     private final char icon;
+    private final String iconName;
+    private final String label;
     private final int order;
     final List<SubPageNode> subPages = new ArrayList<>();
 
-    PageNode(Class<?> type, String name, char icon, int order) {
+    PageNode(Class<?> type, String name, char icon, String iconName, int order) {
         this.type = type;
         this.name = name;
         this.icon = icon;
+        this.iconName = iconName == null ? "" : iconName;
+        this.label = Labels.of(type, name);
         this.order = order;
     }
 
@@ -30,11 +34,16 @@ public final class PageNode {
     }
 
     public String getLabel() {
-        return name.replace('_', ' ');
+        return label;
     }
 
     public char getIcon() {
         return icon;
+    }
+
+    /** Named theme icon from {@code @IPage(icon)}, or empty. */
+    public String getIconName() {
+        return iconName;
     }
 
     public int getOrder() {

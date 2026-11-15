@@ -1,5 +1,7 @@
 package studio.dreamys.icarus.settings;
 
+import studio.dreamys.icarus.annotation.type.ISubPage;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +12,7 @@ public final class SubPageNode {
     private final Class<?> type;
     private final String name;
     private final int order;
+    private final char icon;
     final List<GroupNode> groups = new ArrayList<>();
 
     SubPageNode(PageNode page, Class<?> type, String name, int order) {
@@ -17,6 +20,13 @@ public final class SubPageNode {
         this.type = type;
         this.name = name;
         this.order = order;
+        ISubPage annotation = type == null ? null : type.getAnnotation(ISubPage.class);
+        this.icon = annotation == null ? ' ' : annotation.icon();
+    }
+
+    /** Icon from {@code @ISubPage(icon)}, or a space. */
+    public char getIcon() {
+        return icon;
     }
 
     public PageNode getPage() {
@@ -33,7 +43,7 @@ public final class SubPageNode {
     }
 
     public String getLabel() {
-        return name == null ? page.getLabel() : name.replace('_', ' ');
+        return name == null ? page.getLabel() : Labels.of(type, name);
     }
 
     public int getOrder() {

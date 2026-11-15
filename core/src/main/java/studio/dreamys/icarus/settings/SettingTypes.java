@@ -230,7 +230,30 @@ public final class SettingTypes {
     };
 
     /** In matching order: the more specific types first. */
+    /** {@link Label} field: a text-only row (optionally with a keybind). Not saved. */
+    public static final SettingType<Label> LABEL = new SettingType<Label>("label") {
+        @Override
+        public boolean matches(Field field) {
+            return field.getType() == Label.class;
+        }
+
+        @Override
+        public boolean isPersistent() {
+            return false;
+        }
+
+        @Override
+        public JsonElement toJson(Label value) {
+            return JsonNull.INSTANCE;
+        }
+
+        @Override
+        public Label fromJson(JsonElement json, Setting<Label> setting) {
+            return null;
+        }
+    };
+
     public static List<SettingType<?>> builtIn() {
-        return Arrays.<SettingType<?>>asList(BUTTON, CHECKBOX, CHOICE, COMBO, FIELD, SLIDER, COLOR, LIST);
+        return Arrays.<SettingType<?>>asList(BUTTON, CHECKBOX, CHOICE, COMBO, FIELD, SLIDER, COLOR, LIST, LABEL);
     }
 }

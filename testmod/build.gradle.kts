@@ -15,4 +15,15 @@ tasks.withType<JavaCompile>().configureEach {
 
 dependencies {
     implementation(project(":core"))
+    testRuntimeOnly("com.google.code.gson:gson:2.2.4")
+}
+
+// Renders a theme's menu headlessly for comparison with the reference footage:
+// ./gradlew :testmod:snapshot -Pargs="skeet 1.25 4 build/snap.png"
+tasks.register<JavaExec>("snapshot") {
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("studio.dreamys.test.snapshot.Snapshot")
+    args = (project.findProperty("args") as String? ?: "skeet 1.25 0 build/snapshot.png").split(" ")
+    workingDir = projectDir
+    systemProperty("java.awt.headless", "true")
 }

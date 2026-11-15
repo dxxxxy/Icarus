@@ -19,6 +19,8 @@ public class KeyboardHandlerMixin {
         Minecraft mc = Minecraft.getInstance();
         if (action == InputConstants.PRESS && window == mc.getWindow().handle() && mc.gui.screen() == null) {
             PlatformImpl.keyPressed(Keys.fromSdl(event.key()));
+        } else if (action == InputConstants.RELEASE) {
+            PlatformImpl.keyReleased(Keys.fromSdl(event.key()));
         }
     }
 }

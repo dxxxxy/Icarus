@@ -2,11 +2,17 @@ package studio.dreamys.icarus.ui.widget;
 
 import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.render.Canvas;
+import studio.dreamys.icarus.settings.KeybindMode;
 import studio.dreamys.icarus.settings.Keybinds;
+import studio.dreamys.icarus.settings.SettingTypes;
 import studio.dreamys.icarus.settings.Setting;
 import studio.dreamys.icarus.theme.Theme;
 import studio.dreamys.icarus.ui.Menu;
 import studio.dreamys.icarus.ui.Rect;
+import studio.dreamys.icarus.ui.popup.ContextPopup;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The key bound to a button or checkbox, shown in its row. Click to capture: the next key binds it,
@@ -15,6 +21,7 @@ import studio.dreamys.icarus.ui.Rect;
 public final class KeybindWidget extends Widget {
     private final Keybinds keybinds;
     private final Widget owner;
+    private final ContextPopup modes;
     /** The clickable label, set during layout. */
     public final Rect label = new Rect();
     private boolean capturing;
@@ -30,6 +37,19 @@ public final class KeybindWidget extends Widget {
         super(menu, setting);
         this.keybinds = keybinds;
         this.owner = owner;
+        List<String> labels = new ArrayList<>();
+        for (KeybindMode mode : KeybindMode.values()) labels.add(mode.getLabel());
+        this.modes = new ContextPopup(this, labels, () -> getMode().ordinal(), index -> keybinds.setMode(setting, KeybindMode.values()[index]));
+    }
+
+    /** Whether the binding has modes the user can pick (checkboxes). */
+    public boolean hasModes() {
+        return setting.getType() == SettingTypes.CHECKBOX;
+    }
+
+    public KeybindMode getMode() {
+        KeybindMode mode = keybinds.getMode(setting);
+        return mode == null ? KeybindMode.TOGGLE : mode;
     }
 
     public Widget getOwner() {
@@ -70,6 +90,10 @@ public final class KeybindWidget extends Widget {
 
     @Override
     public boolean mousePressed(double x, double y, int button) {
+        if (button == 1) {
+            if (hasModes()) menu.openContext(modes, x, y);
+            return false;
+        }
         if (button != 0) return false;
         capturing = true;
         menu.focus(this);
@@ -89,6 +113,14 @@ public final class KeybindWidget extends Widget {
         } else if (key > 0) {
             keybinds.set(setting, key);
         }
+        menu.focus(null);
+        return true;
+    }
+
+    /** While capturing: binds a mouse button (right, middle or side). */
+    public boolean bindMouse(int button) {
+        if (!capturing || button < 1) return false;
+        keybinds.set(setting, Keys.mouse(button));
         menu.focus(null);
         return true;
     }

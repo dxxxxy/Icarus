@@ -8,6 +8,7 @@ import studio.dreamys.icarus.ui.GroupView;
 import studio.dreamys.icarus.ui.Menu;
 import studio.dreamys.icarus.ui.Rect;
 import studio.dreamys.icarus.ui.popup.ColorPopup;
+import studio.dreamys.icarus.ui.popup.ContextPopup;
 import studio.dreamys.icarus.ui.popup.DropdownPopup;
 import studio.dreamys.icarus.ui.widget.ButtonWidget;
 import studio.dreamys.icarus.ui.widget.CheckboxWidget;
@@ -16,6 +17,7 @@ import studio.dreamys.icarus.ui.widget.ColorWidget;
 import studio.dreamys.icarus.ui.widget.ComboWidget;
 import studio.dreamys.icarus.ui.widget.FieldWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
+import studio.dreamys.icarus.ui.widget.LabelWidget;
 import studio.dreamys.icarus.ui.widget.ListWidget;
 import studio.dreamys.icarus.ui.widget.SliderWidget;
 import studio.dreamys.icarus.ui.widget.Widget;
@@ -171,6 +173,41 @@ public abstract class BaseTheme implements Theme {
         w.bounds.set(x, y, width, h);
         w.swatch.set(x + width - swatchWidth, Math.round(y + (h - swatchHeight) / 2), swatchWidth, swatchHeight);
         return h;
+    }
+
+    @Override
+    public void layoutAttachedColor(Canvas c, ColorWidget w, Widget row, int index) {
+        Rect r = row.bounds;
+        double h = Math.max(textRow, swatchHeight);
+        w.bounds.set(r.x, r.y, r.w, h);
+        w.swatch.set(r.right() - swatchWidth - index * (swatchWidth + 4), Math.round(r.y + (h - swatchHeight) / 2), swatchWidth, swatchHeight);
+        if (index > 0) return;
+        //a keybind on the same row moves left of the swatch
+        KeybindWidget keybind = row.getKeybind();
+        if (keybind != null) {
+            double shift = swatchWidth + 6;
+            keybind.bounds.x -= shift;
+            keybind.label.x -= shift;
+        }
+    }
+
+    @Override
+    public double layoutLabel(Canvas c, LabelWidget w, double x, double y, double width) {
+        w.bounds.set(x, y, width, textRow);
+        layoutKeybind(c, w, x + width, y, textRow);
+        return textRow;
+    }
+
+    @Override
+    public void layoutContext(Canvas c, ContextPopup popup) {
+        popup.itemHeight = popupItemHeight;
+        double w = 0;
+        for (String item : popup.getItems()) w = Math.max(w, c.measure(text(c), item));
+        w += 20;
+        double h = popup.getItems().size() * popupItemHeight;
+        Menu menu = popup.getOwner().getMenu();
+        double x = Math.min(popup.anchorX, menu.getViewWidth() - w), y = Math.min(popup.anchorY, menu.getViewHeight() - h);
+        popup.bounds.set(Math.max(0, x), Math.max(0, y), w, h);
     }
 
     @Override

@@ -39,6 +39,11 @@ public class PlatformImpl extends ModernPlatform {
         if (installed != null) Icarus.onKeyPressed(key);
     }
 
+    /** Called by KeyboardHandlerMixin for key releases. */
+    public static void keyReleased(int key) {
+        if (installed != null) Icarus.onKeyReleased(key);
+    }
+
     @Override
     public Collection<Path> getModRoots(String modid) {
         return container(modid).getRootPaths();

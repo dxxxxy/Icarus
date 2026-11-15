@@ -23,6 +23,8 @@ public class PlatformImpl extends ModernPlatform {
         NeoForge.EVENT_BUS.addListener((InputEvent.Key e) -> {
             if (e.getAction() == InputConstants.PRESS && Minecraft.getInstance().gui.screen() == null) {
                 Icarus.onKeyPressed(Keys.fromSdl(e.getKey()));
+            } else if (e.getAction() == InputConstants.RELEASE) {
+                Icarus.onKeyReleased(Keys.fromSdl(e.getKey()));
             }
         });
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) -> {

@@ -2,7 +2,10 @@ package studio.dreamys.icarus.settings;
 
 import studio.dreamys.icarus.annotation.field.DropdownOptions;
 import studio.dreamys.icarus.annotation.field.FieldOptions;
+import studio.dreamys.icarus.annotation.field.IAttach;
 import studio.dreamys.icarus.annotation.field.IKeybind;
+import studio.dreamys.icarus.annotation.field.IDisabled;
+import studio.dreamys.icarus.annotation.field.IWarning;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
@@ -31,7 +34,7 @@ public final class ModelBuilder {
         for (Class<?> pageClass : pageClasses) {
             IPage annotation = pageClass.getAnnotation(IPage.class);
             if (annotation == null) throw new IllegalArgumentException(pageClass.getName() + " is not annotated with @IPage");
-            PageNode page = new PageNode(pageClass, pageClass.getSimpleName(), annotation.value(), annotation.order());
+            PageNode page = new PageNode(pageClass, pageClass.getSimpleName(), annotation.value(), annotation.icon(), annotation.order());
 
             List<Class<?>> subPageClasses = new ArrayList<>();
             List<Class<?>> groupClasses = new ArrayList<>();
@@ -75,6 +78,7 @@ public final class ModelBuilder {
         for (Class<?> groupClass : groupClasses) {
             IGroup annotation = groupClass.getAnnotation(IGroup.class);
             GroupNode group = new GroupNode(sub, groupClass, groupClass.getSimpleName(), annotation.column(), annotation.order(), annotation.pinBottom());
+            group.height = annotation.height();
             for (Field field : groupClass.getDeclaredFields()) {
                 if (field.isSynthetic()) continue;
                 Setting<?> setting = createSetting(group, field);
@@ -112,14 +116,14 @@ public final class ModelBuilder {
         Setting.SliderSpec slider = null;
         if (type == SettingTypes.SLIDER) {
             try {
-                slider = new Setting.SliderSpec(sliderOptions.min(), sliderOptions.max(), sliderOptions.onlyInt(), sliderOptions.units());
+                slider = new Setting.SliderSpec(sliderOptions.min(), sliderOptions.max(), sliderOptions.onlyInt(), sliderOptions.units()).step(sliderOptions.step()).endTexts(sliderOptions.minText(), sliderOptions.maxText());
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Invalid @SliderOptions on " + field + ": " + e.getMessage(), e);
             }
         }
 
-        boolean bindable = keybind != null && (type == SettingTypes.BUTTON || type == SettingTypes.CHECKBOX);
-        if (keybind != null && !bindable) LOG.warning("[Icarus] @IKeybind on " + field + " ignored: only buttons and checkboxes can be bound");
+        //any setting can show a key; buttons run, checkboxes follow the mode, others just store it for the mod to read
+        boolean bindable = keybind != null;
 
         if (type == SettingTypes.CHOICE || type == SettingTypes.COMBO) {
             if (dropdown.value().length == 0) throw new IllegalStateException("@DropdownOptions on " + field + " has no options");
@@ -129,6 +133,13 @@ public final class ModelBuilder {
         Setting<T> setting = new Setting<>(group, field.getName(), type, holder, field, true,
                 dropdown == null ? null : Arrays.asList(dropdown.value()), slider,
                 fieldOptions == null ? 64 : fieldOptions.maxLength(), bindable ? keybind.value() : -1);
+        if (bindable) setting.defaultMode = keybind.mode();
+        setting.warning = field.isAnnotationPresent(IWarning.class);
+        setting.disabled = field.isAnnotationPresent(IDisabled.class);
+        if (field.isAnnotationPresent(IAttach.class)) {
+            if (type == SettingTypes.COLOR) setting.attached = true;
+            else LOG.warning("[Icarus] @IAttach on " + field + " ignored: only colours can share a row");
+        }
         if (type == SettingTypes.LIST) {
             try {
                 Object model = field.get(null);

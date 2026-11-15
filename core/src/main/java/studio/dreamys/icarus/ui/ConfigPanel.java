@@ -40,7 +40,7 @@ public final class ConfigPanel {
     public ConfigPanel(IcarusMod mod, boolean configUi, boolean themeSelector) {
         this.mod = mod;
         this.store = mod.getConfigStore();
-        this.full = GroupNode.standalone(configUi ? "Configs" : "Menu", LAST_COLUMN, Integer.MAX_VALUE, false);
+        this.full = GroupNode.standalone(configUi ? "Presets" : "Menu", LAST_COLUMN, Integer.MAX_VALUE, false);
         this.compact = GroupNode.standalone(configUi ? "Config" : "Menu", LAST_COLUMN, Integer.MAX_VALUE, true);
 
         if (configUi) {
@@ -55,7 +55,7 @@ public final class ConfigPanel {
                     profiles.select(value);
                     if (value != null) name = value;
                 }
-            }, null, null).setExtra(profiles);
+            }, null, null).labelled("").setExtra(profiles);
             full.addVirtual("Name", SettingTypes.FIELD, new Setting.Holder<String>() {
                 @Override
                 public String get() {
@@ -66,7 +66,7 @@ public final class ConfigPanel {
                 public void set(String value) {
                     name = value;
                 }
-            }, null, null);
+            }, null, null).labelled("");
             button(full, "Load", () -> {
                 String selected = profiles.getSelected();
                 if (selected != null) store.load(selected);

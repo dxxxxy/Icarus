@@ -9,9 +9,11 @@ public final class GroupNode {
     private final SubPageNode subPage;
     private final Class<?> type;
     private final String name;
-    private final int column;
+    private int column;
     private final int order;
     private final boolean pinBottom;
+    private final String label;
+    double height;
     final List<Setting<?>> settings = new ArrayList<>();
 
     GroupNode(SubPageNode subPage, Class<?> type, String name, int column, int order, boolean pinBottom) {
@@ -21,6 +23,7 @@ public final class GroupNode {
         this.column = column;
         this.order = order;
         this.pinBottom = pinBottom;
+        this.label = Labels.of(type, name);
     }
 
     /** The sub-page holding this group, or null for a free-standing group created in code. */
@@ -38,7 +41,23 @@ public final class GroupNode {
     }
 
     public String getLabel() {
-        return name.replace('_', ' ');
+        return label;
+    }
+
+    /** Fixed height in design units from {@code @IGroup(height)}, or 0 for automatic. */
+    public double getHeight() {
+        return height;
+    }
+
+    public GroupNode height(double height) {
+        this.height = height;
+        return this;
+    }
+
+    /** Changes the preferred column (for groups created in code). */
+    public GroupNode column(int column) {
+        this.column = column;
+        return this;
     }
 
     /** Preferred column, or -1 for automatic. */

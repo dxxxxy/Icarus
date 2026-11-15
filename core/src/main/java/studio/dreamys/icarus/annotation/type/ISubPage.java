@@ -14,4 +14,7 @@ import java.lang.annotation.Target;
 public @interface ISubPage {
     /** Sub-tab position; lower comes first. Ties are ordered by class name. */
     int order() default Integer.MAX_VALUE;
+
+    /** Icon character for themes that show sub-tabs as icons (the classic theme's weapon row uses the weapon icon font). */
+    char icon() default ' ';
 }

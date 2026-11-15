@@ -15,6 +15,8 @@ public final class SliderWidget extends Widget {
     private final Setting.SliderSpec spec;
     /** The track, set during layout. */
     public final Rect track = new Rect();
+    /** Optional -/+ buttons that step the value, set by themes that show them (else empty). */
+    public final Rect minus = new Rect(), plus = new Rect();
     private boolean dragging;
     private double cachedValue = Double.NaN;
     private String cachedText;
@@ -55,12 +57,19 @@ public final class SliderWidget extends Widget {
 
     @Override
     public boolean contains(double x, double y) {
+        if (minus.contains(x, y) || plus.contains(x, y)) return true;
         return x >= track.x && x < track.right() && y >= track.y - GRAB_MARGIN && y < track.bottom() + GRAB_MARGIN;
     }
 
     @Override
     public boolean mousePressed(double x, double y, int button) {
         if (button != 0) return false;
+        if (minus.contains(x, y) || plus.contains(x, y)) {
+            double step = spec.getStep() * (minus.contains(x, y) ? -1 : 1);
+            value.set(spec.sanitize(getValue() + step));
+            menu.interactionEnded();
+            return false;
+        }
         dragging = true;
         mouseDragged(x, y);
         return true;

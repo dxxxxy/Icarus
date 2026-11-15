@@ -22,4 +22,7 @@ public @interface IGroup {
 
     /** Keep the group at the bottom of its column. */
     boolean pinBottom() default false;
+
+    /** Fixed height in design units; 0 lets the theme size it (stretching to fill the column). */
+    double height() default 0;
 }

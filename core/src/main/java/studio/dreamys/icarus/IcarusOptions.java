@@ -11,6 +11,7 @@ public final class IcarusOptions {
     int menuKey = Keys.KEY_RSHIFT;
     Integer accent;
     double menuScale = 1;
+    String pagesPackage;
 
     public static IcarusOptions defaults() {
         return new IcarusOptions();
@@ -44,6 +45,15 @@ public final class IcarusOptions {
     /** Accent colour; the theme's own accent is used if unset. */
     public IcarusOptions accent(Color color) {
         accent = color == null ? null : color.getRGB();
+        return this;
+    }
+
+    /**
+     * Only use {@code @IPage} classes in this package (and its sub-packages). Useful when a mod ships page sets for
+     * different themes, since themes differ in the controls they offer.
+     */
+    public IcarusOptions pagesPackage(String packageName) {
+        pagesPackage = packageName == null || packageName.isEmpty() ? null : packageName;
         return this;
     }
 

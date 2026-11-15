@@ -4,6 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import studio.dreamys.icarus.settings.GroupNode;
+import studio.dreamys.icarus.settings.KeybindMode;
 import studio.dreamys.icarus.settings.Keybinds;
 import studio.dreamys.icarus.settings.Setting;
 import studio.dreamys.icarus.settings.SettingsModel;
@@ -27,7 +28,17 @@ public final class ProfileCodec {
         for (Setting<?> setting : model.getSettings()) {
             if (setting.isPersistent()) groupObject(settings, setting.getGroup()).add(setting.getName(), toJson(setting));
             int key = keybinds.get(setting);
-            if (key >= 0) groupObject(keys, setting.getGroup()).addProperty(setting.getName(), key);
+            if (key < 0) continue;
+            KeybindMode mode = keybinds.getMode(setting);
+            if (mode == null || mode == setting.getDefaultMode()) {
+                groupObject(keys, setting.getGroup()).addProperty(setting.getName(), key);
+            } else {
+                //{"key": 7, "mode": "on_hotkey"}; a plain number (older configs) means the default mode
+                JsonObject binding = new JsonObject();
+                binding.addProperty("key", key);
+                binding.addProperty("mode", mode.name().toLowerCase(java.util.Locale.ROOT));
+                groupObject(keys, setting.getGroup()).add(setting.getName(), binding);
+            }
         }
         root.add("settings", settings);
         root.add("keybinds", keys);
@@ -51,7 +62,16 @@ public final class ProfileCodec {
                 JsonObject group = findGroup(keys, setting.getGroup());
                 if (group != null) {
                     JsonElement key = group.get(setting.getName());
-                    if (key != null && key.isJsonPrimitive() && key.getAsJsonPrimitive().isNumber()) keybinds.load(setting, key.getAsInt());
+                    if (key != null && key.isJsonPrimitive() && key.getAsJsonPrimitive().isNumber()) {
+                        keybinds.load(setting, key.getAsInt());
+                        keybinds.loadMode(setting, setting.getDefaultMode());
+                    } else if (key != null && key.isJsonObject()) {
+                        JsonObject binding = key.getAsJsonObject();
+                        JsonElement code = binding.get("key"), mode = binding.get("mode");
+                        if (code != null && code.isJsonPrimitive() && code.getAsJsonPrimitive().isNumber()) keybinds.load(setting, code.getAsInt());
+                        KeybindMode parsed = mode != null && mode.isJsonPrimitive() ? KeybindMode.byName(mode.getAsString()) : null;
+                        keybinds.loadMode(setting, parsed != null ? parsed : setting.getDefaultMode());
+                    }
                 }
             }
         }

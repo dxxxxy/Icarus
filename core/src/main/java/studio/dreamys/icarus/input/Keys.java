@@ -603,8 +603,22 @@ public final class Keys {
         SDL_TO_KEYS.put(scancode, key);
     }
 
-    /** Same as LWJGL2's {@code Keyboard.getKeyName}: e.g. "RSHIFT", "6", or null for unknown codes. */
+    /** First mouse button code: mouse buttons are bindable as {@code MOUSE_BASE + button} (0 left, 1 right, 2 middle, 3/4 side). */
+    public static final int MOUSE_BASE = 0x100;
+    public static final int MOUSE_1 = MOUSE_BASE, MOUSE_2 = MOUSE_BASE + 1, MOUSE_3 = MOUSE_BASE + 2, MOUSE_4 = MOUSE_BASE + 3, MOUSE_5 = MOUSE_BASE + 4;
+
+    /** The code of a mouse button (LWJGL numbering: 0 left, 1 right, 2 middle, 3 and 4 side buttons). */
+    public static int mouse(int button) {
+        return MOUSE_BASE + button;
+    }
+
+    public static boolean isMouse(int key) {
+        return key >= MOUSE_BASE && key < MOUSE_BASE + 16;
+    }
+
+    /** Same as LWJGL2's {@code Keyboard.getKeyName}: e.g. "RSHIFT", "6", "M5" for mouse 5, or null for unknown codes. */
     public static String getKeyName(int key) {
+        if (isMouse(key)) return "M" + (key - MOUSE_BASE + 1);
         return key >= 0 && key < NAMES.length ? NAMES[key] : null;
     }
 

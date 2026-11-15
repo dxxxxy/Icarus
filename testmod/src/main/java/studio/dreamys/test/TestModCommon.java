@@ -2,42 +2,34 @@ package studio.dreamys.test;
 
 import studio.dreamys.icarus.Icarus;
 import studio.dreamys.icarus.IcarusMod;
+import studio.dreamys.icarus.IcarusOptions;
 import studio.dreamys.icarus.hud.HudContext;
 import studio.dreamys.icarus.hud.HudElement;
 import studio.dreamys.icarus.hud.Notification;
-import studio.dreamys.icarus.hud.Watermark;
-import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.theme.Theme;
 import studio.dreamys.icarus.theme.Themes;
-import studio.dreamys.test.ui.page.Combat;
-import studio.dreamys.test.ui.page.Misc;
 
 /**
- * The example mod, independent of Minecraft version and mod loader.
+ * The example mod, independent of Minecraft version and mod loader: a recreation of the skeet menu
+ * ({@code studio.dreamys.test.skeet}) or the fatality menu ({@code studio.dreamys.test.fatality}). The two themes
+ * offer different controls, so each has its own pages; {@code ICARUS_TEST_THEME=fatality} picks the second.
  * Each platform has a tiny entrypoint (@Mod class, mixin, ...) that calls {@link #init(String)}.
  */
 public class TestModCommon {
     private static IcarusMod mod;
 
     public static void init(String modid) {
-        mod = Icarus.create(modid, Themes.CLASSIC);
-        mod.setFooter("uid: 001", modid, "dxxxxy#0776");
+        String themeId = System.getenv("ICARUS_TEST_THEME");
+        Theme theme = Themes.byId(themeId == null ? "skeet" : themeId);
+        if (theme == null) theme = Themes.SKEET;
+        mod = Icarus.create(modid, theme, IcarusOptions.defaults()
+                .themeSelector(false)
+                .pagesPackage("studio.dreamys.test." + theme.getId()));
+        //the fatality header shows the product name
+        if (theme == Themes.FATALITY) mod.getMenu().setTitle("FATALITY");
 
-        mod.onChange(Combat.KillAura.class, "Checkbox_Haha", (Boolean value) -> System.out.println("KillAura toggled: " + value));
-
-        Watermark watermark = new Watermark(Misc.Watermark.Text);
-        watermark.setEnabled(Misc.Watermark.Enabled);
-        mod.addHud(watermark);
-        mod.onChange(Misc.Watermark.class, "Enabled", (Boolean value) -> watermark.setEnabled(value));
-        mod.onChange(Misc.Watermark.class, "Text", (String value) -> watermark.setText(value));
-        mod.notifications().setOffsetY(32); //start below the watermark
-
-        mod.addKeyListener(TestModCommon::key);
-
-        //dev aids: open the menu on the title screen (and pick a theme) so every platform can be checked without a world
-        Theme theme = Themes.byId(System.getenv("ICARUS_TEST_THEME"));
-        if (theme != null) mod.setTheme(theme);
+        //dev aid: open the menu on the title screen so every platform can be checked without a world
         if (System.getenv("ICARUS_TEST_OPEN") != null) {
             mod.addHud(new HudElement() {
                 private int ticks;
@@ -55,15 +47,6 @@ public class TestModCommon {
     }
 
     public static void notify(String title, String message) {
-        mod.notifications().send(new Notification(title, message));
-    }
-
-    private static void key(int keyCode) {
-        if (keyCode == Keys.KEY_K) notify("Test", "Test");
-        if (keyCode == Keys.KEY_J) notify("Test", "This is a very cool informational notification which is much larger in size.");
-        if (keyCode == Keys.KEY_L) {
-            notify("Hello", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec congue neque libero, a posuere erat pharetra sed. "
-                    + "Phasellus convallis nisi vel tortor malesuada commodo eu in nunc.");
-        }
+        if (mod != null) mod.notifications().send(new Notification(title, message));
     }
 }

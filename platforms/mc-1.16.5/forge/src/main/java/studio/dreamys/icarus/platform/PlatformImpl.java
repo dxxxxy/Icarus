@@ -29,6 +29,8 @@ public class PlatformImpl extends ModernPlatform {
         MinecraftForge.EVENT_BUS.addListener((InputEvent.KeyInputEvent e) -> {
             if (e.getAction() == GLFW.GLFW_PRESS && Minecraft.getInstance().screen == null) {
                 Icarus.onKeyPressed(Keys.fromGlfw(e.getKey()));
+            } else if (e.getAction() == GLFW.GLFW_RELEASE) {
+                Icarus.onKeyReleased(Keys.fromGlfw(e.getKey()));
             }
         });
         MinecraftForge.EVENT_BUS.addListener((RenderGameOverlayEvent.Text e) -> {

@@ -1,5 +1,6 @@
 package studio.dreamys.icarus;
 
+import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.config.ClassScanner;
 import studio.dreamys.icarus.platform.Platform;
@@ -43,6 +44,7 @@ public final class Icarus {
             installed = true;
         }
         List<Class<?>> pages = ClassScanner.findAnnotated(p.getModRoots(modid), p.getModClassLoader(modid), IPage.class);
+        if (options.pagesPackage != null) pages.removeIf(type -> !type.getName().startsWith(options.pagesPackage + "."));
         Path game = p.getGameDir().toPath();
         IcarusMod mod = new IcarusMod(modid, theme, options, pages, game.resolve("config").resolve(modid), game.resolve(modid));
         mods.add(mod);
@@ -87,6 +89,21 @@ public final class Icarus {
     public static void onKeyPressed(int key) {
         if (key <= 0 || !getPlatform().isInGame()) return;
         for (IcarusMod mod : mods) mod.onKeyPressed(key);
+    }
+
+    /** A key was released in game while no screen was open (drives "on hotkey" / "off hotkey" checkboxes). */
+    public static void onKeyReleased(int key) {
+        if (key <= 0 || platform == null) return;
+        for (IcarusMod mod : mods) mod.onKeyReleased(key);
+    }
+
+    /** A mouse button (0 left, 1 right, 2 middle, 3/4 side) was pressed in game while no screen was open. */
+    public static void onMousePressed(int button) {
+        onKeyPressed(Keys.mouse(button));
+    }
+
+    public static void onMouseReleased(int button) {
+        onKeyReleased(Keys.mouse(button));
     }
 
     /** The HUD is being drawn. */

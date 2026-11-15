@@ -20,6 +20,29 @@ public final class ListModel {
         this.items.addAll(Arrays.asList(items));
     }
 
+    private boolean searchable;
+    private double height;
+
+    /** Height of the list box in design units (0 lets the theme choose). */
+    public ListModel height(double height) {
+        this.height = height;
+        return this;
+    }
+
+    public double getHeight() {
+        return height;
+    }
+
+    /** Shows a search box above the list that filters it as the user types (classic theme). */
+    public ListModel searchable(boolean searchable) {
+        this.searchable = searchable;
+        return this;
+    }
+
+    public boolean isSearchable() {
+        return searchable;
+    }
+
     public List<String> getItems() {
         return view;
     }

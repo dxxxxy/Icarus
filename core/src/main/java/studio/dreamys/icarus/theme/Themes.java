@@ -11,16 +11,16 @@ import java.util.Map;
 
 /** The themes players can pick from. Register custom themes with {@link #register}. */
 public final class Themes {
-    /** Dark grey, icon tabs on the left, multi-colour accent strip. */
-    public static final Theme CLASSIC = new SkeetStyleTheme();
-    /** Indigo and pink, text tabs on top, three columns. */
-    public static final Theme NEON = new FatalityStyleTheme();
+    /** Recreation of the skeet / gamesense menu: icon tabs on the left, multi-colour strip, two columns. */
+    public static final Theme SKEET = new SkeetStyleTheme();
+    /** Recreation of the fatality menu: indigo and pink, text tabs in the header, three columns. */
+    public static final Theme FATALITY = new FatalityStyleTheme();
 
     private static final Map<String, Theme> themes = new LinkedHashMap<>();
 
     static {
-        register(CLASSIC);
-        register(NEON);
+        register(SKEET);
+        register(FATALITY);
     }
 
     private Themes() {

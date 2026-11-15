@@ -13,8 +13,10 @@ import studio.dreamys.icarus.settings.Setting;
 import studio.dreamys.icarus.settings.SubPageNode;
 import studio.dreamys.icarus.theme.ConfigUiStyle;
 import studio.dreamys.icarus.theme.Theme;
+import studio.dreamys.icarus.ui.popup.ContextPopup;
 import studio.dreamys.icarus.ui.popup.Popup;
 import studio.dreamys.icarus.ui.widget.ButtonWidget;
+import studio.dreamys.icarus.ui.widget.ColorWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
 import studio.dreamys.icarus.ui.widget.ListWidget;
 import studio.dreamys.icarus.ui.widget.Widget;
@@ -94,17 +96,26 @@ public final class Menu implements MenuController {
         boolean pageStyle = theme.getConfigUiStyle() == ConfigUiStyle.PAGE;
         if (configPanel != null) extra = groupView(configPanel.group(pageStyle));
 
+        boolean merged = false;
         for (PageNode page : mod.getModel().getPages()) {
             TabView tabView = new TabView(page, page.getLabel(), page.getIcon());
+            //a page with the config icon hosts the built-in config UI (first, in the first column) instead of a tab of its own
+            boolean host = extra != null && pageStyle && !merged && "config".equals(page.getIconName());
             for (SubPageNode sub : page.getSubPages()) {
                 SubTabView subView = new SubTabView(sub, sub.getLabel());
+                if (host) {
+                    extra.getGroup().column(0);
+                    subView.groups.add(extra);
+                    host = false;
+                    merged = true;
+                }
                 for (GroupNode group : sub.getGroups()) subView.groups.add(groupView(group));
                 if (extra != null && !pageStyle) subView.groups.add(extra);
                 tabView.subTabs.add(subView);
             }
             tabs.add(tabView);
         }
-        if (extra != null && pageStyle) {
+        if (extra != null && pageStyle && !merged) {
             TabView configTab = new TabView(null, extra.getLabel(), theme.getConfigIcon());
             SubTabView sub = new SubTabView(null, extra.getLabel());
             sub.groups.add(extra);
@@ -311,6 +322,16 @@ public final class Menu implements MenuController {
         p.resetAnimation();
     }
 
+    /** Opens a right-click menu at the given point (design units), replacing any open popup. */
+    public void openContext(ContextPopup context, double x, double y) {
+        closePopup();
+        focus(null);
+        context.anchorX = x;
+        context.anchorY = y;
+        popup = context;
+        context.resetAnimation();
+    }
+
     public void closePopup() {
         if (popup == null) return;
         if (popupCaptured) popup.mouseReleased(mouseX, mouseY, 0);
@@ -339,6 +360,11 @@ public final class Menu implements MenuController {
      * top-down, pinned groups stack at the bottom, and spare height is shared out. Groups that don't fit scroll.
      */
     public void layoutColumns(Canvas canvas, Rect area, int columns, double gap, GroupMetrics metrics) {
+        layoutColumns(canvas, area, columns, gap, metrics, null);
+    }
+
+    /** Like {@link #layoutColumns(Canvas, Rect, int, double, GroupMetrics)}, with column {@code i} starting {@code topOffsets[i]} lower. */
+    public void layoutColumns(Canvas canvas, Rect area, int columns, double gap, GroupMetrics metrics, double[] topOffsets) {
         content.set(area);
         List<GroupView> groups = getCurrentSubTab().groups;
         columns = Math.max(1, columns);
@@ -366,12 +392,19 @@ public final class Menu implements MenuController {
 
         for (int c = 0; c < columns; c++) {
             double x = area.x + c * (columnWidth + gap);
-            placeColumn(canvas, perColumn[c], x, area.y, columnWidth, area.h, gap, metrics);
+            double offset = topOffsets != null && c < topOffsets.length ? topOffsets[c] : 0;
+            placeColumn(canvas, perColumn[c], x, area.y + offset, columnWidth, area.h - offset, gap, metrics);
         }
     }
 
     private double natural(GroupView g, GroupMetrics m) {
+        double fixed = g.getGroup().getHeight();
+        if (fixed > 0) return fixed;
         return Math.max(m.minHeight, m.padTop + g.contentHeight + m.padBottom);
+    }
+
+    private static boolean grows(GroupView g) {
+        return !g.getGroup().isPinBottom() && g.getGroup().getHeight() <= 0;
     }
 
     private void placeColumn(Canvas canvas, List<GroupView> column, double x, double y, double width, double height, double gap, GroupMetrics m) {
@@ -387,16 +420,18 @@ public final class Menu implements MenuController {
         double[] heights = new double[column.size()];
         if (total <= available) {
             double extra = available - total;
-            int growers = top.isEmpty() ? 0 : top.size();
+            int growers = 0;
+            for (GroupView g : column) if (grows(g)) growers++;
             for (int i = 0; i < column.size(); i++) {
                 GroupView g = column.get(i);
                 double h = natural(g, m);
-                if (!g.getGroup().isPinBottom() && growers > 0) h += extra / growers;
+                if (grows(g) && growers > 0) h += extra / growers;
                 heights[i] = h;
             }
         } else {
             for (int i = 0; i < column.size(); i++) {
-                heights[i] = Math.max(m.minHeight, natural(column.get(i), m) * available / total);
+                GroupView g = column.get(i);
+                heights[i] = g.getGroup().getHeight() > 0 ? g.getGroup().getHeight() : Math.max(m.minHeight, natural(g, m) * available / total);
             }
         }
 
@@ -435,12 +470,20 @@ public final class Menu implements MenuController {
     private double stackRows(Canvas canvas, GroupView g, double x, double y, double width, double rowGap) {
         double cursor = y;
         boolean first = true;
+        Widget row = null;
+        int attached = 0;
         for (Widget w : g.getWidgets()) {
+            if (row != null && w instanceof ColorWidget && ((ColorWidget) w).isAttached()) {
+                theme.layoutAttachedColor(canvas, (ColorWidget) w, row, attached++);
+                continue;
+            }
+            attached = 0;
             double rowY = first ? cursor : cursor + rowGap;
             double h = w.layout(theme, canvas, x, rowY, width);
             if (h <= 0) continue;
             cursor = rowY + h;
             first = false;
+            row = w;
         }
         return cursor - y;
     }
@@ -549,7 +592,11 @@ public final class Menu implements MenuController {
     private Widget hitWidget(double x, double y) {
         for (GroupView g : getCurrentSubTab().groups) {
             if (!g.content.contains(x, y)) continue;
-            for (Widget w : g.getWidgets()) {
+            //last first: a swatch attached to a row sits on top of that row's widget
+            List<Widget> widgets = g.getWidgets();
+            for (int i = widgets.size() - 1; i >= 0; i--) {
+                Widget w = widgets.get(i);
+                if (w.getSetting().isDisabled()) continue;
                 KeybindWidget keybind = w.getKeybind();
                 if (keybind != null && keybind.contains(x, y)) return keybind;
                 if (w.contains(x, y)) return w;
@@ -567,6 +614,8 @@ public final class Menu implements MenuController {
     public void mousePressed(double guiX, double guiY, int button) {
         updateMouse(guiX, guiY);
         double x = mouseX, y = mouseY;
+
+        if (focused instanceof KeybindWidget && ((KeybindWidget) focused).bindMouse(button)) return;
 
         if (popup != null) {
             if (popup.contains(x, y)) {

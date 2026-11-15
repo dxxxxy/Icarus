@@ -13,7 +13,13 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface IPage {
     /** Tab icon: a character of the icon font (used by themes with icon tabs). */
-    char value();
+    char value() default ' ';
+
+    /**
+     * Named tab icon provided by the theme (e.g. the classic theme's "rage", "antiaim", "legit", "visuals", "misc",
+     * "skins", "players", "config"); takes precedence over {@link #value()} when the theme has it.
+     */
+    String icon() default "";
 
     /** Tab position; lower comes first. Ties are ordered by class name. */
     int order() default Integer.MAX_VALUE;

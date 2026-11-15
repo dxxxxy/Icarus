@@ -12,6 +12,8 @@ public class ForgeHooks {
     public void onKeyInput(InputEvent.KeyInputEvent e) {
         if (Keyboard.getEventKeyState()) { //if the key is down
             Icarus.onKeyPressed(Keyboard.getEventKey()); //LWJGL2 codes are Icarus' codes
+        } else {
+            Icarus.onKeyReleased(Keyboard.getEventKey());
         }
     }
 

@@ -23,7 +23,7 @@ public final class Setting<T> {
 
     private final GroupNode group;
     private final String name;
-    private final String label;
+    private String label;
     private final SettingType<T> type;
     private final Holder<T> holder;
     private final Field field;
@@ -35,6 +35,10 @@ public final class Setting<T> {
     private final int defaultKey;
 
     private T defaultValue;
+    boolean attached;
+    boolean warning;
+    boolean disabled;
+    KeybindMode defaultMode = KeybindMode.TOGGLE;
     private SettingListener listener;
     private Object extra;
 
@@ -42,7 +46,7 @@ public final class Setting<T> {
             List<String> options, SliderSpec slider, int maxLength, int defaultKey) {
         this.group = group;
         this.name = name;
-        this.label = name.replace('_', ' ');
+        this.label = Labels.of(field, name);
         this.type = type;
         this.holder = holder;
         this.field = field;
@@ -118,6 +122,12 @@ public final class Setting<T> {
         return label;
     }
 
+    /** Replaces the shown label (for settings created in code); empty hides it in themes that allow that. */
+    public Setting<T> labelled(String label) {
+        this.label = label == null ? "" : label;
+        return this;
+    }
+
     public SettingType<T> getType() {
         return type;
     }
@@ -156,6 +166,26 @@ public final class Setting<T> {
         return defaultKey >= 0;
     }
 
+    /** Whether the setting is drawn on the previous setting's row ({@code @IAttach}). */
+    public boolean isAttached() {
+        return attached;
+    }
+
+    /** Whether the setting is shown greyed out and ignores input ({@code @IDisabled}). */
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    /** Whether the setting is marked risky ({@code @IWarning}). */
+    public boolean isWarning() {
+        return warning;
+    }
+
+    /** Keybind mode from {@code @IKeybind} (checkboxes). */
+    public KeybindMode getDefaultMode() {
+        return defaultMode;
+    }
+
     /** The {@link Keys} code from {@code @IKeybind}, {@link Keys#KEY_NONE} for none, or -1 if not bindable. */
     public int getDefaultKey() {
         return defaultKey;
@@ -171,6 +201,8 @@ public final class Setting<T> {
         private final double min, max;
         private final boolean onlyInt;
         private final String units;
+        private double step;
+        private String minText = "", maxText = "";
 
         public SliderSpec(double min, double max, boolean onlyInt, String units) {
             if (!(max > min)) throw new IllegalArgumentException("slider max (" + max + ") must be greater than min (" + min + ")");
@@ -196,11 +228,34 @@ public final class Setting<T> {
             return units;
         }
 
+        /** Step for -/+ buttons and nudging. */
+        public double getStep() {
+            if (step > 0) return step;
+            return onlyInt ? 1 : (max - min) / 100;
+        }
+
+        public SliderSpec step(double step) {
+            this.step = step;
+            return this;
+        }
+
+        /** Texts shown at the ends of the range instead of the value (empty to show the value). */
+        public SliderSpec endTexts(String minText, String maxText) {
+            this.minText = minText == null ? "" : minText;
+            this.maxText = maxText == null ? "" : maxText;
+            return this;
+        }
+
         /** Clamps and rounds a value to what this slider can hold. */
         public double sanitize(double value) {
             if (Double.isNaN(value)) value = min;
             value = Math.max(min, Math.min(max, value));
             if (onlyInt) return Math.round(value);
+            if (step > 0) {
+                value = Math.max(min, Math.min(max, min + Math.round((value - min) / step) * step));
+                int decimals = Math.max(2, java.math.BigDecimal.valueOf(step).stripTrailingZeros().scale());
+                return java.math.BigDecimal.valueOf(value).setScale(decimals, java.math.RoundingMode.HALF_UP).doubleValue();
+            }
             return java.math.BigDecimal.valueOf(value).setScale(2, java.math.RoundingMode.HALF_UP).doubleValue();
         }
 
@@ -213,7 +268,15 @@ public final class Setting<T> {
         }
 
         public String format(double value) {
-            String number = onlyInt ? Long.toString(Math.round(value)) : java.math.BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
+            if (!minText.isEmpty() && value <= min) return minText;
+            if (!maxText.isEmpty() && value >= max) return maxText;
+            String number;
+            if (onlyInt) number = Long.toString(Math.round(value));
+            else if (step > 0) {
+                //as many decimals as the step has (0.1 -> "10.0", 0.05 -> "0.65")
+                int decimals = Math.max(0, java.math.BigDecimal.valueOf(step).stripTrailingZeros().scale());
+                number = java.math.BigDecimal.valueOf(value).setScale(decimals, java.math.RoundingMode.HALF_UP).toPlainString();
+            } else number = java.math.BigDecimal.valueOf(value).stripTrailingZeros().toPlainString();
             return number + units;
         }
     }

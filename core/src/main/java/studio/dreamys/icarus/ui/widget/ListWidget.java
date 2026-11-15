@@ -1,5 +1,9 @@
 package studio.dreamys.icarus.ui.widget;
 
+import studio.dreamys.icarus.input.Keys;
+import java.util.ArrayList;
+import java.util.Locale;
+
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.settings.ListModel;
 import studio.dreamys.icarus.settings.Setting;
@@ -20,6 +24,12 @@ public final class ListWidget extends Widget {
     public int visibleRows;
     private int scroll;
     private int hovered = -1;
+    /** The search box when the model is searchable (else empty), set during layout. */
+    public final Rect search = new Rect();
+    private final StringBuilder query = new StringBuilder();
+    private final List<String> filtered = new ArrayList<>();
+    private String filteredFor;
+    private int filteredVersion = -1;
 
     public ListWidget(Menu menu, Setting<String> setting, ListModel model) {
         super(menu, setting);
@@ -27,8 +37,35 @@ public final class ListWidget extends Widget {
         this.model = model;
     }
 
+    /** The items shown: all of them, or those matching the search text. */
     public List<String> getItems() {
-        return model.getItems();
+        if (query.length() == 0) return model.getItems();
+        String q = query.toString();
+        if (!q.equals(filteredFor) || filteredVersion != model.getVersion()) {
+            filtered.clear();
+            String lower = q.toLowerCase(Locale.ROOT);
+            for (String item : model.getItems()) if (item.toLowerCase(Locale.ROOT).contains(lower)) filtered.add(item);
+            filteredFor = q;
+            filteredVersion = model.getVersion();
+        }
+        return filtered;
+    }
+
+    public ListModel getModel() {
+        return model;
+    }
+
+    public boolean isSearchable() {
+        return model.isSearchable();
+    }
+
+    /** The search text. */
+    public String getQuery() {
+        return query.toString();
+    }
+
+    public boolean isSearchFocused() {
+        return menu.getFocused() == this;
     }
 
     public String getSelected() {
@@ -57,18 +94,43 @@ public final class ListWidget extends Widget {
 
     @Override
     public boolean contains(double x, double y) {
-        return box.contains(x, y);
+        return box.contains(x, y) || search.contains(x, y);
     }
 
     @Override
     public boolean mousePressed(double x, double y, int button) {
         if (button != 0) return false;
+        if (search.contains(x, y)) {
+            menu.focus(this);
+            return false;
+        }
         int index = indexAt(y);
         if (index >= 0) {
             selection.set(getItems().get(index));
             menu.interactionEnded();
         }
         return false;
+    }
+
+    @Override
+    public boolean keyPressed(int key) {
+        if (key == Keys.KEY_BACK) {
+            if (query.length() > 0) query.setLength(query.length() - 1);
+            scroll = 0;
+            return true;
+        }
+        if (key == Keys.KEY_ESCAPE || key == Keys.KEY_RETURN) {
+            menu.focus(null);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void charTyped(int codePoint) {
+        if (codePoint < 32 || query.length() >= 48) return;
+        query.appendCodePoint(codePoint);
+        scroll = 0;
     }
 
     @Override

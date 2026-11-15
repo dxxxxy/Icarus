@@ -17,6 +17,8 @@ public class KeyboardHandlerMixin {
     private void icarus$keyPress(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
         if (action == GLFW.GLFW_PRESS && window == Minecraft.getInstance().getWindow().getWindow() && Minecraft.getInstance().screen == null) {
             PlatformImpl.keyPressed(Keys.fromGlfw(key));
+        } else if (action == GLFW.GLFW_RELEASE) {
+            PlatformImpl.keyReleased(Keys.fromGlfw(key));
         }
     }
 }

@@ -13,7 +13,10 @@ import studio.dreamys.icarus.settings.Setting;
 import studio.dreamys.icarus.support.FakePlatform;
 import studio.dreamys.icarus.support.Fixture;
 import studio.dreamys.icarus.theme.skeet.SkeetStyleTheme;
+import studio.dreamys.icarus.settings.KeybindMode;
+import studio.dreamys.icarus.ui.popup.ContextPopup;
 import studio.dreamys.icarus.ui.popup.DropdownPopup;
+import studio.dreamys.icarus.ui.widget.ColorWidget;
 import studio.dreamys.icarus.ui.widget.CheckboxWidget;
 import studio.dreamys.icarus.ui.widget.ChoiceWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
@@ -187,6 +190,42 @@ class MenuTest {
         click(menu, keybind.label.centerX(), keybind.label.centerY());
         menu.keyPressed(Keys.KEY_G);
         assertEquals(Keys.KEY_G, mod.getKeybinds().get(setting));
+    }
+
+    @Test
+    void rightClickKeybindPicksAMode() {
+        IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
+        Menu menu = mod.getMenu();
+        frame(menu, 0, 0);
+        KeybindWidget keybind = widget(menu, CheckboxWidget.class, "Enabled").getKeybind();
+        menu.mousePressed(keybind.label.centerX() / 2, keybind.label.centerY() / 2, 1);
+        assertTrue(menu.getPopup() instanceof ContextPopup, "right click opens the mode menu");
+        ContextPopup modes = (ContextPopup) menu.getPopup();
+        frame(menu, 0, 0);
+        assertEquals(KeybindMode.TOGGLE.ordinal(), modes.getSelected());
+        click(menu, modes.bounds.centerX(), modes.bounds.y + modes.itemHeight * 1.5);
+        assertNull(menu.getPopup());
+        assertEquals(KeybindMode.ON_HOTKEY, mod.getKeybinds().getMode(keybind.getSetting()));
+    }
+
+    @Test
+    void rightClickColourCopiesAndPastes() {
+        IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
+        Menu menu = mod.getMenu();
+        frame(menu, 0, 0);
+        ColorWidget tint = widget(menu, ColorWidget.class, "Tint");
+        menu.mousePressed(tint.swatch.centerX() / 2, tint.swatch.centerY() / 2, 1);
+        ContextPopup context = (ContextPopup) menu.getPopup();
+        frame(menu, 0, 0);
+        click(menu, context.bounds.centerX(), context.bounds.y + context.itemHeight * 0.5);
+        assertEquals("#FF0000FF", platform.clipboard);
+
+        platform.clipboard = "#00FF0080";
+        menu.mousePressed(tint.swatch.centerX() / 2, tint.swatch.centerY() / 2, 1);
+        context = (ContextPopup) menu.getPopup();
+        frame(menu, 0, 0);
+        click(menu, context.bounds.centerX(), context.bounds.y + context.itemHeight * 1.5);
+        assertEquals(new java.awt.Color(0, 255, 0, 128), Fixture.Combat.Second.Tint);
     }
 
     @Test

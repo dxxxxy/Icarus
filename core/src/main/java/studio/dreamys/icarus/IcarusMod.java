@@ -6,6 +6,7 @@ import studio.dreamys.icarus.hud.HudElement;
 import studio.dreamys.icarus.hud.Notifications;
 import studio.dreamys.icarus.platform.Platform;
 import studio.dreamys.icarus.render.FrameRenderer;
+import studio.dreamys.icarus.settings.KeybindMode;
 import studio.dreamys.icarus.settings.Keybinds;
 import studio.dreamys.icarus.settings.ModelBuilder;
 import studio.dreamys.icarus.settings.Setting;
@@ -192,7 +193,10 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     @Override
     public void keybindChanged(Setting<?> setting, boolean byUser) {
-        if (byUser) store.markDirty();
+        if (byUser) {
+            store.markDirty();
+            applyRestingState(setting);
+        }
     }
 
     /* ---- HUD, keys, ticks ---- */
@@ -233,10 +237,41 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
                 if (action != null) action.run();
             } else if (setting.getType() == SettingTypes.CHECKBOX) {
                 @SuppressWarnings("unchecked") Setting<Boolean> toggle = (Setting<Boolean>) setting;
-                toggle.set(!Boolean.TRUE.equals(toggle.get()));
+                switch (keybinds.getMode(setting)) {
+                    case TOGGLE:
+                        toggle.set(!Boolean.TRUE.equals(toggle.get()));
+                        break;
+                    case ON_HOTKEY:
+                        toggle.set(true);
+                        break;
+                    case OFF_HOTKEY:
+                        toggle.set(false);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
         for (IntConsumer listener : keyListeners) listener.accept(key);
+    }
+
+    void onKeyReleased(int key) {
+        for (Map.Entry<Setting<?>, Integer> binding : keybinds.asMap().entrySet()) {
+            if (binding.getValue() != key || binding.getKey().getType() != SettingTypes.CHECKBOX) continue;
+            @SuppressWarnings("unchecked") Setting<Boolean> toggle = (Setting<Boolean>) binding.getKey();
+            KeybindMode mode = keybinds.getMode(toggle);
+            if (mode == KeybindMode.ON_HOTKEY) toggle.set(false);
+            else if (mode == KeybindMode.OFF_HOTKEY) toggle.set(true);
+        }
+    }
+
+    /** Puts a bound checkbox in the resting state of its mode (after the user picked a mode). */
+    private void applyRestingState(Setting<?> setting) {
+        if (setting.getType() != SettingTypes.CHECKBOX) return;
+        @SuppressWarnings("unchecked") Setting<Boolean> toggle = (Setting<Boolean>) setting;
+        KeybindMode mode = keybinds.getMode(setting);
+        if (mode == KeybindMode.ALWAYS_ON || mode == KeybindMode.OFF_HOTKEY) toggle.set(true);
+        else if (mode == KeybindMode.ON_HOTKEY) toggle.set(false);
     }
 
     void tick() {

@@ -6,6 +6,7 @@ import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.ui.GroupView;
 import studio.dreamys.icarus.ui.Menu;
 import studio.dreamys.icarus.ui.popup.ColorPopup;
+import studio.dreamys.icarus.ui.popup.ContextPopup;
 import studio.dreamys.icarus.ui.popup.DropdownPopup;
 import studio.dreamys.icarus.ui.widget.ButtonWidget;
 import studio.dreamys.icarus.ui.widget.CheckboxWidget;
@@ -14,8 +15,10 @@ import studio.dreamys.icarus.ui.widget.ColorWidget;
 import studio.dreamys.icarus.ui.widget.ComboWidget;
 import studio.dreamys.icarus.ui.widget.FieldWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
+import studio.dreamys.icarus.ui.widget.LabelWidget;
 import studio.dreamys.icarus.ui.widget.ListWidget;
 import studio.dreamys.icarus.ui.widget.SliderWidget;
+import studio.dreamys.icarus.ui.widget.Widget;
 
 /**
  * A complete look for the menu and HUD: window chrome, layout and every widget. Widgets and the menu only hold
@@ -92,6 +95,16 @@ public interface Theme {
 
     void paintList(Canvas canvas, ListWidget widget);
 
+    /**
+     * A swatch shown on another widget's row ({@code @IAttach}); sets the swatch inside {@code row}'s bounds.
+     * {@code index} counts the swatches already on that row (0 for the first), so several can line up.
+     */
+    void layoutAttachedColor(Canvas canvas, ColorWidget widget, Widget row, int index);
+
+    double layoutLabel(Canvas canvas, LabelWidget widget, double x, double y, double width);
+
+    void paintLabel(Canvas canvas, LabelWidget widget);
+
     void paintKeybind(Canvas canvas, KeybindWidget widget);
 
     /** Keybind label text, e.g. "[DEL]". {@code refused} is true briefly after the menu key was pressed. */
@@ -102,6 +115,11 @@ public interface Theme {
     void layoutDropdown(Canvas canvas, DropdownPopup popup);
 
     void paintDropdown(Canvas canvas, DropdownPopup popup);
+
+    /** Right-click menu at {@code popup.anchorX/anchorY}: sets its bounds and item height. */
+    void layoutContext(Canvas canvas, ContextPopup popup);
+
+    void paintContext(Canvas canvas, ContextPopup popup);
 
     void layoutColorPicker(Canvas canvas, ColorPopup popup);
 

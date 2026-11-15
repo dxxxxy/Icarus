@@ -12,4 +12,13 @@ public @interface SliderOptions {
     double max();
     boolean onlyInt() default false;
     String units() default "";
+
+    /** Step of themes with -/+ buttons (and of keyboard/scroll nudging); 0 means 1 for integer sliders, 1% of the range otherwise. */
+    double step() default 0;
+
+    /** Shown instead of the value at the minimum (e.g. "Off"); empty shows the value. */
+    String minText() default "";
+
+    /** Shown instead of the value at the maximum (e.g. "∞"); empty shows the value. */
+    String maxText() default "";
 }
