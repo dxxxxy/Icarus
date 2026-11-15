@@ -4,7 +4,8 @@ name: Release
 #   1. build and test every target with the tag's version,
 #   2. deploy each jar as studio.dreamys:icarus-<loader>-<minecraft>:<version> to DxxxxY/repo (served at
 #      https://repo.dreamys.studio/),
-#   3. create a GitHub release with the jars attached and .github/release-notes/<tag>.md as its notes.
+#   3. deploy the same artifacts to GitHub Packages (https://maven.pkg.github.com/<owner>/<repo>),
+#   4. create a GitHub release with the jars attached and .github/release-notes/<tag>.md as its notes.
 # The tag sets the version; gradle.properties' icarus_version is only for local builds.
 #
 # Needs the secret MAVEN_REPO_DEPLOY_KEY: the private half of a deploy key with write access on DxxxxY/repo.
@@ -19,6 +20,7 @@ concurrency:
 
 permissions:
   contents: write # the GitHub release
+  packages: write # GitHub Packages
 
 jobs:
   publish:
@@ -30,6 +32,10 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          # writes ~/.m2/settings.xml with credentials for GitHub Packages
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: true
@@ -83,6 +89,24 @@ jobs:
           # other projects deploy to this repository too
           git pull --rebase
           git push
+
+      - name: Deploy to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          # GitHub Packages refuses to overwrite a version, so skip what a previous run already deployed
+          url="https://maven.pkg.github.com/${GITHUB_REPOSITORY,,}"
+          for jar in dist/*.jar; do
+            artifact="$(basename "$jar" "-$VERSION.jar")"
+            pom="$url/studio/dreamys/$artifact/$VERSION/$artifact-$VERSION.pom"
+            if curl -sfI -u "$GITHUB_ACTOR:$GITHUB_TOKEN" "$pom" > /dev/null; then
+              echo "$artifact:$VERSION is already on GitHub Packages"
+              continue
+            fi
+            mvn -B -ntp org.apache.maven.plugins:maven-deploy-plugin:3.1.2:deploy-file \
+              -Dfile="$jar" -DgroupId=studio.dreamys -DartifactId="$artifact" -Dversion="$VERSION" \
+              -Dpackaging=jar -DgeneratePom=true -DrepositoryId=github -Durl="$url"
+          done
 
       - name: GitHub release
         env:
