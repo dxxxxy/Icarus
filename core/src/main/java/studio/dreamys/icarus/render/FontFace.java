@@ -69,6 +69,9 @@ public final class FontFace {
         float advance = (float) vector.getGlyphMetrics(0).getAdvanceX();
         Rectangle bounds = vector.getPixelBounds(frc, 0, 0);
 
+        //a thin stem hinted flush against its advance (Segoe UI Bold "I" at 11px) would touch the next glyph
+        if (bounds.width > 0 && bounds.width <= 2 && bounds.x >= 1 && bounds.x + bounds.width >= advance) advance += 1;
+
         Glyph glyph = new Glyph();
         glyph.advance = advance;
         glyph.generation = atlas.getGeneration();

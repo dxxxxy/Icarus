@@ -56,7 +56,11 @@ public class TestModCommon {
 
                 @Override
                 public void tick() {
-                    if (++ticks == 100) mod.openMenu();
+                    if (++ticks == 100) {
+                        mod.openMenu();
+                        //a long toast, to check toasts over the menu without a world
+                        mod.toasts().send(new Toast("Icarus", "Menu opened by ICARUS_TEST_OPEN.", 600));
+                    }
                 }
             });
         }

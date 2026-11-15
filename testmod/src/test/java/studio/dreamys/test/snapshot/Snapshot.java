@@ -71,6 +71,14 @@ public final class Snapshot {
             menu.mouseReleased(cx * scale / platform.guiScale, cy * scale / platform.guiScale, 0);
         }
 
+        //optional toast (title|message), slid fully in
+        String toast = System.getenv("SNAPSHOT_TOAST");
+        if (toast != null) {
+            String[] parts = toast.split("[|]", 2);
+            mod.toasts().send(parts[0], parts.length > 1 ? parts[1] : "");
+            for (int i = 0; i < 20; i++) mod.toasts().tick();
+        }
+
         //optional typed text into whatever the clicks focused
         String typed = System.getenv("SNAPSHOT_TYPE");
         if (typed != null) typed.codePoints().forEach(menu::charTyped);

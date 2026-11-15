@@ -27,3 +27,6 @@ tasks.register<JavaExec>("snapshot") {
     workingDir = projectDir
     systemProperty("java.awt.headless", "true")
 }
+
+// src/test only holds the snapshot tool above, no tests; Gradle 9 fails a test task that finds none
+tasks.test { enabled = false }

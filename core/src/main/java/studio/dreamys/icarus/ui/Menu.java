@@ -70,6 +70,10 @@ public final class Menu implements MenuController {
 
     private double mouseX, mouseY;
     private double viewWidth, viewHeight;
+    /** Framebuffer pixels kept free around a window that had to shrink to fit. */
+    private static final double FIT_MARGIN = 8;
+    /** View size the window was last kept on screen for; -1 forces a check (on open). */
+    private double clampedViewWidth = -1, clampedViewHeight = -1;
     private long lastFrame;
     private float dt;
 
@@ -524,6 +528,7 @@ public final class Menu implements MenuController {
         mod.setMenuOpen(true);
         if (closing || fadeStart == 0) fadeStart = System.nanoTime(); //a resize re-opens without fading again
         closing = false;
+        clampedViewWidth = clampedViewHeight = -1;
         if (configPanel != null) configPanel.refresh();
         lastFrame = 0;
     }
@@ -532,8 +537,8 @@ public final class Menu implements MenuController {
     public void render(double guiX, double guiY, float partialTick) {
         Platform platform = Icarus.getPlatform();
         double guiScale = platform.getGuiScale();
-        double scale = mod.renderScale(guiScale);
         int fbWidth = platform.getFramebufferWidth(), fbHeight = platform.getFramebufferHeight();
+        double scale = fitScale(guiScale, fbWidth, fbHeight);
         viewWidth = fbWidth / scale;
         viewHeight = fbHeight / scale;
         mouseX = guiX * guiScale / scale;
@@ -555,14 +560,17 @@ public final class Menu implements MenuController {
         //2. layout
         layoutCanvas.setup(Icarus.getAtlas(), scale);
         theme.layout(this, layoutCanvas);
-        if (!positioned) {
+        boolean shrunk = scale < mod.renderScale(guiScale);
+        if (!positioned || shrunk) { //a window shrunk to fit fills the screen, so it stays centred
             window.x = Math.round((viewWidth - window.w) / 2);
             window.y = Math.round((viewHeight - window.h) / 2);
             positioned = true;
             theme.layout(this, layoutCanvas);
-        } else if (clampWindow()) {
+        } else if (viewWidth != clampedViewWidth || viewHeight != clampedViewHeight ? keepWholeWindowVisible() : clampWindow()) {
             theme.layout(this, layoutCanvas);
         }
+        clampedViewWidth = viewWidth;
+        clampedViewHeight = viewHeight;
         if (popup != null) popup.layout(theme, layoutCanvas);
 
         //3. hover
@@ -587,6 +595,20 @@ public final class Menu implements MenuController {
         //4. paint, then the toasts on top
         frame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, paintPass);
         mod.renderOverMenu(partialTick);
+    }
+
+    /**
+     * On open and after a resize, a window that fits is moved fully on screen (a saved position may come from a
+     * bigger screen); dragging may still leave part of it off screen. Returns whether it moved.
+     */
+    private boolean keepWholeWindowVisible() {
+        if (window.w <= 0 || viewWidth <= 0 || window.w > viewWidth || window.h > viewHeight) return clampWindow();
+        double x = Math.max(0, Math.min(viewWidth - window.w, window.x));
+        double y = Math.max(0, Math.min(viewHeight - window.h, window.y));
+        boolean moved = x != window.x || y != window.y;
+        window.x = x;
+        window.y = y;
+        return moved;
     }
 
     /** Keeps part of the window on screen; returns whether it moved. */
@@ -798,10 +820,23 @@ public final class Menu implements MenuController {
         mod.menuClosed();
     }
 
+    /**
+     * The mod's render scale, shrunk when the window wouldn't fit the screen at it (e.g. 720p at the default GUI
+     * scale), keeping a small margin. Uses the window size from the previous layout.
+     */
+    private double fitScale(double guiScale, int fbWidth, int fbHeight) {
+        double scale = mod.renderScale(guiScale);
+        if (window.w > 0 && window.h > 0) {
+            double fit = Math.min((fbWidth - 2 * FIT_MARGIN) / window.w, (fbHeight - 2 * FIT_MARGIN) / window.h);
+            if (fit > 0 && fit < scale) scale = fit;
+        }
+        return scale;
+    }
+
     private void updateMouse(double guiX, double guiY) {
         Platform platform = Icarus.getPlatform();
         double guiScale = platform.getGuiScale();
-        double scale = mod.renderScale(guiScale);
+        double scale = fitScale(guiScale, platform.getFramebufferWidth(), platform.getFramebufferHeight());
         mouseX = guiX * guiScale / scale;
         mouseY = guiY * guiScale / scale;
     }
