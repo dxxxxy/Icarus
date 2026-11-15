@@ -22,6 +22,8 @@ public final class GroupView {
     double contentHeight;
     /** Height counted in {@link #contentHeight} that rows don't draw into (the theme's row offset), so it never scrolls. */
     double slack;
+    /** Extra height below {@link #content} that is still drawn (see GroupMetrics#clipBelow). */
+    double clipBelow;
 
     GroupView(GroupNode group) {
         this.group = group;

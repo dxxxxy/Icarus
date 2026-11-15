@@ -55,6 +55,10 @@ public class FatalityStyleTheme extends BaseTheme {
     protected static final int PANEL_EDGE = 0xFF393153;
     protected static final int PANEL_BG = 0xFF191337;
     /** The panel and the groups darken a little toward the bottom. */
+    protected static final double POPUP_ITEM_H = 16.75;
+    /** Height of the fade at the bottom of an overflowing group. */
+    protected static final double FADE_H = 12;
+    protected static final int POPUP_BOTTOM = 0xFF171139;
     protected static final int LIST_TOP = 0xFF1C1641, LIST_BOTTOM = 0xFF18123A, SEARCH_BG = 0xFF150E3C, SEARCH_HINT = 0xFF2C2654;
     protected static final int PANEL_FILL_TOP = 0xFF181334, PANEL_FILL_BOTTOM = 0xFF14112D;
     protected static final int SUBTAB_BG = 0xFF1F193F;
@@ -89,6 +93,8 @@ public class FatalityStyleTheme extends BaseTheme {
         groupMetrics.rowOffset = 3;
         //stacked groups sit a pixel closer than the columns
         groupMetrics.stackGap = GAP - 1;
+        //an overflowing group shows its next row fading out down to the frame
+        groupMetrics.clipBelow = 5;
     }
     private final Rect panel = new Rect();
     /** The small text of keybind boxes ("NONE"). */
@@ -296,7 +302,7 @@ public class FatalityStyleTheme extends BaseTheme {
                 double sx = slot.getValue()[0], sw = slot.getValue()[1];
                 boolean active = slot.getKey().equals(activeLabel);
                 boolean hovered = !active && menu.getMouseX() >= sx && menu.getMouseX() < sx + sw && menu.getMouseY() >= panel.y && menu.getMouseY() < w.y + SUBTAB_DIVIDER;
-                capText(c, font, upper(slot.getKey()), sx + SUBTAB_PAD, w.y + 99, active ? TEXT_BRIGHT : hovered ? TAB_HOVER : TAB_IDLE);
+                capText(c, font, upper(slot.getKey()), sx + SUBTAB_PAD, w.y + 99 - (active ? 3 : 0), active ? TEXT_BRIGHT : hovered ? TAB_HOVER : TAB_IDLE);
                 if (active) c.rect(sx, w.y + SUBTAB_DIVIDER - 4, sw, 3, accent);
             }
             if (weaponRow) {
@@ -376,8 +382,10 @@ public class FatalityStyleTheme extends BaseTheme {
     public void paintGroupForeground(Canvas c, Menu menu, GroupView g) {
         if (!g.isScrollable()) return;
         Rect f = g.frame;
-        //a small down arrow in the corner while there is more below
+        //a small down arrow in the corner while there is more below, over rows fading into the frame
         if (g.getScroll() < g.getContentHeight() - g.content.h - 0.5) {
+            double fadeTop = f.bottom() - 1 - FADE_H;
+            c.gradientV(f.x + 1, fadeTop, f.w - 2, FADE_H, GROUP_BOTTOM & 0x00FFFFFF, GROUP_BOTTOM);
             double ax = f.right() - 10, ay = f.bottom() - 7;
             c.triangle(ax - 3, ay - 2, ax + 3, ay - 2, ax, ay + 1, TAB_IDLE);
         }
@@ -576,12 +584,14 @@ public class FatalityStyleTheme extends BaseTheme {
 
     protected void dropdown(Canvas c, Widget w, Rect b, String value, boolean open) {
         int accent = w.getMenu().getAccent();
-        c.rect(b.x, b.y, b.w, b.h, open ? accent : Colors.mix(GROUP_EDGE, accent, 0.3 * w.getHover()));
-        c.gradientV(b.x + 1, b.y + 1, b.w - 2, b.h - 2, CONTROL_BG, 0xFF17113C);
-        //the pink button with three lines
-        double bw = 18, bx = b.right() - bw - 1, by = b.y + 1, bh = b.h - 2;
+        c.rect(b.x, b.y, b.w, b.h, Colors.mix(GROUP_EDGE, accent, open ? 0.5 : 0.3 * w.getHover()));
+        c.gradientV(b.x + 1, b.y + 1, b.w - 2, b.h - 2, LIST_TOP, 0xFF17113C);
+        //an open box gets a dark pink inner ring
+        if (open) c.outline(b.x + 1, b.y + 1, b.w - 2, b.h - 2, Colors.shade(accent, 0.4));
+        //the pink button with three lines: the box's full height, 2px in from its right edge
+        double bw = 19, bx = b.right() - bw - 2, by = b.y, bh = b.h;
         accentBox(c, bx, by, bw, bh, accent, w.getHover() + (open ? 1 : 0));
-        for (int i = 0; i < 3; i++) c.rect(bx + 5, by + 4 + i * 3, bw - 10, 1, Colors.shade(accent, 0.55));
+        for (int i = 0; i < 3; i++) c.rect(bx + 5, by + 5 + i * 3, bw - 10, 1, Colors.shade(accent, 0.55));
         Font font = text(c);
         capText(c, font, c.fit(font, value, b.w - bw - 12), b.x + 6, b.y + 5, TEXT_DIM);
     }
@@ -694,37 +704,34 @@ public class FatalityStyleTheme extends BaseTheme {
     public void layoutDropdown(Canvas c, DropdownPopup popup) {
         Rect box = popup.getOwner() instanceof ChoiceWidget ? ((ChoiceWidget) popup.getOwner()).box : ((ComboWidget) popup.getOwner()).box;
         int rows = Math.min(popupMaxRows, popup.getOptions().size());
-        popup.itemHeight = popupItemHeight;
+        popup.itemHeight = POPUP_ITEM_H;
+        popup.padTop = 3;
         popup.visibleRows = rows;
-        double h = rows * popupItemHeight + 2;
-        double y = box.bottom() - 1;
+        //measured: the box's full width, 3px below it, options 16.75px apart with 3px above and 4px below
+        double h = rows * POPUP_ITEM_H + 7;
+        double y = box.bottom() + 3;
         Menu menu = popup.getOwner().getMenu();
-        if (y + h > menu.getViewHeight() && box.y - h >= 0) y = box.y - h + 1;
-        popup.bounds.set(box.x, y, box.w - 19, h);
+        if (y + h > menu.getViewHeight() && box.y - h - 3 >= 0) y = box.y - h - 3;
+        popup.bounds.set(box.x, y, box.w, h);
     }
 
     @Override
     public void paintDropdown(Canvas c, DropdownPopup p) {
+        //opens at once (no roll); hovered options turn white, selected ones pink
         Rect b = p.bounds;
-        //the options roll open over a few frames
-        double reveal = Math.min(1, p.getOpen());
-        double shown = b.h * (1 - Math.pow(1 - reveal, 3));
         int accent = p.getOwner().getMenu().getAccent();
-        c.pushClip(b.x, b.y, b.w, shown);
         c.rect(b.x, b.y, b.w, b.h, GROUP_EDGE);
-        c.rect(b.x + 1, b.y + 1, b.w - 2, b.h - 2, 0xFF1C1645);
+        c.gradientV(b.x + 1, b.y + 1, b.w - 2, b.h - 2, SEARCH_BG, POPUP_BOTTOM);
         List<String> options = p.getOptions();
         Font font = text(c);
         for (int row = 0; row < p.visibleRows; row++) {
             int index = p.getScroll() + row;
             if (index >= options.size()) break;
-            double y = b.y + 1 + row * p.itemHeight;
-            boolean hovered = index == p.getHovered();
-            if (hovered) c.rect(b.x + 1, y, b.w - 2, p.itemHeight, 0xFF262057);
+            double y = b.y + 3 + row * p.itemHeight;
             boolean selected = p.getSource().isSelected(index);
-            capText(c, font, c.fit(font, options.get(index), b.w - 10), b.x + 6, y + 5, selected ? accent : hovered ? TEXT : TEXT_DIM);
+            int color = selected ? accent : index == p.getHovered() ? TEXT_BRIGHT : TEXT_DIM;
+            capText(c, font, c.fit(font, options.get(index), b.w - 10), b.x + 6, Math.round(y + 5), color);
         }
-        c.popClip();
     }
 
     @Override

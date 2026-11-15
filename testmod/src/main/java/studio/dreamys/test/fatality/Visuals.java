@@ -67,7 +67,7 @@ public class Visuals {
             @IAttach
             public static Color Pingspike_color = new Color(255, 255, 255);
 
-            @DropdownOptions({"Money", "Armor", "Scoped", "Flashed", "Defuser"})
+            @DropdownOptions({"Money", "Armor", "Scoped", "Hit", "Defuser", "Bomb", "LC", "Fake duck"})
             public static String[] Info = {};
 
             public static boolean Sound = false;

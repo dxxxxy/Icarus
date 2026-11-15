@@ -21,6 +21,8 @@ public final class DropdownPopup extends Popup {
     private final Source source;
     /** Row height and visible rows, set by the theme. */
     public double itemHeight;
+    /** Space above the first option, set by the theme. */
+    public double padTop;
     public int visibleRows;
     private int scroll;
     private int hovered = -1;
@@ -49,7 +51,7 @@ public final class DropdownPopup extends Popup {
 
     private int indexAt(double y) {
         if (itemHeight <= 0) return -1;
-        int row = (int) Math.floor((y - bounds.y) / itemHeight);
+        int row = (int) Math.floor((y - bounds.y - padTop) / itemHeight);
         int index = scroll + row;
         return row >= 0 && row < visibleRows && index < getOptions().size() ? index : -1;
     }

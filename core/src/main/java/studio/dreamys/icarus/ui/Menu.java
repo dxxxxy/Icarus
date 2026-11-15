@@ -384,6 +384,7 @@ public final class Menu implements MenuController {
         for (GroupView g : groups) {
             g.contentHeight = metrics.rowOffset + measureRows(canvas, g, innerWidth, metrics.rowGap);
             g.slack = metrics.rowOffset; //rows start that far down but also end that far above their height
+            g.clipBelow = metrics.clipBelow;
             int hint = g.getGroup().getColumn();
             int column;
             if (ConfigPanel.isLastColumn(hint)) column = columns - 1;
@@ -600,9 +601,9 @@ public final class Menu implements MenuController {
         for (GroupView g : getCurrentSubTab().groups) {
             if (g.frame.isEmpty()) continue;
             theme.paintGroup(canvas, this, g);
-            canvas.pushClip(g.content.x, g.content.y, g.content.w, g.content.h);
+            canvas.pushClip(g.content.x, g.content.y, g.content.w, g.content.h + g.clipBelow);
             for (Widget w : g.getWidgets()) {
-                if (w.hidden || w.bounds.bottom() < g.content.y || w.bounds.y > g.content.bottom()) continue;
+                if (w.hidden || w.bounds.bottom() < g.content.y || w.bounds.y > g.content.bottom() + g.clipBelow) continue;
                 w.paint(theme, canvas);
                 if (w.getKeybind() != null) w.getKeybind().paint(theme, canvas);
             }

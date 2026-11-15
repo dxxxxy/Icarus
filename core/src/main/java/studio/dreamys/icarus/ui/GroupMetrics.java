@@ -16,6 +16,8 @@ public final class GroupMetrics {
      * above their {@code y} (so the first row isn't clipped).
      */
     public double rowOffset;
+    /** How far below the content area rows may still be drawn (themes that fade them out into the frame). */
+    public double clipBelow;
     /** Vertical gap between groups stacked in one column; negative means the same as the column gap. */
     public double stackGap = -1;
 
