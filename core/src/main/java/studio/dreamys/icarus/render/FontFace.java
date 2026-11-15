@@ -11,8 +11,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 /**
- * A font at one real pixel size. Glyphs are rasterised with AWT the first time a code point is used and packed
- * into the shared {@link FontAtlas}; afterwards lookups and measuring don't allocate.
+ * A font at one real pixel size. Glyphs are hinted with whole-pixel advances, like Windows (GDI) text, so small
+ * sizes stay crisp; they're rasterised with AWT the first time a code point is used and packed into the shared
+ * {@link FontAtlas}; afterwards lookups and measuring don't allocate.
  */
 public final class FontFace {
     private final FontAtlas atlas;
@@ -24,7 +25,7 @@ public final class FontFace {
     FontFace(FontAtlas atlas, String family, int style, int pixelSize) {
         this.atlas = atlas;
         this.font = new Font(family, style, 1).deriveFont((float) pixelSize);
-        this.frc = new FontRenderContext(new AffineTransform(), true, true);
+        this.frc = new FontRenderContext(new AffineTransform(), true, false);
         LineMetrics metrics = font.getLineMetrics("Hg", frc);
         this.ascent = metrics.getAscent();
         this.descent = metrics.getDescent();
@@ -78,7 +79,7 @@ public final class FontFace {
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
+        g.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
         g.setColor(java.awt.Color.WHITE);
         g.drawGlyphVector(vector, 1 - bounds.x, 1 - bounds.y);
