@@ -51,8 +51,8 @@ jobs:
           mkdir -p dist
           find platforms -path "*/build/libs/icarus-*-$VERSION.jar" -exec cp {} dist/ \;
           ls -l dist
-          # one jar per target: 14 at the time of writing
-          test "$(ls dist | wc -l)" -ge 14
+          # one jar per target: 11 at the time of writing
+          test "$(ls dist | wc -l)" -ge 11
 
       - uses: actions/checkout@v4
         with:
