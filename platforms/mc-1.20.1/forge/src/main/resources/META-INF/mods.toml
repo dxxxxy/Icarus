@@ -1,0 +1,23 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "All rights reserved"
+
+[[mods]]
+modId = "icarus"
+version = "${version}"
+displayName = "Icarus"
+description = "GUI and config library"
+
+[[dependencies.icarus]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1]"
+ordering = "NONE"
+side = "CLIENT"
+
+# testmod-begin (dev-only example mod; stripped from the published jar)
+[[mods]]
+modId = "testmod"
+version = "1.0.0"
+displayName = "Icarus Test Mod"
+# testmod-end

@@ -1,0 +1,8 @@
+package studio.dreamys.icarus.platform.mc263.neoforge;
+
+import net.neoforged.fml.common.Mod;
+
+/** Icarus is a library: this only gives its mods.toml entry a container. Hooks are installed by Icarus.init. */
+@Mod("icarus")
+public class IcarusMod {
+}

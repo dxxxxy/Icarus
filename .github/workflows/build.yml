@@ -1,0 +1,38 @@
+name: Build
+
+# Builds every target (and runs the core tests) on each push and pull request.
+
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["**"]
+  pull_request:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      # Gradle runs on 21; the toolchains (8, 17, 21, 25) are downloaded by the foojay resolver.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build and test
+        run: ./gradlew build --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jars
+          path: |
+            platforms/**/build/libs/icarus-*.jar
+            !platforms/**/build/libs/icarus-*-dev.jar
+          if-no-files-found: error
