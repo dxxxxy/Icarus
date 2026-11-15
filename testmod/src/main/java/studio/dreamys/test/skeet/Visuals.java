@@ -17,7 +17,7 @@ import java.awt.Color;
 @IPage(icon = "visuals", order = 3)
 public class Visuals {
     @ILabel("Player ESP")
-    @IGroup(column = 0, order = 0, height = 420 / 1.25)
+    @IGroup(column = 0, order = 0, height = 424 / 1.25)
     public static class Player_ESP {
         @IKeybind(Keys.KEY_LSHIFT)
         public static Label Activation_type;
@@ -113,7 +113,7 @@ public class Visuals {
     }
 
     @ILabel("Other ESP")
-    @IGroup(column = 1, order = 0, height = 254 / 1.25)
+    @IGroup(column = 1, order = 0, height = 258 / 1.25)
     public static class Other_ESP {
         public static boolean Radar = false;
 

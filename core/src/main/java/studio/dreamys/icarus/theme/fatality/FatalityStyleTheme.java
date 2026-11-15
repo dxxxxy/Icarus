@@ -54,10 +54,12 @@ public class FatalityStyleTheme extends BaseTheme {
     protected static final double PULSE_PERIOD = 1.1, PULSE_LOW = 0.62;
     protected static final int PANEL_EDGE = 0xFF393153;
     protected static final int PANEL_BG = 0xFF191337;
+    /** The panel and the groups darken a little toward the bottom. */
+    protected static final int PANEL_FILL_TOP = 0xFF181334, PANEL_FILL_BOTTOM = 0xFF14112D;
     protected static final int SUBTAB_BG = 0xFF1F193F;
     protected static final int DIVIDER = 0xFF373155;
     protected static final int GROUP_EDGE = 0xFF363058;
-    protected static final int GROUP_TOP = 0xFF201A42, GROUP_BOTTOM = 0xFF1F1944;
+    protected static final int GROUP_TOP = 0xFF201A45, GROUP_BOTTOM = 0xFF1A1538;
     protected static final int CONTROL_BG = 0xFF1A143C;
     protected static final int CONTROL_GAP = 0xFF1C1736;
     protected static final int TEXT = 0xFFD9D4F0;
@@ -280,7 +282,7 @@ public class FatalityStyleTheme extends BaseTheme {
 
         //panel with the sub-tab row
         c.rect(panel.x, panel.y, panel.w, panel.h, PANEL_EDGE);
-        c.rect(panel.x + 1, panel.y + 1, panel.w - 2, panel.h - 2, PANEL_BG);
+        c.gradientV(panel.x + 1, panel.y + 1, panel.w - 2, panel.h - 2, PANEL_FILL_TOP, PANEL_FILL_BOTTOM);
         if (menu.getCurrentTab().hasSubTabs()) {
             c.rect(panel.x + 1, panel.y + 1, panel.w - 2, w.y + SUBTAB_DIVIDER - panel.y - 1, SUBTAB_BG);
             c.hline(panel.x + 1, w.y + SUBTAB_DIVIDER, panel.w - 2, DIVIDER);

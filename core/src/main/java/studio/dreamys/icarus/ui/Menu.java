@@ -485,12 +485,20 @@ public final class Menu implements MenuController {
         boolean first = true;
         Widget row = null;
         int attached = 0;
+        boolean rowHidden = false;
         for (Widget w : g.getWidgets()) {
             if (row != null && w instanceof ColorWidget && ((ColorWidget) w).isAttached()) {
-                theme.layoutAttachedColor(canvas, (ColorWidget) w, row, attached++);
+                //an attached swatch follows its row, also when the row is hidden
+                w.hidden = rowHidden || !w.getSetting().isVisible();
+                if (!w.hidden) theme.layoutAttachedColor(canvas, (ColorWidget) w, row, attached++);
                 continue;
             }
             attached = 0;
+            rowHidden = w.hidden = !w.getSetting().isVisible();
+            if (w.hidden) {
+                row = w; //its attached swatches hide with it
+                continue;
+            }
             double rowY = first ? cursor : cursor + rowGap;
             double h = w.layout(theme, canvas, x, rowY, width);
             if (h <= 0) continue;
@@ -593,7 +601,7 @@ public final class Menu implements MenuController {
             theme.paintGroup(canvas, this, g);
             canvas.pushClip(g.content.x, g.content.y, g.content.w, g.content.h);
             for (Widget w : g.getWidgets()) {
-                if (w.bounds.bottom() < g.content.y || w.bounds.y > g.content.bottom()) continue;
+                if (w.hidden || w.bounds.bottom() < g.content.y || w.bounds.y > g.content.bottom()) continue;
                 w.paint(theme, canvas);
                 if (w.getKeybind() != null) w.getKeybind().paint(theme, canvas);
             }
@@ -655,7 +663,7 @@ public final class Menu implements MenuController {
             List<Widget> widgets = g.getWidgets();
             for (int i = widgets.size() - 1; i >= 0; i--) {
                 Widget w = widgets.get(i);
-                if (w.getSetting().isDisabled()) continue;
+                if (w.hidden || w.getSetting().isDisabled()) continue;
                 KeybindWidget keybind = w.getKeybind();
                 if (keybind != null && keybind.contains(x, y)) return keybind;
                 if (w.contains(x, y)) return w;

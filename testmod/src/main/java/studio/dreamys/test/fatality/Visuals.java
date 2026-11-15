@@ -4,6 +4,7 @@ import studio.dreamys.icarus.annotation.ILabel;
 import studio.dreamys.icarus.annotation.field.DropdownOptions;
 import studio.dreamys.icarus.annotation.field.IAttach;
 import studio.dreamys.icarus.annotation.field.IKeybind;
+import studio.dreamys.icarus.annotation.field.IShowIf;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
 import studio.dreamys.icarus.annotation.type.IPage;
@@ -14,18 +15,18 @@ import studio.dreamys.test.TestModCommon;
 
 import java.awt.Color;
 
-/** The VISUALS tab: ESP, MODELS and MISC, as in the reference. */
+/** The VISUALS tab: ESP, MODELS and MISC, as first shown in the reference. */
 @IPage(order = 1)
 public class Visuals {
     @ISubPage(order = 0)
     public static class ESP {
         @IGroup(column = 0)
         public static class Player {
-            public static boolean Esp = true;
+            public static boolean Esp = false;
             @IAttach
             public static Color Esp_color = new Color(28, 22, 65);
 
-            public static boolean Box = true;
+            public static boolean Box = false;
             @IAttach
             public static Color Box_color = new Color(255, 255, 255);
 
@@ -37,29 +38,30 @@ public class Visuals {
             @IAttach
             public static Color History_skeleton_color = new Color(255, 255, 255);
 
-            public static boolean Name = true;
+            public static boolean Name = false;
             @IAttach
             public static Color Name_color = new Color(255, 255, 255);
 
-            public static boolean Weapon = true;
+            public static boolean Weapon = false;
             @IAttach
             public static Color Weapon_color = new Color(255, 255, 255);
 
-            public static boolean Weapon_icons = true;
+            @IShowIf("Weapon")
+            public static boolean Weapon_icons = false;
 
-            public static boolean Health = true;
+            public static boolean Health = false;
             @IAttach
             public static Color Health_color = new Color(140, 0, 0);
             @IAttach
             public static Color Health_color2 = new Color(150, 200, 30);
 
-            public static boolean Armor = true;
+            public static boolean Armor = false;
             @IAttach
             public static Color Armor_color = new Color(255, 255, 255);
 
-            public static boolean Ammo = true;
+            public static boolean Ammo = false;
             @IAttach
-            public static Color Ammo_color = new Color(40, 90, 230);
+            public static Color Ammo_color = new Color(255, 255, 255);
 
             public static boolean Pingspike = false;
             @IAttach

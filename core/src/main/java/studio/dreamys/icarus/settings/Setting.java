@@ -38,6 +38,9 @@ public final class Setting<T> {
     boolean attached;
     boolean warning;
     boolean disabled;
+    /** {@code @IShowIf}: the checkbox this setting follows, or null to always show. */
+    Setting<?> showIf;
+    boolean showIfNot;
     KeybindMode defaultMode = KeybindMode.TOGGLE;
     private SettingListener listener;
     private Object extra;
@@ -174,6 +177,12 @@ public final class Setting<T> {
     /** Whether the setting is shown greyed out and ignores input ({@code @IDisabled}). */
     public boolean isDisabled() {
         return disabled;
+    }
+
+    /** Whether the setting is shown right now ({@code @IShowIf}). */
+    public boolean isVisible() {
+        if (showIf == null) return true;
+        return Boolean.TRUE.equals(showIf.get()) != showIfNot;
     }
 
     /** Whether the setting is marked risky ({@code @IWarning}). */

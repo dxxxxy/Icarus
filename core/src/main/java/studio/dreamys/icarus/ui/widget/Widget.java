@@ -20,6 +20,8 @@ public abstract class Widget {
     private KeybindWidget keybind;
     private GroupView group;
     private boolean hovered;
+    /** Set by the menu's layout: the row is hidden ({@code @IShowIf}) and takes no space, paint or input. */
+    public boolean hidden;
     private float hover;
 
     protected Widget(Menu menu, Setting<?> setting) {

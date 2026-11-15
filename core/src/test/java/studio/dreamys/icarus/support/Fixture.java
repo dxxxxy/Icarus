@@ -58,6 +58,9 @@ public final class Fixture {
             public static studio.dreamys.icarus.settings.Label Activation;
 
             public static boolean A, B, C;
+
+            @studio.dreamys.icarus.annotation.field.IShowIf("A")
+            public static boolean Child;
         }
 
         @IGroup(column = 0, order = 1)

@@ -5,6 +5,7 @@ import studio.dreamys.icarus.annotation.field.FieldOptions;
 import studio.dreamys.icarus.annotation.field.IAttach;
 import studio.dreamys.icarus.annotation.field.IKeybind;
 import studio.dreamys.icarus.annotation.field.IDisabled;
+import studio.dreamys.icarus.annotation.field.IShowIf;
 import studio.dreamys.icarus.annotation.field.IWarning;
 import studio.dreamys.icarus.annotation.field.SliderOptions;
 import studio.dreamys.icarus.annotation.type.IGroup;
@@ -84,7 +85,25 @@ public final class ModelBuilder {
                 Setting<?> setting = createSetting(group, field);
                 if (setting != null) group.settings.add(setting);
             }
+            resolveShowIf(group);
             sub.groups.add(group);
+        }
+    }
+
+    /** Links {@code @IShowIf} settings to the checkbox they follow. */
+    private static void resolveShowIf(GroupNode group) {
+        for (Setting<?> setting : group.settings) {
+            Field field = setting.getField();
+            IShowIf showIf = field == null ? null : field.getAnnotation(IShowIf.class);
+            if (showIf == null) continue;
+            Setting<?> condition = null;
+            for (Setting<?> other : group.settings) if (other.getName().equals(showIf.value())) condition = other;
+            if (condition == null || condition.getType() != SettingTypes.CHECKBOX) {
+                LOG.warning("[Icarus] @IShowIf(\"" + showIf.value() + "\") on " + field + " ignored: no checkbox of that name in the group");
+                continue;
+            }
+            setting.showIf = condition;
+            setting.showIfNot = showIf.not();
         }
     }
 

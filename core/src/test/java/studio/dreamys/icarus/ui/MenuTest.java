@@ -295,6 +295,19 @@ class MenuTest {
     }
 
     @Test
+    void showIfHidesRowsUntilTheCheckboxIsTicked() {
+        Menu menu = mod(IcarusOptions.builder().configUi(false), Fixture.Tall.class).getMenu();
+        frame(menu, 0, 0);
+        CheckboxWidget a = widget(menu, CheckboxWidget.class, "A"), child = widget(menu, CheckboxWidget.class, "Child");
+        assertTrue(child.hidden, "hidden while A is off");
+        double below = widget(menu, CheckboxWidget.class, "C").bounds.y;
+        click(menu, a.box.centerX(), a.box.centerY());
+        frame(menu, 0, 0);
+        assertFalse(child.hidden);
+        assertTrue(child.bounds.y > below, "takes a row once shown");
+    }
+
+    @Test
     void groupsNeverLeaveTheirColumn() {
         Menu menu = mod(IcarusOptions.builder().configUi(false), Fixture.Tall.class).getMenu();
         frame(menu, 0, 0);
