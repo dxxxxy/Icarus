@@ -19,6 +19,7 @@ import studio.dreamys.icarus.ui.popup.DropdownPopup;
 import studio.dreamys.icarus.ui.widget.ColorWidget;
 import studio.dreamys.icarus.ui.widget.CheckboxWidget;
 import studio.dreamys.icarus.ui.widget.ChoiceWidget;
+import studio.dreamys.icarus.ui.widget.FieldWidget;
 import studio.dreamys.icarus.ui.widget.KeybindWidget;
 import studio.dreamys.icarus.ui.widget.SliderWidget;
 import studio.dreamys.icarus.ui.widget.Widget;
@@ -190,6 +191,27 @@ class MenuTest {
         click(menu, keybind.label.centerX(), keybind.label.centerY());
         menu.keyPressed(Keys.KEY_G);
         assertEquals(Keys.KEY_G, mod.getKeybinds().get(setting));
+    }
+
+    @Test
+    void menuKeyClosesTheMenuUnlessTyping() {
+        IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
+        Menu menu = mod.getMenu();
+        menu.opened();
+        frame(menu, 0, 0);
+        menu.keyPressed(mod.getMenuKey());
+        assertFalse(menu.isClosing(), "ignored while fading in: the press that opened the menu can reach it too");
+
+        menu.skipFade();
+        FieldWidget name = widget(menu, FieldWidget.class, "Name");
+        click(menu, name.box.centerX(), name.box.centerY());
+        assertTrue(menu.isTyping());
+        menu.keyPressed(mod.getMenuKey());
+        assertFalse(menu.isClosing(), "typing keeps the menu open");
+
+        menu.focus(null);
+        assertTrue(menu.keyPressed(mod.getMenuKey()));
+        assertTrue(menu.isClosing(), "the menu key toggles the menu");
     }
 
     @Test

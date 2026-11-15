@@ -793,8 +793,16 @@ public final class Menu implements MenuController {
             closePopup();
             return true;
         }
-        if (focused != null) return focused.keyPressed(key);
-        return false;
+        if (focused != null && focused.keyPressed(key)) return true;
+        //the menu key toggles, like Escape; not while it fades in, since the press that opened the menu can reach
+        //the new screen too on some versions
+        boolean fadedIn = fadeStart == 0 || System.nanoTime() - fadeStart > FADE_NANOS;
+        if (key == mod.getMenuKey() && !isTyping() && fadedIn) {
+            closePopup();
+            requestClose();
+            return true;
+        }
+        return focused != null;
     }
 
     @Override
