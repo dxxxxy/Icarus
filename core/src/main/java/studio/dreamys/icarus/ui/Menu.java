@@ -108,11 +108,12 @@ public final class Menu implements MenuController {
 
         boolean merged = false;
         for (PageNode page : mod.getModel().getPages()) {
-            TabView tabView = new TabView(page, page.getLabel(), page.getIcon());
+            TabView tabView = new TabView(page, page.getLabel(), icon(page.getIcon(), page.getType()));
             //a page with the config icon hosts the built-in config UI (first, in the first column) instead of a tab of its own
-            boolean host = extra != null && pageStyle && !merged && "config".equals(page.getIconName());
+            String configIcon = theme.getConfigIcon();
+            boolean host = extra != null && pageStyle && !merged && !configIcon.isEmpty() && configIcon.equals(page.getIcon());
             for (SubPageNode sub : page.getSubPages()) {
-                SubTabView subView = new SubTabView(sub, sub.getLabel());
+                SubTabView subView = new SubTabView(sub, sub.getLabel(), sub.isImplicit() ? Icon.NONE : icon(sub.getIcon(), sub.getType()));
                 if (host) {
                     extra.getGroup().column(0);
                     subView.groups.add(extra);
@@ -126,19 +127,24 @@ public final class Menu implements MenuController {
             tabs.add(tabView);
         }
         if (extra != null && pageStyle && !merged) {
-            TabView configTab = new TabView(null, extra.getLabel(), theme.getConfigIcon());
-            SubTabView sub = new SubTabView(null, extra.getLabel());
+            TabView configTab = new TabView(null, extra.getLabel(), icon(theme.getConfigIcon(), null));
+            SubTabView sub = new SubTabView(null, extra.getLabel(), Icon.NONE);
             sub.groups.add(extra);
             configTab.subTabs.add(sub);
             tabs.add(configTab);
         }
         if (tabs.isEmpty()) {
-            TabView empty = new TabView(null, "", ' ');
-            empty.subTabs.add(new SubTabView(null, ""));
+            TabView empty = new TabView(null, "", Icon.NONE);
+            empty.subTabs.add(new SubTabView(null, "", Icon.NONE));
             tabs.add(empty);
         }
         tab = Math.min(tab, tabs.size() - 1);
         subTab = Math.min(subTab, tabs.get(tab).subTabs.size() - 1);
+    }
+
+    /** An icon of this mod; {@code owner} is the annotated class whose jar holds a resource icon. */
+    private Icon icon(String name, Class<?> owner) {
+        return name == null || name.isEmpty() ? Icon.NONE : new Icon(name, mod.getModid(), owner);
     }
 
     private GroupView groupView(GroupNode group) {

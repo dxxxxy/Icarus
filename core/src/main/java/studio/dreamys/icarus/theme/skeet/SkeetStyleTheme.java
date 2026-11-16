@@ -31,10 +31,7 @@ import studio.dreamys.icarus.ui.widget.ListWidget;
 import studio.dreamys.icarus.ui.widget.SliderWidget;
 import studio.dreamys.icarus.ui.widget.Widget;
 
-import javax.imageio.ImageIO;
 import java.awt.Color;
-import java.awt.image.BufferedImage;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,9 +82,9 @@ public class SkeetStyleTheme extends BaseTheme {
     protected static final double ROW_CHECKBOX = 21, ROW_LABEL = 20, ROW_SLIDER = 36, ROW_DROPDOWN = 49, ROW_BUTTON = 40;
     protected static final double BOX_H = 25, BUTTON_H = 32, TRACK_H = 10, CHECK = 10;
     /** Sub-tabs: a full-width header group with an icon per sub-tab (the "Weapon type" row). */
-    protected static final double SUBTAB_H = 57, SUBTAB_GAP = 23, SUBTAB_X = 6, SUBTAB_PITCH = 82, SUBTAB_SLOT_H = 40, WEAPON_ICON = 31;
-    /** Where a weapon bitmap's cell starts, left of and above its slot (the bitmaps are 90x44 cells). */
-    protected static final double WEAPON_CELL_X = 4, WEAPON_CELL_Y = 3;
+    protected static final double SUBTAB_H = 57, SUBTAB_GAP = 23, SUBTAB_X = 6, SUBTAB_PITCH = 82, SUBTAB_SLOT_H = 40;
+    /** A sub-tab icon's cell: where it starts, left of and above its slot, and its size (the built-in icons fill it). */
+    protected static final double WEAPON_CELL_X = 4, WEAPON_CELL_Y = 3, WEAPON_CELL_W = 90, WEAPON_CELL_H = 44;
     protected static final int TEXT_DISABLED = 0xFF5C5C5C;
     protected static final double KEYBIND_RIGHT = 33, SWATCH_RIGHT = 31, SWATCH_W = 21, SWATCH_H = 12;
 
@@ -95,7 +92,6 @@ public class SkeetStyleTheme extends BaseTheme {
     private final Rect contentArea = new Rect();
     private final Rect subTabArea = new Rect();
     private AtlasImage stripes;
-    private final Map<String, AtlasImage> icons = new HashMap<>();
 
     public SkeetStyleTheme() {
         textRow = P(ROW_LABEL);
@@ -135,8 +131,8 @@ public class SkeetStyleTheme extends BaseTheme {
     }
 
     @Override
-    public char getConfigIcon() {
-        return ' ';
+    public String getConfigIcon() {
+        return "config";
     }
 
     @Override
@@ -144,8 +140,7 @@ public class SkeetStyleTheme extends BaseTheme {
         String family = FontFamilies.first("Verdana", "DejaVu Sans", "Tahoma");
         Font text = new Font(atlas, family, java.awt.Font.PLAIN, P(11));
         Font bold = new Font(atlas, family, java.awt.Font.BOLD, P(11));
-        String icons = FontFamilies.register(SkeetStyleTheme.class, "/assets/icarus/undefeated.ttf");
-        setFonts(text, bold, bold, new Font(atlas, icons, java.awt.Font.PLAIN, P(WEAPON_ICON)), bold, text);
+        setFonts(text, bold, bold, bold, text);
     }
 
     /* ---- resources ---- */
@@ -161,23 +156,6 @@ public class SkeetStyleTheme extends BaseTheme {
             stripes = new AtlasImage(pixels, 2, 2);
         }
         return stripes;
-    }
-
-    /** A tab icon from the theme's resources (white with alpha), or null. */
-    protected AtlasImage icon(String name) {
-        if (name == null || name.isEmpty()) return null;
-        if (icons.containsKey(name)) return icons.get(name);
-        AtlasImage image = null;
-        try (InputStream in = SkeetStyleTheme.class.getResourceAsStream("/assets/icarus/skeet/" + name + ".png")) {
-            if (in != null) {
-                BufferedImage img = ImageIO.read(in);
-                int[] argb = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
-                image = new AtlasImage(argb, img.getWidth(), img.getHeight());
-            }
-        } catch (Exception ignored) {
-        }
-        icons.put(name, image);
-        return image;
     }
 
     /* ---- window ---- */
@@ -268,17 +246,11 @@ public class SkeetStyleTheme extends BaseTheme {
             boolean hovered = !isActive && b.contains(menu.getMouseX(), menu.getMouseY());
             int color = isActive ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE;
             double cx = w.x + P(TAB_ICON_X), cy = w.y + P(TAB_ICON_Y + TAB_PITCH * i);
-            String name = tab.getPage() == null ? "config" : tab.getPage().getIconName();
-            AtlasImage image = icon(name);
+            AtlasImage image = image(tab.getIcon());
             if (image != null) {
                 //icons are reference-sized bitmaps: draw them at their pixel size for the reference scale
                 double iwd = P(image.getWidth()), ihd = P(image.getHeight());
                 c.image(image, snap(c, cx - iwd / 2), snap(c, cy - ihd / 2), iwd, ihd, color);
-            } else if (tab.getPage() != null) {
-                String glyph = String.valueOf(tab.getIcon());
-                Font iconFont = icon(c);
-                double gw = c.measure(iconFont, glyph);
-                c.text(iconFont, glyph, Math.round(cx - gw / 2), centeredTextY(c, iconFont, cy), color);
             }
         }
 
@@ -298,25 +270,23 @@ public class SkeetStyleTheme extends BaseTheme {
         groupEdge(c, f.x + p, f.y + p, f.w - 2 * p, f.h - 2 * p, GROUP_EDGE, gapStart, gapEnd, p);
         c.text(font, title, f.x + P(14), capsTop(c, font, f.y - P(4)), TEXT);
 
-        Font iconFont = icon(c);
         java.util.List<studio.dreamys.icarus.ui.SubTabView> subs = menu.getCurrentTab().getSubTabs();
         for (int j = 0; j < subs.size(); j++) {
             Rect b = subs.get(j).bounds;
             boolean active = j == menu.getSubTabIndex();
             boolean hovered = !active && b.contains(menu.getMouseX(), menu.getMouseY());
-            studio.dreamys.icarus.settings.SubPageNode node = subs.get(j).getSubPage();
-            char icon = node == null ? ' ' : node.getIcon();
-            String text = icon == ' ' ? subs.get(j).getLabel() : String.valueOf(icon);
             int color = active ? ICON_ACTIVE : hovered ? ICON_HOVER : ICON_IDLE;
-            //skeet's own weapon bitmaps (cut from the reference, named by code point) replace the font glyphs it has
-            AtlasImage bitmap = icon == ' ' ? null : icon("weapon_" + (int) icon);
+            //centred in its cell (skeet's own weapon bitmaps, cut from the reference, fill it); without one, the label
+            AtlasImage bitmap = image(subs.get(j).getIcon());
             if (bitmap != null) {
-                c.image(bitmap, snap(c, b.x - P(WEAPON_CELL_X)), snap(c, b.y - P(WEAPON_CELL_Y)), P(bitmap.getWidth()), P(bitmap.getHeight()), color);
+                double x = b.x - P(WEAPON_CELL_X) + P((WEAPON_CELL_W - bitmap.getWidth()) / 2);
+                double y = b.y - P(WEAPON_CELL_Y) + P((WEAPON_CELL_H - bitmap.getHeight()) / 2);
+                c.image(bitmap, snap(c, x), snap(c, y), P(bitmap.getWidth()), P(bitmap.getHeight()), color);
                 continue;
             }
-            Font f2 = icon == ' ' ? bold(c) : iconFont;
-            double tw = c.measure(f2, text);
-            c.text(f2, text, snap(c, b.x + (b.w - tw) / 2), centeredTextY(c, f2, b.centerY() + (icon == ' ' ? 0 : P(3))), color);
+            String text = subs.get(j).getLabel();
+            double tw = c.measure(font, text);
+            c.text(font, text, snap(c, b.x + (b.w - tw) / 2), centeredTextY(c, font, b.centerY()), color);
         }
     }
 

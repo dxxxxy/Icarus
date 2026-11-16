@@ -10,7 +10,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /** A headless platform that records what Icarus draws. */
@@ -21,6 +20,8 @@ public final class FakePlatform implements Platform {
     public int width = 1920, height = 1080;
     public MenuController opened;
     public String clipboard = "";
+    /** What {@link #getModRoots} reports for every mod id. */
+    public final List<Path> modRoots = new ArrayList<>();
 
     public FakePlatform(File gameDir) {
         this.gameDir = gameDir;
@@ -67,7 +68,7 @@ public final class FakePlatform implements Platform {
 
     @Override
     public Collection<Path> getModRoots(String modid) {
-        return Collections.emptyList();
+        return modRoots;
     }
 
     @Override

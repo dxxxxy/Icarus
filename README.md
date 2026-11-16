@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // studio.dreamys:icarus-<loader>-<minecraft version>:<icarus version>
-    implementation "studio.dreamys:icarus-fabric-1.21.1:3.0.1"
+    implementation "studio.dreamys:icarus-fabric-1.21.1:3.1.0"
 }
 ```
 
@@ -87,7 +87,6 @@ The **[wiki](https://github.com/DxxxxY/Icarus/wiki)** covers:
 
 - The menu designs belong to [gamesense / skeet](https://gamesense.pub) and [fatality](https://fatality.win). Icarus isn't affiliated with either.
 - Measurements, colours and icons were taken from the YouTube reviews "My Brutally Honest Skeet.cc Review" and "My Brutally Honest Fatality.win Review".
-- `undefeated.ttf` is the "undefeated" CS:GO icon font from the CS:GO community.
 
 ## Disclaimer
 This is for educational purposes only. I am not responsible for any damage caused by this tool.

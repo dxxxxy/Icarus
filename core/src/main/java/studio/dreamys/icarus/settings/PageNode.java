@@ -8,17 +8,15 @@ import java.util.List;
 public final class PageNode {
     private final Class<?> type;
     private final String name;
-    private final char icon;
-    private final String iconName;
+    private final String icon;
     private final String label;
     private final int order;
     final List<SubPageNode> subPages = new ArrayList<>();
 
-    PageNode(Class<?> type, String name, char icon, String iconName, int order) {
+    PageNode(Class<?> type, String name, String icon, int order) {
         this.type = type;
         this.name = name;
-        this.icon = icon;
-        this.iconName = iconName == null ? "" : iconName;
+        this.icon = icon == null ? "" : icon;
         this.label = Labels.of(type, name);
         this.order = order;
     }
@@ -37,13 +35,9 @@ public final class PageNode {
         return label;
     }
 
-    public char getIcon() {
+    /** {@code @IPage(icon)}: a resource path, a built-in icon name, or empty. */
+    public String getIcon() {
         return icon;
-    }
-
-    /** Named theme icon from {@code @IPage(icon)}, or empty. */
-    public String getIconName() {
-        return iconName;
     }
 
     public int getOrder() {

@@ -5,6 +5,8 @@ import studio.dreamys.icarus.render.AtlasImage;
 import studio.dreamys.icarus.render.Canvas;
 import studio.dreamys.icarus.render.Font;
 import studio.dreamys.icarus.render.FontAtlas;
+import studio.dreamys.icarus.render.Images;
+import studio.dreamys.icarus.ui.Icon;
 import studio.dreamys.icarus.ui.GroupView;
 import studio.dreamys.icarus.ui.Menu;
 import studio.dreamys.icarus.ui.Rect;
@@ -28,17 +30,38 @@ import studio.dreamys.icarus.ui.widget.Widget;
  * their constructor and implement painting. Fonts are created lazily from the shared atlas.
  */
 public abstract class BaseTheme implements Theme {
-    /** An image from the classpath as a white alpha mask for tinting (e.g. icons cut from a reference), or null. */
+    private static final java.util.logging.Logger LOG = java.util.logging.Logger.getLogger("Icarus");
+
+    /** An image from Icarus's resources as a white alpha mask for tinting (e.g. icons cut from a reference), or null. */
     protected static AtlasImage resourceImage(String path) {
-        try (java.io.InputStream in = BaseTheme.class.getResourceAsStream(path)) {
-            if (in == null) return null;
-            java.awt.image.BufferedImage img = javax.imageio.ImageIO.read(in);
-            if (img == null) return null;
-            int[] argb = img.getRGB(0, 0, img.getWidth(), img.getHeight(), null, 0, img.getWidth());
-            return new AtlasImage(argb, img.getWidth(), img.getHeight());
-        } catch (java.io.IOException e) {
-            return null;
+        return Images.resource(BaseTheme.class, path);
+    }
+
+    private final java.util.Map<String, AtlasImage> builtinIcons = new java.util.HashMap<>();
+
+    /**
+     * The image to draw for a tab or sub-tab icon: the mod's own PNG, or this theme's built-in icon of that name.
+     * Null if there's no icon or it can't be found.
+     */
+    protected AtlasImage image(Icon icon) {
+        if (icon.isEmpty()) return null;
+        return icon.isResource() ? icon.getImage() : builtinIcon(icon.getName());
+    }
+
+    /**
+     * A built-in icon by name: {@code /assets/icarus/<theme id>/<name>.png}, looked up next to the theme's class (so a
+     * subclass in another mod can add its own) and then in Icarus. Null, with a warning once, if there's none.
+     */
+    protected AtlasImage builtinIcon(String name) {
+        AtlasImage image = builtinIcons.get(name);
+        if (image == null && !builtinIcons.containsKey(name)) {
+            String path = "/assets/icarus/" + getId() + "/" + name + ".png";
+            image = Images.resource(getClass(), path);
+            if (image == null) image = resourceImage(path);
+            if (image == null) LOG.warning("[Icarus] The " + getDisplayName() + " theme has no icon \"" + name + "\" (" + path + ")");
+            builtinIcons.put(name, image);
         }
+        return image;
     }
 
     /** Row metrics in design units. */
@@ -63,16 +86,15 @@ public abstract class BaseTheme implements Theme {
     protected double scrollbarWidth = 3;
 
     private FontAtlas fontsFor;
-    private Font text, bold, small, icon, title, tab;
+    private Font text, bold, small, title, tab;
 
     /** Creates the theme's fonts (called once per atlas). */
     protected abstract void createFonts(FontAtlas atlas);
 
-    protected final void setFonts(Font text, Font bold, Font small, Font icon, Font title, Font tab) {
+    protected final void setFonts(Font text, Font bold, Font small, Font title, Font tab) {
         this.text = text;
         this.bold = bold;
         this.small = small;
-        this.icon = icon;
         this.title = title;
         this.tab = tab;
     }
@@ -97,11 +119,6 @@ public abstract class BaseTheme implements Theme {
     protected Font small(Canvas c) {
         ensureFonts(c);
         return small;
-    }
-
-    protected Font icon(Canvas c) {
-        ensureFonts(c);
-        return icon;
     }
 
     protected Font title(Canvas c) {

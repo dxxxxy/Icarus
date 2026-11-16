@@ -16,7 +16,7 @@ public final class Fixture {
     private Fixture() {
     }
 
-    @IPage(value = 'a', order = 0)
+    @IPage(order = 0)
     public static class Combat {
         @IGroup(order = 0)
         public static class Kill_Aura {
@@ -50,7 +50,7 @@ public final class Fixture {
     }
 
     /** One column: a fixed-height group above a group too tall to fit. */
-    @IPage(value = 'c', order = 2)
+    @IPage(order = 2)
     public static class Tall {
         @IGroup(column = 0, order = 0, height = 300)
         public static class Fixed {
@@ -108,7 +108,7 @@ public final class Fixture {
         }
     }
 
-    @IPage(value = 'b', order = 1)
+    @IPage(order = 1)
     public static class Visuals {
         @ISubPage(order = 0)
         public static class Esp {

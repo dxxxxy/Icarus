@@ -18,7 +18,7 @@ import studio.dreamys.icarus.settings.Label;
 @ILabel("Weapon type")
 @IPage(icon = "legit", order = 2)
 public class Legit {
-    @ISubPage(order = 0, icon = 'G')
+    @ISubPage(order = 0, icon = "pistol")
     public static class Pistol {
         @IGroup(column = 0)
         public static class Aimbot {
@@ -99,7 +99,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 1, icon = 'P')
+    @ISubPage(order = 1, icon = "smg")
     public static class SMG {
         @IGroup(column = 0)
         public static class Aimbot {
@@ -180,7 +180,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 2, icon = 'W')
+    @ISubPage(order = 2, icon = "rifle")
     public static class Rifle {
         @IGroup(column = 0)
         public static class Aimbot {
@@ -261,7 +261,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 3, icon = 'd')
+    @ISubPage(order = 3, icon = "shotgun")
     public static class Shotgun {
         @IGroup(column = 0)
         public static class Aimbot {
@@ -342,7 +342,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 4, icon = 'f')
+    @ISubPage(order = 4, icon = "machine_gun")
     public static class Machine_gun {
         @IGroup(column = 0)
         public static class Aimbot {
@@ -423,7 +423,7 @@ public class Legit {
         }
     }
 
-    @ISubPage(order = 5, icon = 'a')
+    @ISubPage(order = 5, icon = "sniper")
     public static class Sniper {
         @IGroup(column = 0)
         public static class Aimbot {

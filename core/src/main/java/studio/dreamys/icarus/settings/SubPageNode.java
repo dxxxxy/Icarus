@@ -12,7 +12,7 @@ public final class SubPageNode {
     private final Class<?> type;
     private final String name;
     private final int order;
-    private final char icon;
+    private final String icon;
     final List<GroupNode> groups = new ArrayList<>();
 
     SubPageNode(PageNode page, Class<?> type, String name, int order) {
@@ -21,11 +21,11 @@ public final class SubPageNode {
         this.name = name;
         this.order = order;
         ISubPage annotation = type == null ? null : type.getAnnotation(ISubPage.class);
-        this.icon = annotation == null ? ' ' : annotation.icon();
+        this.icon = annotation == null ? "" : annotation.icon();
     }
 
-    /** Icon from {@code @ISubPage(icon)}, or a space. */
-    public char getIcon() {
+    /** {@code @ISubPage(icon)}: a resource path, a built-in icon name, or empty. */
+    public String getIcon() {
         return icon;
     }
 

@@ -18,7 +18,7 @@ import java.awt.Color;
 @IPage(order = 0)
 public class Rage {
     @ILabel("Aimbot")
-    @ISubPage(order = 0, icon = 'Y')
+    @ISubPage(order = 0, icon = "auto")
     public static class Aimbot_Auto {
         @ILabel("Auto")
         @IGroup(column = 0)
@@ -88,7 +88,7 @@ public class Rage {
     }
 
     @ILabel("Aimbot")
-    @ISubPage(order = 1, icon = 'a')
+    @ISubPage(order = 1, icon = "scout")
     public static class Aimbot_Scout {
         @ILabel("Scout")
         @IGroup(column = 0)
@@ -158,7 +158,7 @@ public class Rage {
     }
 
     @ILabel("Aimbot")
-    @ISubPage(order = 2, icon = 'Z')
+    @ISubPage(order = 2, icon = "awp")
     public static class Aimbot_AWP {
         @ILabel("AWP")
         @IGroup(column = 0)
@@ -228,7 +228,7 @@ public class Rage {
     }
 
     @ILabel("Aimbot")
-    @ISubPage(order = 3, icon = 'A')
+    @ISubPage(order = 3, icon = "heavy_pistol")
     public static class Aimbot_Heavy_pistol {
         @ILabel("Heavy pistol")
         @IGroup(column = 0)
@@ -298,7 +298,7 @@ public class Rage {
     }
 
     @ILabel("Aimbot")
-    @ISubPage(order = 4, icon = 'G')
+    @ISubPage(order = 4, icon = "pistol")
     public static class Aimbot_Pistol {
         @ILabel("Pistol")
         @IGroup(column = 0)
@@ -368,7 +368,7 @@ public class Rage {
     }
 
     @ILabel("Aimbot")
-    @ISubPage(order = 5, icon = 'W')
+    @ISubPage(order = 5, icon = "rifle")
     public static class Aimbot_Rifle {
         @ILabel("Rifle")
         @IGroup(column = 0)

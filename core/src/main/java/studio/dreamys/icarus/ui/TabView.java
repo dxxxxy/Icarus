@@ -10,13 +10,13 @@ import java.util.List;
 public final class TabView {
     private final PageNode page;
     private final String label;
-    private final char icon;
+    private final Icon icon;
     final List<SubTabView> subTabs = new ArrayList<>();
     private final List<SubTabView> subTabsView = Collections.unmodifiableList(subTabs);
     /** Tab button, laid out by the theme. */
     public final Rect bounds = new Rect();
 
-    TabView(PageNode page, String label, char icon) {
+    TabView(PageNode page, String label, Icon icon) {
         this.page = page;
         this.label = label;
         this.icon = icon;
@@ -31,7 +31,7 @@ public final class TabView {
         return label;
     }
 
-    public char getIcon() {
+    public Icon getIcon() {
         return icon;
     }
 

@@ -35,7 +35,7 @@ public final class ModelBuilder {
         for (Class<?> pageClass : pageClasses) {
             IPage annotation = pageClass.getAnnotation(IPage.class);
             if (annotation == null) throw new IllegalArgumentException(pageClass.getName() + " is not annotated with @IPage");
-            PageNode page = new PageNode(pageClass, pageClass.getSimpleName(), annotation.value(), annotation.icon(), annotation.order());
+            PageNode page = new PageNode(pageClass, pageClass.getSimpleName(), annotation.icon(), annotation.order());
 
             List<Class<?>> subPageClasses = new ArrayList<>();
             List<Class<?>> groupClasses = new ArrayList<>();

@@ -41,8 +41,11 @@ public interface Theme {
     /** Where the built-in config UI goes. */
     ConfigUiStyle getConfigUiStyle();
 
-    /** Icon of the config tab for {@link ConfigUiStyle#PAGE} (a character of the icon font). */
-    char getConfigIcon();
+    /**
+     * Icon of the config tab for {@link ConfigUiStyle#PAGE}: a built-in icon name, or empty. A page whose
+     * {@code @IPage(icon)} is this name hosts the config UI instead of getting a tab of its own.
+     */
+    String getConfigIcon();
 
     /* ---- menu ---- */
 

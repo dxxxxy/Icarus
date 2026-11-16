@@ -10,14 +10,16 @@ import java.util.List;
 public final class SubTabView {
     private final SubPageNode subPage;
     private final String label;
+    private final Icon icon;
     final List<GroupView> groups = new ArrayList<>();
     private final List<GroupView> groupsView = Collections.unmodifiableList(groups);
     /** Sub-tab button, laid out by the theme (empty when the page has no sub-tabs). */
     public final Rect bounds = new Rect();
 
-    SubTabView(SubPageNode subPage, String label) {
+    SubTabView(SubPageNode subPage, String label, Icon icon) {
         this.subPage = subPage;
         this.label = label;
+        this.icon = icon;
     }
 
     /** The model sub-page, or null for the config page. */
@@ -27,6 +29,10 @@ public final class SubTabView {
 
     public String getLabel() {
         return label;
+    }
+
+    public Icon getIcon() {
+        return icon;
     }
 
     public List<GroupView> getGroups() {

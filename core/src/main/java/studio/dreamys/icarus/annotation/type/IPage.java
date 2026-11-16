@@ -12,12 +12,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface IPage {
-    /** Tab icon: a character of the icon font (used by themes with icon tabs). */
-    char value() default ' ';
-
     /**
-     * Named tab icon provided by the theme (e.g. the skeet theme's "rage", "antiaim", "legit", "visuals", "misc",
-     * "skins", "players", "config"); takes precedence over {@link #value()} when the theme has it.
+     * Tab icon, for themes with icon tabs (skeet). Either a PNG in your mod's resources, as an absolute path such as
+     * {@code "/assets/mymod/icons/radar.png"}, or the name of a built-in icon of the theme (skeet: "rage", "antiaim",
+     * "legit", "visuals", "misc", "skins", "players", "config"). The image is a white mask on transparency, tinted by
+     * the theme, and drawn at its pixel size at the theme's reference scale (skeet's tab icons are about 40x40).
      */
     String icon() default "";
 

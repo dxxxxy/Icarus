@@ -102,10 +102,12 @@ public class FatalityStyleTheme extends BaseTheme {
     private final Rect columns = new Rect();
     /** Weapon row (sub-pages of the active text tab, shown as icons). */
     protected static final double WEAPONS_X = 33, WEAPONS_H = 38, WEAPONS_SHIFT = 40;
-    /** Weapon bitmaps (cut from the reference as whole slots, named by code point): top, underline, the active lift. */
-    protected static final double WEAPONS_CELL_Y = 129, WEAPONS_UNDERLINE_Y = 156, WEAPON_LIFT = 3;
+    /**
+     * Weapon icons (the built-in ones are cut from the reference as whole slots): top and height of their cell (an
+     * icon is centred in it vertically), underline, the active lift, and the width of a slot without an icon.
+     */
+    protected static final double WEAPONS_CELL_Y = 129, WEAPONS_CELL_H = 27, WEAPONS_UNDERLINE_Y = 156, WEAPON_LIFT = 3, WEAPON_EMPTY_W = 30;
     protected static final int WEAPON_IDLE = 0xFF76719A;
-    private final java.util.Map<Character, AtlasImage> weaponBitmaps = new java.util.HashMap<>();
     private boolean weaponRow;
     private final java.util.Map<String, double[]> textSlots = new java.util.LinkedHashMap<>();
 
@@ -156,8 +158,8 @@ public class FatalityStyleTheme extends BaseTheme {
     }
 
     @Override
-    public char getConfigIcon() {
-        return ' ';
+    public String getConfigIcon() {
+        return "";
     }
 
     @Override
@@ -165,12 +167,10 @@ public class FatalityStyleTheme extends BaseTheme {
         String ui = FontFamilies.first("Segoe UI Semibold", "Segoe UI", "Tahoma", "DejaVu Sans", "Arial");
         String uiBold = FontFamilies.first("Segoe UI", "Tahoma", "DejaVu Sans", "Arial");
         String din = FontFamilies.first("Bahnschrift", "DIN", "Segoe UI", "Arial");
-        String icons = FontFamilies.register(FatalityStyleTheme.class, "/assets/icarus/undefeated.ttf");
         keybindFont = new Font(atlas, din, java.awt.Font.PLAIN, 11);
         setFonts(new Font(atlas, ui, java.awt.Font.PLAIN, 11),
                 new Font(atlas, uiBold, java.awt.Font.BOLD, 11),
                 new Font(atlas, din, java.awt.Font.PLAIN, 15),
-                new Font(atlas, icons, java.awt.Font.PLAIN, 20),
                 new Font(atlas, din, java.awt.Font.BOLD, 24),
                 new Font(atlas, din, java.awt.Font.PLAIN, 15));
     }
@@ -222,9 +222,9 @@ public class FatalityStyleTheme extends BaseTheme {
                     weaponRow = true;
                     double ix = w.x + WEAPONS_X;
                     for (int j = i; j <= end; j++) {
-                        //a reference bitmap is its whole slot; a font glyph gets the same padding around it
-                        AtlasImage bitmap = weaponBitmap(iconOf(subs.get(j)));
-                        double sw = bitmap != null ? bitmap.getWidth() : c.measure(icon(c), String.valueOf(iconOf(subs.get(j)))) + 30;
+                        //an icon is its whole slot (padding included)
+                        AtlasImage bitmap = image(subs.get(j).getIcon());
+                        double sw = bitmap != null ? bitmap.getWidth() : WEAPON_EMPTY_W;
                         subs.get(j).bounds.set(ix, w.y + SUBTAB_DIVIDER + 1, sw, WEAPONS_H);
                         ix += sw;
                     }
@@ -242,17 +242,6 @@ public class FatalityStyleTheme extends BaseTheme {
 
         columns.set(w.x + GROUPS_X, top, 3 * GROUP_W + 2 * GAP, w.y + GROUPS_BOTTOM + 1 - top);
         menu.layoutColumns(c, columns, 3, GAP, groupMetrics, weaponRow ? new double[]{WEAPONS_SHIFT, WEAPONS_SHIFT, 0} : null);
-    }
-
-    /** Fatality's own weapon icon for a sub-page glyph, or null to draw the font glyph. */
-    protected AtlasImage weaponBitmap(char icon) {
-        if (icon == ' ') return null;
-        if (!weaponBitmaps.containsKey(icon)) weaponBitmaps.put(icon, resourceImage("/assets/icarus/fatality/weapon_" + (int) icon + ".png"));
-        return weaponBitmaps.get(icon);
-    }
-
-    private static char iconOf(SubTabView sub) {
-        return sub.getSubPage() == null ? ' ' : sub.getSubPage().getIcon();
     }
 
     private static String upper(String label) {
@@ -306,7 +295,6 @@ public class FatalityStyleTheme extends BaseTheme {
                 if (active) c.rect(sx, w.y + SUBTAB_DIVIDER - 4, sw, 3, accent);
             }
             if (weaponRow) {
-                Font iconFont = icon(c);
                 for (int i = 0; i < subs.size(); i++) {
                     if (!subs.get(i).getLabel().equals(activeLabel)) continue;
                     Rect b = subs.get(i).bounds;
@@ -315,13 +303,10 @@ public class FatalityStyleTheme extends BaseTheme {
                     //idle grey, hovered pink, active white and lifted 3px over its underline
                     int color = active ? TEXT_BRIGHT : hovered ? accent : WEAPON_IDLE;
                     double lift = active ? WEAPON_LIFT : 0;
-                    AtlasImage bitmap = weaponBitmap(iconOf(subs.get(i)));
+                    AtlasImage bitmap = image(subs.get(i).getIcon());
                     if (bitmap != null) {
-                        c.image(bitmap, b.x, w.y + WEAPONS_CELL_Y - lift, bitmap.getWidth(), bitmap.getHeight(), color);
-                    } else {
-                        String glyph = String.valueOf(iconOf(subs.get(i)));
-                        double gw = c.measure(iconFont, glyph);
-                        c.text(iconFont, glyph, Math.round(b.centerX() - gw / 2), centeredTextY(c, iconFont, w.y + 143 - lift), color);
+                        double top = WEAPONS_CELL_Y + Math.round((WEAPONS_CELL_H - bitmap.getHeight()) / 2);
+                        c.image(bitmap, b.x, w.y + top - lift, bitmap.getWidth(), bitmap.getHeight(), color);
                     }
                     if (active) c.rect(b.x, w.y + WEAPONS_UNDERLINE_Y, b.w, 3, accent);
                 }

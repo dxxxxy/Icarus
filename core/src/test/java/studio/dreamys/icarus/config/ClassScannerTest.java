@@ -18,11 +18,11 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ClassScannerTest {
-    @IPage('a')
+    @IPage
     public static class FirstPage {
     }
 
-    @IPage('b')
+    @IPage
     public static class SecondPage {
     }
 
