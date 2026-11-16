@@ -215,6 +215,26 @@ class MenuTest {
     }
 
     @Test
+    void pasteAppendsToTheFocusedFieldOnly() {
+        IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
+        Menu menu = mod.getMenu();
+        frame(menu, 0, 0);
+        platform.clipboard = " world\r\n!";
+        assertFalse(menu.paste(), "nothing focused: the press goes on as an ordinary key");
+
+        FieldWidget name = widget(menu, FieldWidget.class, "Name");
+        click(menu, name.box.centerX(), name.box.centerY());
+        assertTrue(menu.paste());
+        assertEquals("Hello world!", Fixture.Combat.Kill_Aura.Name, "line breaks are dropped");
+
+        StringBuilder longText = new StringBuilder();
+        for (int i = 0; i < 100; i++) longText.append('x');
+        platform.clipboard = longText.toString();
+        menu.paste();
+        assertEquals(64, Fixture.Combat.Kill_Aura.Name.length(), "cut at the field's maximum length");
+    }
+
+    @Test
     void rightClickKeybindPicksAMode() {
         IcarusMod mod = mod(IcarusOptions.defaults(), Fixture.Combat.class);
         Menu menu = mod.getMenu();

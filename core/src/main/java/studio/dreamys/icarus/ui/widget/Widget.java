@@ -104,6 +104,15 @@ public abstract class Widget {
     public void charTyped(int codePoint) {
     }
 
+    /** Clipboard text pasted while focused; by default typed one code point at a time. */
+    public void paste(String text) {
+        for (int i = 0; i < text.length(); ) {
+            int codePoint = text.codePointAt(i);
+            charTyped(codePoint);
+            i += Character.charCount(codePoint);
+        }
+    }
+
     public void focusLost() {
     }
 

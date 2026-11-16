@@ -29,6 +29,14 @@ public interface MenuController {
     void charTyped(int codePoint);
 
     /**
+     * The platform's paste shortcut (Ctrl+V, Cmd+V on macOS) was pressed. Returns whether the menu used it; if not,
+     * the screen forwards the press to {@link #keyPressed} as usual.
+     */
+    default boolean paste() {
+        return false;
+    }
+
+    /**
      * Escape found nothing left to dismiss: the menu starts fading out, ignoring input meanwhile. The screen closes
      * itself once {@link #isFadedOut()} says so (checked after each {@link #render}).
      */

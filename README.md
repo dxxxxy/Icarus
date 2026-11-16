@@ -29,7 +29,7 @@ repositories {
 
 dependencies {
     // studio.dreamys:icarus-<loader>-<minecraft version>:<icarus version>
-    implementation "studio.dreamys:icarus-fabric-1.21.1:3.0.0"
+    implementation "studio.dreamys:icarus-fabric-1.21.1:3.0.1"
 }
 ```
 

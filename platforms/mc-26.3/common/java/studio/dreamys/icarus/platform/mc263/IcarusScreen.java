@@ -88,6 +88,7 @@ public class IcarusScreen extends Screen {
             if (!menu.keyPressed(Keys.KEY_ESCAPE)) menu.requestClose(); //fades out, then closes below
             return true;
         }
+        if (event.isPaste() && menu.paste()) return true;
         menu.keyPressed(Keys.fromSdl(event.key()));
         return true;
     }

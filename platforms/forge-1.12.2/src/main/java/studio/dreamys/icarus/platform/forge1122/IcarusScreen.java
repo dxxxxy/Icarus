@@ -61,6 +61,7 @@ public class IcarusScreen extends GuiScreen {
             if (!menu.keyPressed(keyCode)) menu.requestClose(); //fades out, then closes in drawScreen
             return;
         }
+        if (isKeyComboCtrlV(keyCode) && menu.paste()) return;
         menu.keyPressed(keyCode);
         if (typedChar != 0 && !Character.isISOControl(typedChar)) menu.charTyped(typedChar);
     }

@@ -8,8 +8,8 @@ import studio.dreamys.icarus.ui.Menu;
 import studio.dreamys.icarus.ui.Rect;
 
 /**
- * A single-line text field. Click to focus; typing appends any printable character up to the setting's maximum
- * length, Backspace deletes, Enter or Escape unfocuses. The text is saved when the field loses focus.
+ * A single-line text field. Click to focus; typing or pasting (Ctrl+V) appends printable characters up to the
+ * setting's maximum length, Backspace deletes, Enter or Escape unfocuses. The text is saved when the field loses focus.
  */
 public final class FieldWidget extends Widget {
     private final Setting<String> value;
@@ -69,11 +69,31 @@ public final class FieldWidget extends Widget {
 
     @Override
     public void charTyped(int codePoint) {
-        if (Character.isISOControl(codePoint) || !Character.isDefined(codePoint)) return;
+        if (!accepts(codePoint)) return;
         String text = getText();
         if (text.codePointCount(0, text.length()) >= setting.getMaxLength()) return;
         value.set(text + new String(Character.toChars(codePoint)));
         focusedAt = System.nanoTime();
+    }
+
+    /** Appends the printable part of {@code text} (line breaks and other controls dropped), up to the length limit. */
+    @Override
+    public void paste(String text) {
+        StringBuilder out = new StringBuilder(getText());
+        int room = setting.getMaxLength() - out.codePointCount(0, out.length());
+        for (int i = 0; i < text.length() && room > 0; ) {
+            int codePoint = text.codePointAt(i);
+            i += Character.charCount(codePoint);
+            if (!accepts(codePoint)) continue;
+            out.appendCodePoint(codePoint);
+            room--;
+        }
+        value.set(out.toString());
+        focusedAt = System.nanoTime();
+    }
+
+    private static boolean accepts(int codePoint) {
+        return !Character.isISOControl(codePoint) && Character.isDefined(codePoint);
     }
 
     @Override

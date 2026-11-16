@@ -810,6 +810,15 @@ public final class Menu implements MenuController {
         if (focused != null) focused.charTyped(codePoint);
     }
 
+    /** Pastes the clipboard into the focused text field or list search; ignored (returns false) otherwise. */
+    @Override
+    public boolean paste() {
+        if (!isTyping()) return false;
+        String text = Icarus.getPlatform().getClipboard();
+        if (text != null && !text.isEmpty()) focused.paste(text);
+        return true;
+    }
+
     @Override
     public void closed() {
         mod.setMenuOpen(false);
