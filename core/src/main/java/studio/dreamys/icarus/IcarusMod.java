@@ -129,9 +129,13 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     }
 
     /**
-     * Whether the menu is drawn in a separate window that recorders and screen sharing (OBS, Discord, Snipping Tool)
-     * can't see, laid over the game so it looks the same to the player. Saved in {@code icarus.json}. Has no effect
-     * where {@link Icarus#canHideFromRecorders()} is false.
+     * Whether this mod's drawing (its menu, toasts, watermark and every other {@link #addHud HUD element}) goes into
+     * separate windows that recorders and screen sharing (OBS, Discord, Snipping Tool) can't see, laid over the game
+     * so it looks the same to the player. Saved in {@code icarus.json}. Has no effect where
+     * {@link Icarus#canHideFromRecorders()} is false.
+     * <p>
+     * Anything a mod draws through a {@link HudElement} follows this, so a mod can keep its own overlays (ESP boxes,
+     * indicators, ...) off recordings by drawing them as HUD elements.
      */
     public boolean isHiddenFromRecorders() {
         return store.getPrefs().isHideFromRecorders();
@@ -139,7 +143,7 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     public void setHiddenFromRecorders(boolean hidden) {
         store.setHideFromRecorders(hidden);
-        if (!hidden) Icarus.getRecorderOverlay().hide(Icarus.getRecorderShield());
+        if (!hidden) Icarus.getRecorderOverlay().hide();
     }
 
     /** Accent colour (ARGB): the one from the options, or the theme's. */
@@ -353,7 +357,11 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
         double scale = renderScale(platform.getGuiScale());
         int fbWidth = platform.getFramebufferWidth(), fbHeight = platform.getFramebufferHeight();
         hudContext.set(theme, getAccent(), fbWidth / scale, fbHeight / scale, partialTick);
-        hudFrame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, hudPaint);
+        if (isHiddenFromRecorders() && Icarus.canHideFromRecorders()) {
+            Icarus.getRecorderOverlay().submit(hudFrame.paint(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, hudPaint));
+        } else {
+            hudFrame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, hudPaint);
+        }
     }
 
     private void paintHud() {
@@ -383,6 +391,10 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
     /** Whether this mod's menu is on screen (set by the menu). */
     public void setMenuOpen(boolean open) {
         menuOpen = open;
+    }
+
+    public boolean isMenuOpen() {
+        return menuOpen;
     }
 
     /* ---- called by the menu ---- */

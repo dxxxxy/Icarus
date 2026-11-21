@@ -9,6 +9,7 @@ import studio.dreamys.icarus.IcarusMod;
 import studio.dreamys.icarus.IcarusOptions;
 import studio.dreamys.icarus.settings.Setting;
 import studio.dreamys.icarus.support.FakePlatform;
+import studio.dreamys.icarus.support.FakePlatform.FakeShield.FakeLayer;
 import studio.dreamys.icarus.support.Fixture;
 import studio.dreamys.icarus.theme.Themes;
 import studio.dreamys.icarus.ui.ConfigPanel;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+/** The menu hidden from recorders: drawn into the shield's layers instead of the game. */
 class RecorderOverlayTest {
     @TempDir
     Path game;
@@ -59,38 +61,49 @@ class RecorderOverlayTest {
     }
 
     @Test
-    void hiddenMenuIsDrawnIntoTheShieldNotTheGame() {
+    void hiddenMenuIsDrawnIntoALayerNotTheGame() {
         IcarusMod mod = mod(IcarusOptions.defaults());
         mod.setHiddenFromRecorders(true);
         Menu menu = open(mod);
         for (int i = 0; i < 3; i++) menu.render(0, 0, 0);
 
         assertEquals(0, platform.renderer.renders, "nothing drawn in game");
-        assertTrue(shield.visible);
-        int opaque = 0;
-        for (int p : shield.pixels) if (p >>> 24 == 255) opaque++;
-        assertTrue(opaque > 100_000, "the menu's pixels reached the shield (" + opaque + ")");
-        assertTrue(shield.width < platform.width && shield.height < platform.height, "only the menu's bounds are sent");
+        List<FakeLayer> visible = shield.visible();
+        assertEquals(1, visible.size());
+        FakeLayer layer = visible.get(0);
+        assertTrue(layer.opaquePixels() > 100_000, "the menu's pixels reached the layer (" + layer.opaquePixels() + ")");
+        assertTrue(layer.width < platform.width && layer.height < platform.height, "only the menu's bounds are sent");
 
         //an unchanged frame isn't rasterised or uploaded again
         RecorderOverlay overlay = Icarus.getRecorderOverlay();
-        int rasterised = overlay.rasterisations, uploads = shield.uploads;
+        int rasterised = overlay.rasterisations, uploads = layer.uploads;
         menu.render(0, 0, 0);
         assertEquals(rasterised, overlay.rasterisations);
-        assertEquals(uploads, shield.uploads);
+        assertEquals(uploads, layer.uploads);
 
-        //moving the window by whole pixels only moves the shield
-        int x = shield.x, y = shield.y;
+        //moving the window by whole pixels only moves the layer
+        int x = layer.x, y = layer.y;
         menu.window.x += 10;
         menu.window.y += 5;
         menu.render(0, 0, 0);
         assertEquals(rasterised, overlay.rasterisations);
-        assertEquals(uploads, shield.uploads);
-        assertEquals(x + 10, shield.x);
-        assertEquals(y + 5, shield.y);
+        assertEquals(uploads, layer.uploads);
+        assertEquals(x + 10, layer.x);
+        assertEquals(y + 5, layer.y);
+    }
 
-        menu.closed();
-        assertFalse(shield.visible);
+    @Test
+    void toastsOverTheMenuGetTheirOwnLayerOnTop() {
+        IcarusMod mod = mod(IcarusOptions.defaults());
+        mod.setHiddenFromRecorders(true);
+        Menu menu = open(mod);
+        mod.toasts().send("Title", "Message");
+        for (int i = 0; i < 20; i++) mod.toasts().tick();
+        menu.render(0, 0, 0);
+        List<FakeLayer> visible = shield.visible();
+        assertEquals(2, visible.size(), "menu and toasts");
+        assertTrue(visible.get(0).opaquePixels() > visible.get(1).opaquePixels(), "the menu is under the toasts");
+        assertEquals(0, platform.renderer.renders);
     }
 
     @Test
@@ -99,13 +112,13 @@ class RecorderOverlayTest {
         mod.setHiddenFromRecorders(true);
         Menu menu = open(mod);
         menu.render(0, 0, 0);
-        assertTrue(shield.visible);
+        assertEquals(1, shield.visible().size());
 
         mod.setHiddenFromRecorders(false);
-        assertFalse(shield.visible);
+        assertEquals(0, shield.visible().size());
         menu.render(0, 0, 0);
         assertEquals(1, platform.renderer.renders);
-        assertFalse(shield.visible);
+        assertEquals(0, shield.visible().size());
     }
 
     @Test
@@ -118,19 +131,19 @@ class RecorderOverlayTest {
         assertEquals(1, platform.renderer.renders, "the failed frame is still drawn");
         menu.render(0, 0, 0);
         assertEquals(2, platform.renderer.renders);
-        assertEquals(1, shield.shows, "an unavailable shield isn't asked again");
+        assertEquals(1, shield.layers.get(0).shows, "an unavailable shield isn't asked again");
     }
 
     @Test
-    void staleShieldIsHiddenOnTick() throws Exception {
+    void staleLayersAreHiddenOnTick() throws Exception {
         IcarusMod mod = mod(IcarusOptions.defaults());
         mod.setHiddenFromRecorders(true);
         open(mod).render(0, 0, 0);
         Icarus.clientTick();
-        assertTrue(shield.visible, "just presented");
+        assertEquals(1, shield.visible().size(), "just presented");
         Thread.sleep(RecorderOverlay.STALE_NANOS / 1_000_000 + 20);
         Icarus.clientTick();
-        assertFalse(shield.visible);
+        assertEquals(0, shield.visible().size());
     }
 
     @Test

@@ -1,93 +1,197 @@
 package studio.dreamys.icarus.render;
 
 import studio.dreamys.icarus.platform.RecorderShield;
+import studio.dreamys.icarus.platform.Renderer;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Shows painted draw lists in the {@link RecorderShield} instead of the game: rasterises them on the CPU into the
- * smallest rectangle that holds them and hands the pixels over. Frames identical to the previous one, or the previous
- * one moved by whole pixels (dragging the window), aren't rasterised again. Steady frames don't allocate.
+ * Shows draw lists in the {@link RecorderShield} instead of the game. During a frame, whatever is hidden from
+ * recorders is {@link #submit submitted} (each mod's HUD, the open menu, the toasts over it); at the end of the frame
+ * {@link #flush} shows each list in its own layer, stacked in submission order, and hides the layers of lists that
+ * weren't submitted.
+ * <p>
+ * Each layer is rasterised on the CPU into the smallest rectangle that holds its list. A list identical to its
+ * previous frame, or moved by whole pixels (dragging the menu), isn't rasterised again, and other layers aren't
+ * touched, so a still HUD costs nothing while the menu moves. Steady frames don't allocate.
  */
 public final class RecorderOverlay {
-    /** The shield is hidden when nothing was shown for this long (a screen replaced without being closed). */
+    /** Layers are hidden when nothing was presented for this long (the HUD stopped drawing, a screen was replaced). */
     static final long STALE_NANOS = 150_000_000L;
 
-    private final SoftwareRaster raster = new SoftwareRaster();
+    private final Map<DrawList, LayerState> states = new IdentityHashMap<>();
+    private final List<LayerState> all = new ArrayList<>();
+    private DrawList[] pending = new DrawList[8];
+    private int pendingCount;
+    private LayerState[] order = new LayerState[8], previousOrder = new LayerState[8];
+    private int previousOrderCount;
     private final int[] bounds = new int[4];
-    private final ListCopy[] previous = {new ListCopy(), new ListCopy()};
-    private int previousX0, previousY0, previousX1, previousY1;
-    private int previousAtlasSize = -1, previousGeneration = -1;
-    private boolean previousValid, previousClamped;
     private boolean shown;
     private long lastShown;
-    /** Frames actually rasterised (tests). */
+    /** Lists actually rasterised (tests). */
     int rasterisations;
 
-    /**
-     * Shows {@code first} with {@code second} (may be null) drawn over it, dropping fragments below
-     * {@code alphaCutoff} like the platform's shader ({@link studio.dreamys.icarus.platform.Renderer#getAlphaCutoff()}).
-     * Returns false if the shield can't hide them; the caller then draws them in game.
-     */
-    public boolean present(RecorderShield shield, FontAtlas atlas, float alphaCutoff, int framebufferWidth, int framebufferHeight, DrawList first, DrawList second) {
-        if (!shield.isAvailable()) return false;
-        raster.setAlphaCutoff(alphaCutoff);
-        SoftwareRaster.emptyBounds(bounds);
-        SoftwareRaster.unionBounds(first, framebufferWidth, framebufferHeight, bounds);
-        if (second != null) SoftwareRaster.unionBounds(second, framebufferWidth, framebufferHeight, bounds);
-        int x0 = bounds[0], y0 = bounds[1], w = bounds[2] - bounds[0], h = bounds[3] - bounds[1];
-        boolean clamped = isClamped(first, framebufferWidth, framebufferHeight) || second != null && isClamped(second, framebufferWidth, framebufferHeight);
+    /** Adds a list to show in the hidden layers this frame, above those submitted before it. */
+    public void submit(DrawList list) {
+        if (list == null || list.isEmpty()) return;
+        for (int i = 0; i < pendingCount; i++) if (pending[i] == list) return;
+        if (pendingCount == pending.length) pending = java.util.Arrays.copyOf(pending, pendingCount * 2);
+        pending[pendingCount++] = list;
+    }
 
-        int dx = x0 - previousX0, dy = y0 - previousY0;
-        boolean same = previousValid && !clamped && !previousClamped && w == previousX1 - previousX0 && h == previousY1 - previousY0
-                && atlas.getSize() == previousAtlasSize && atlas.getGeneration() == previousGeneration
-                && previous[0].matches(first, dx, dy) && previous[1].matches(second, dx, dy);
-        if (!same) {
-            raster.begin(x0, y0, w, h, 0);
-            raster.draw(first, atlas);
-            if (second != null) raster.draw(second, atlas);
-            rasterisations++;
-            previous[0].copy(first);
-            previous[1].copy(second);
-            previousAtlasSize = atlas.getSize();
-            previousGeneration = atlas.getGeneration();
-            previousClamped = clamped;
-            previousValid = true;
+    /** Whether there is anything to show or hide (so {@link #flush} can be skipped when hiding isn't used). */
+    public boolean hasWork() {
+        return pendingCount > 0 || shown;
+    }
+
+    /**
+     * Ends the frame: shows the submitted lists, each in its own layer, and hides the rest. Fragments below
+     * {@code alphaCutoff} are dropped like the platform's shader does ({@link Renderer#getAlphaCutoff()}). If the
+     * shield can't hide them, the submitted lists are drawn in game with {@code fallback} instead and false is
+     * returned.
+     */
+    public boolean flush(RecorderShield shield, FontAtlas atlas, float alphaCutoff, int framebufferWidth, int framebufferHeight, Renderer fallback) {
+        int count = pendingCount;
+        pendingCount = 0;
+        boolean ok = shield.isAvailable();
+        if (order.length < count) {
+            order = new LayerState[count * 2];
+            previousOrder = new LayerState[count * 2];
         }
-        previousX0 = x0;
-        previousY0 = y0;
-        previousX1 = x0 + w;
-        previousY1 = y0 + h;
-        //on a pure move the raster's own origin is stale, but the shield only needs the new position;
-        //a hidden shield gets the pixels again, the raster still holds them
-        if (!shield.show(raster.getPixels(), raster.getWidth(), w, h, x0, y0, !same || !shown)) {
-            previousValid = false;
-            shown = false;
+        for (int i = 0; ok && i < count; i++) {
+            LayerState state = states.get(pending[i]);
+            if (state == null) {
+                RecorderShield.Layer layer = shield.createLayer();
+                if (layer == null) {
+                    ok = false;
+                    break;
+                }
+                state = new LayerState(layer);
+                states.put(pending[i], state);
+                all.add(state);
+            }
+            state.used = true;
+            order[i] = state;
+            ok = state.present(pending[i], atlas, alphaCutoff, framebufferWidth, framebufferHeight);
+        }
+        if (!ok) {
+            hideAll();
+            for (int i = 0; i < count; i++) fallback.render(pending[i]);
+            clear(count);
             return false;
         }
-        shown = true;
-        lastShown = System.nanoTime();
+        for (int i = 0; i < all.size(); i++) {
+            LayerState state = all.get(i);
+            if (!state.used) state.hide();
+            state.used = false;
+        }
+        //restack only when the order changed; each layer goes right under the one drawn after it
+        boolean restack = count != previousOrderCount;
+        for (int i = 0; !restack && i < count; i++) restack = order[i] != previousOrder[i] || order[i].reshown;
+        if (restack) for (int i = count - 2; i >= 0; i--) order[i].layer.placeUnder(order[i + 1].layer);
+        for (int i = 0; i < count; i++) {
+            order[i].reshown = false;
+            previousOrder[i] = order[i];
+        }
+        previousOrderCount = count;
+        shown = count > 0;
+        if (shown) lastShown = System.nanoTime();
+        clear(count);
         return true;
     }
 
-    /** Hides the shield (the menu closed, or hiding was turned off). */
-    public void hide(RecorderShield shield) {
+    /** Hides every layer (hiding was turned off). */
+    public void hide() {
         if (!shown) return;
-        shown = false;
-        shield.hide();
+        hideAll();
     }
 
-    /** Hides the shield if nothing was presented for a while. Called every client tick. */
-    public void hideIfStale(RecorderShield shield) {
-        if (shown && System.nanoTime() - lastShown > STALE_NANOS) hide(shield);
+    /** Hides every layer if nothing was presented for a while. Called every client tick. */
+    public void hideIfStale() {
+        if (shown && System.nanoTime() - lastShown > STALE_NANOS) hideAll();
     }
 
-    /** Forgets the previous frame (the shield was replaced). */
+    /** Forgets every layer (the shield was replaced). */
     public void reset() {
-        previousValid = false;
+        states.clear();
+        all.clear();
+        pendingCount = 0;
+        previousOrderCount = 0;
         shown = false;
     }
 
     public boolean isShown() {
         return shown;
+    }
+
+    private void hideAll() {
+        for (int i = 0; i < all.size(); i++) all.get(i).hide();
+        previousOrderCount = 0;
+        shown = false;
+    }
+
+    private void clear(int count) {
+        for (int i = 0; i < count; i++) pending[i] = null;
+    }
+
+    /** One list's layer: its raster and what it last showed. */
+    private final class LayerState {
+        final RecorderShield.Layer layer;
+        final SoftwareRaster raster = new SoftwareRaster();
+        final ListCopy previous = new ListCopy();
+        int previousX0, previousY0, previousW, previousH;
+        int previousAtlasSize = -1, previousGeneration = -1;
+        float previousCutoff = -1;
+        boolean previousValid, previousClamped, visible, used, reshown;
+
+        LayerState(RecorderShield.Layer layer) {
+            this.layer = layer;
+        }
+
+        boolean present(DrawList list, FontAtlas atlas, float alphaCutoff, int framebufferWidth, int framebufferHeight) {
+            SoftwareRaster.emptyBounds(bounds);
+            SoftwareRaster.unionBounds(list, framebufferWidth, framebufferHeight, bounds);
+            int x0 = bounds[0], y0 = bounds[1], w = bounds[2] - bounds[0], h = bounds[3] - bounds[1];
+            boolean clamped = isClamped(list, framebufferWidth, framebufferHeight);
+            boolean same = previousValid && !clamped && !previousClamped && w == previousW && h == previousH
+                    && atlas.getSize() == previousAtlasSize && atlas.getGeneration() == previousGeneration
+                    && alphaCutoff == previousCutoff && previous.matches(list, x0 - previousX0, y0 - previousY0);
+            if (!same) {
+                raster.setAlphaCutoff(alphaCutoff);
+                raster.begin(x0, y0, w, h, 0);
+                raster.draw(list, atlas);
+                rasterisations++;
+                previous.copy(list);
+                previousAtlasSize = atlas.getSize();
+                previousGeneration = atlas.getGeneration();
+                previousCutoff = alphaCutoff;
+                previousClamped = clamped;
+                previousValid = true;
+            }
+            previousX0 = x0;
+            previousY0 = y0;
+            previousW = w;
+            previousH = h;
+            //on a pure move the raster's own origin is stale, but the layer only needs the new position;
+            //a hidden layer gets the pixels again, the raster still holds them
+            if (!layer.show(raster.getPixels(), raster.getWidth(), w, h, x0, y0, !same || !visible)) {
+                previousValid = false;
+                visible = false;
+                return false;
+            }
+            if (!visible) reshown = true;
+            visible = true;
+            return true;
+        }
+
+        void hide() {
+            if (!visible) return;
+            visible = false;
+            layer.hide();
+        }
     }
 
     /** Whether any vertex lies outside the framebuffer, so its bounds were cut and a move can't be reused. */
@@ -110,10 +214,6 @@ public final class RecorderOverlay {
         int[] commandStarts = new int[0], commandCounts = new int[0];
 
         void copy(DrawList list) {
-            if (list == null) {
-                vertices = -1;
-                return;
-            }
             vertices = list.getVertexCount();
             indexCount = 0;
             commands = list.getCommandCount();
@@ -142,7 +242,6 @@ public final class RecorderOverlay {
 
         /** Whether {@code list} equals the copy with every vertex moved by ({@code dx}, {@code dy}). */
         boolean matches(DrawList list, int dx, int dy) {
-            if (list == null) return vertices == -1;
             if (list.getVertexCount() != vertices || list.getCommandCount() != commands) return false;
             for (int c = 0; c < commands; c++) {
                 if (list.getCommandTexture(c) != textures[c] || list.getCommandIndexStart(c) != commandStarts[c]

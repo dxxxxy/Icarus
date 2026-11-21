@@ -60,6 +60,16 @@ public final class Icarus {
         return new IcarusMod(modid, theme, options, pages, configDir, legacyDir);
     }
 
+    /** Adds a detached instance to the ones fed key presses, HUD rendering and ticks (tests). */
+    static void register(IcarusMod mod) {
+        mods.add(mod);
+    }
+
+    /** Removes an instance added by {@link #register} (tests). */
+    static void forget(IcarusMod mod) {
+        mods.remove(mod);
+    }
+
     /** The implementation for the running Minecraft version / mod loader. */
     public static Platform getPlatform() {
         if (platform == null) {
@@ -75,7 +85,7 @@ public final class Icarus {
     /** Supplies the platform explicitly instead of looking it up (tests, custom environments). */
     public static void setPlatform(Platform platform) {
         Icarus.platform = platform;
-        if (shield != null) overlay.hide(shield);
+        overlay.hide();
         overlay.reset();
         shield = null;
     }
@@ -101,9 +111,25 @@ public final class Icarus {
         return shield;
     }
 
-    /** Draws menus into the {@link RecorderShield} while they're hidden from recorders. */
+    /** Shows what's hidden from recorders (HUDs, menus, toasts) in the {@link RecorderShield}'s layers. */
     public static RecorderOverlay getRecorderOverlay() {
         return overlay;
+    }
+
+    /**
+     * Ends the frame for the hidden layers: shows what was submitted to the {@link RecorderOverlay} since the last
+     * call. Called after the HUD, or by an open menu after it draws (the HUD is drawn first, then the screen).
+     */
+    public static void flushHidden() {
+        if (!overlay.hasWork()) return;
+        Platform p = getPlatform();
+        overlay.flush(getRecorderShield(), getAtlas(), p.getRenderer().getAlphaCutoff(), p.getFramebufferWidth(), p.getFramebufferHeight(), p.getRenderer());
+    }
+
+    /** Whether any mod's menu is on screen. */
+    public static boolean isAnyMenuOpen() {
+        for (IcarusMod mod : mods) if (mod.isMenuOpen()) return true;
+        return false;
     }
 
     /** The texture atlas shared by every mod (fonts and generated images). */
@@ -142,11 +168,13 @@ public final class Icarus {
     /** The HUD is being drawn. */
     public static void renderHud(float partialTick) {
         for (IcarusMod mod : mods) mod.renderHud(partialTick);
+        //an open menu draws after the HUD and shows the hidden layers itself
+        if (!isAnyMenuOpen()) flushHidden();
     }
 
     /** Start of a client tick. */
     public static void clientTick() {
         for (IcarusMod mod : mods) mod.tick();
-        if (shield != null) overlay.hideIfStale(shield);
+        if (shield != null) overlay.hideIfStale();
     }
 }

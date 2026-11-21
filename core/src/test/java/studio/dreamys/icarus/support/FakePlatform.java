@@ -94,12 +94,12 @@ public final class FakePlatform implements Platform {
         return shield;
     }
 
-    /** A shield that records what it's asked to show. */
+    /** A shield that records what its layers are asked to show. */
     public static final class FakeShield implements RecorderShield {
-        public boolean available = true, accept = true, visible;
-        public int shows, uploads, hides;
-        public int x, y, width, height;
-        public int[] pixels;
+        public boolean available = true, accept = true;
+        public final List<FakeLayer> layers = new ArrayList<>();
+        /** Every layer, bottom to top, as last stacked with placeUnder. */
+        public final List<FakeLayer> stack = new ArrayList<>();
 
         @Override
         public boolean isAvailable() {
@@ -107,29 +107,71 @@ public final class FakePlatform implements Platform {
         }
 
         @Override
-        public boolean show(int[] pixels, int stride, int width, int height, int x, int y, boolean changed) {
-            shows++;
-            if (!accept) {
-                available = false;
-                return false;
-            }
-            if (changed) {
-                uploads++;
-                this.pixels = new int[width * height];
-                for (int row = 0; row < height; row++) System.arraycopy(pixels, row * stride, this.pixels, row * width, width);
-            }
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-            visible = true;
-            return true;
+        public Layer createLayer() {
+            if (!available) return null;
+            FakeLayer layer = new FakeLayer();
+            layers.add(layer);
+            return layer;
         }
 
-        @Override
-        public void hide() {
-            hides++;
-            visible = false;
+        /** The visible layers, bottom to top. */
+        public List<FakeLayer> visible() {
+            List<FakeLayer> result = new ArrayList<>();
+            for (FakeLayer layer : stack) if (layer.visible) result.add(layer);
+            for (FakeLayer layer : layers) if (layer.visible && !result.contains(layer)) result.add(layer);
+            return result;
+        }
+
+        public final class FakeLayer implements Layer {
+            public boolean visible;
+            public int shows, uploads, hides;
+            public int x, y, width, height;
+            public int[] pixels;
+
+            @Override
+            public boolean show(int[] pixels, int stride, int width, int height, int x, int y, boolean changed) {
+                shows++;
+                if (!accept) {
+                    available = false;
+                    return false;
+                }
+                if (changed) {
+                    uploads++;
+                    this.pixels = new int[width * height];
+                    for (int row = 0; row < height; row++) System.arraycopy(pixels, row * stride, this.pixels, row * width, width);
+                }
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                visible = true;
+                return true;
+            }
+
+            @Override
+            public void hide() {
+                hides++;
+                visible = false;
+            }
+
+            @Override
+            public void placeUnder(Layer above) {
+                stack.remove(this);
+                int at = stack.indexOf(above);
+                if (at < 0) {
+                    stack.add(this);
+                    stack.add((FakeLayer) above);
+                } else {
+                    stack.add(at, this);
+                }
+            }
+
+            /** Pixels with any opacity. */
+            public int opaquePixels() {
+                int n = 0;
+                if (pixels != null) for (int p : pixels) if (p >>> 24 != 0) n++;
+                return n;
+            }
         }
     }
 
