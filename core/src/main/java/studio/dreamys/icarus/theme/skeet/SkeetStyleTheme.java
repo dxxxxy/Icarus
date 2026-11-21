@@ -145,15 +145,16 @@ public class SkeetStyleTheme extends BaseTheme {
 
     /* ---- resources ---- */
 
-    /** Background: 1-pixel vertical stripes, tiled at screen resolution. */
+    /**
+     * Background: 1-pixel vertical stripes, tiled at screen resolution. The tile holds 32 stripe pairs so a window
+     * takes about a hundred quads, not tens of thousands (the pattern starts at the same phase either way).
+     */
     protected AtlasImage stripes() {
         if (stripes == null) {
-            int[] pixels = new int[4];
-            pixels[0] = STRIPE_A;
-            pixels[1] = STRIPE_B;
-            pixels[2] = STRIPE_A;
-            pixels[3] = STRIPE_B;
-            stripes = new AtlasImage(pixels, 2, 2);
+            int size = 64;
+            int[] pixels = new int[size * size];
+            for (int i = 0; i < pixels.length; i++) pixels[i] = i % 2 == 0 ? STRIPE_A : STRIPE_B;
+            stripes = new AtlasImage(pixels, size, size);
         }
         return stripes;
     }
