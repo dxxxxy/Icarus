@@ -122,6 +122,12 @@ public final class ConfigStore {
         prefsDirty = true;
     }
 
+    public void setHideFromRecorders(boolean hide) {
+        if (hide == prefs.isHideFromRecorders()) return;
+        prefs.setHideFromRecorders(hide);
+        prefsDirty = true;
+    }
+
     public void setPosition(double x, double y) {
         if (x == prefs.getX() && y == prefs.getY()) return;
         prefs.setPosition(x, y);

@@ -142,6 +142,34 @@ class SoftwareRasterTest {
         return 0.005f + random.nextFloat() * 0.02f;
     }
 
+    /** Like a shader discarding {@code color.a < cutoff}: faint fragments are dropped, the rest drawn as usual. */
+    @Test
+    void alphaCutoffDropsFaintFragments() {
+        int[] texels = {0xFFFFFFFF};
+        studio.dreamys.icarus.platform.Texture texture = new FakePlatform.RecordingRenderer().createTexture(1, 1);
+        DrawList list = new DrawList();
+        list.reset(8, 8);
+        list.setTexture(texture);
+        int faint = 0x18FFFFFF, clear = 0x1AFFFFFF; //alpha 24/255 < 0.1 <= 26/255
+        list.quad(0, 0, 4, 4, 0, 0, 0, 0, faint, faint, faint, faint);
+        list.quad(4, 0, 8, 4, 0, 0, 0, 0, clear, clear, clear, clear);
+        list.triangle(0, 4, 4, 8, 0, 8, 0, 0, faint);
+        for (boolean quads : new boolean[]{true, false}) {
+            SoftwareRaster raster = new SoftwareRaster();
+            raster.quads = quads;
+            raster.setAlphaCutoff(0.1f);
+            raster.begin(0, 0, 8, 8, 0);
+            raster.drawCommand(list, 0, texels, 1, 1);
+            assertEquals(0, raster.getPixels()[1 * 8 + 1], "faint quad dropped");
+            assertEquals(0, raster.getPixels()[6 * 8 + 1], "faint triangle dropped");
+            assertEquals(26, raster.getPixels()[1 * 8 + 5] >>> 24, "the rest drawn");
+            raster.setAlphaCutoff(0);
+            raster.begin(0, 0, 8, 8, 0);
+            raster.drawCommand(list, 0, texels, 1, 1);
+            assertEquals(24, raster.getPixels()[1 * 8 + 1] >>> 24, "without a cutoff it's drawn");
+        }
+    }
+
     @Test
     void boundsUnionAndClamp() {
         DrawList a = new DrawList(), b = new DrawList();

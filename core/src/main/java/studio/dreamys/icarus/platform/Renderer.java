@@ -20,4 +20,13 @@ public interface Renderer {
 
     /** Draws the list over whatever is on screen, with alpha blending, in the current GUI pass. */
     void render(DrawList list);
+
+    /**
+     * Fragments whose alpha (texel × vertex colour) is below this are dropped by the platform's shader, as
+     * Minecraft's {@code position_tex_color} does below 0.1 on some versions. The menu hidden from recorders is
+     * drawn on the CPU with the same cutoff, so it looks the same.
+     */
+    default float getAlphaCutoff() {
+        return 0;
+    }
 }

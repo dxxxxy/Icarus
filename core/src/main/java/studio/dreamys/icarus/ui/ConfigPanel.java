@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The built-in config UI and theme selector, made of virtual settings so they use the normal widgets:
+ * The built-in config UI, theme selector and "Hide from recorders" checkbox, made of virtual settings so they use the normal widgets:
  * <ul>
  *     <li>full (for {@code ConfigUiStyle.PAGE}): config list, name field, load/save/delete/reset/import/export</li>
  *     <li>compact (for {@code ConfigUiStyle.PINNED}): slot dropdown, load/save</li>
@@ -36,8 +36,9 @@ public final class ConfigPanel {
     /**
      * @param configUi      include the config controls
      * @param themeSelector include a theme dropdown
+     * @param recorderToggle include a "Hide from recorders" checkbox
      */
-    public ConfigPanel(IcarusMod mod, boolean configUi, boolean themeSelector) {
+    public ConfigPanel(IcarusMod mod, boolean configUi, boolean themeSelector, boolean recorderToggle) {
         this.mod = mod;
         this.store = mod.getConfigStore();
         this.full = GroupNode.standalone(configUi ? "Presets" : "Menu", LAST_COLUMN, Integer.MAX_VALUE, false);
@@ -112,6 +113,22 @@ public final class ConfigPanel {
             };
             full.addVirtual("Menu theme", SettingTypes.CHOICE, themeHolder, Themes.displayNames(), null);
             compact.addVirtual("Menu theme", SettingTypes.CHOICE, themeHolder, Themes.displayNames(), null);
+        }
+
+        if (recorderToggle) {
+            Setting.Holder<Boolean> hideHolder = new Setting.Holder<Boolean>() {
+                @Override
+                public Boolean get() {
+                    return mod.isHiddenFromRecorders();
+                }
+
+                @Override
+                public void set(Boolean value) {
+                    mod.setHiddenFromRecorders(Boolean.TRUE.equals(value));
+                }
+            };
+            full.addVirtual("Hide from recorders", SettingTypes.CHECKBOX, hideHolder, null, null);
+            compact.addVirtual("Hide from recorders", SettingTypes.CHECKBOX, hideHolder, null, null);
         }
         refresh();
     }

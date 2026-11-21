@@ -18,6 +18,8 @@ tasks.withType<JavaCompile>().configureEach {
 dependencies {
     // every supported Minecraft version ships gson; 2.2.4 is the oldest (1.7.10/1.8.9)
     compileOnly("com.google.code.gson:gson:2.2.4")
+    // every supported Minecraft version ships JNA; 3.4.0 is the oldest (1.7.10/1.8.9), so only its API is used
+    compileOnly("net.java.dev.jna:jna:3.4.0")
 
     val lombok = "org.projectlombok:lombok:${providers.gradleProperty("lombok_version").get()}"
     compileOnly(lombok)

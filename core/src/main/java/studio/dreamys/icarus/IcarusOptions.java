@@ -8,6 +8,7 @@ import java.awt.Color;
 public final class IcarusOptions {
     boolean configUi = true;
     boolean themeSelector = true;
+    boolean recorderToggle = true;
     int menuKey = Keys.KEY_RSHIFT;
     Integer accent;
     double menuScale = 1;
@@ -33,6 +34,15 @@ public final class IcarusOptions {
     /** Lets players switch the menu theme (on by default). */
     public IcarusOptions themeSelector(boolean enabled) {
         themeSelector = enabled;
+        return this;
+    }
+
+    /**
+     * Shows a "Hide from recorders" checkbox next to the theme selector (on by default). It's only shown where hiding
+     * works (Windows 10 2004 or later); {@link IcarusMod#setHiddenFromRecorders(boolean)} works without it.
+     */
+    public IcarusOptions recorderToggle(boolean enabled) {
+        recorderToggle = enabled;
         return this;
     }
 

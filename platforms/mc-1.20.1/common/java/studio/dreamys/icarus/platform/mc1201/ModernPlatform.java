@@ -2,7 +2,9 @@ package studio.dreamys.icarus.platform.mc1201;
 
 import net.minecraft.client.Minecraft;
 import studio.dreamys.icarus.platform.Platform;
+import studio.dreamys.icarus.platform.RecorderShield;
 import studio.dreamys.icarus.platform.Renderer;
+import studio.dreamys.icarus.platform.win32.Win32RecorderShield;
 import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
@@ -54,5 +56,10 @@ public abstract class ModernPlatform implements Platform {
     @Override
     public void setClipboard(String text) {
         Minecraft.getInstance().keyboardHandler.setClipboard(text);
+    }
+
+    @Override
+    public RecorderShield createRecorderShield() {
+        return Win32RecorderShield.create();
     }
 }

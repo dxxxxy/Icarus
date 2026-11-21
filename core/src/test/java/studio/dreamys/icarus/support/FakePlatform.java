@@ -1,6 +1,7 @@
 package studio.dreamys.icarus.support;
 
 import studio.dreamys.icarus.platform.Platform;
+import studio.dreamys.icarus.platform.RecorderShield;
 import studio.dreamys.icarus.platform.Renderer;
 import studio.dreamys.icarus.platform.Texture;
 import studio.dreamys.icarus.render.DrawList;
@@ -20,6 +21,8 @@ public final class FakePlatform implements Platform {
     public int width = 1920, height = 1080;
     public MenuController opened;
     public String clipboard = "";
+    /** What {@link #createRecorderShield()} returns. */
+    public RecorderShield shield = RecorderShield.UNAVAILABLE;
     /** What {@link #getModRoots} reports for every mod id. */
     public final List<Path> modRoots = new ArrayList<>();
 
@@ -84,6 +87,50 @@ public final class FakePlatform implements Platform {
     @Override
     public void setClipboard(String text) {
         clipboard = text;
+    }
+
+    @Override
+    public RecorderShield createRecorderShield() {
+        return shield;
+    }
+
+    /** A shield that records what it's asked to show. */
+    public static final class FakeShield implements RecorderShield {
+        public boolean available = true, accept = true, visible;
+        public int shows, uploads, hides;
+        public int x, y, width, height;
+        public int[] pixels;
+
+        @Override
+        public boolean isAvailable() {
+            return available;
+        }
+
+        @Override
+        public boolean show(int[] pixels, int stride, int width, int height, int x, int y, boolean changed) {
+            shows++;
+            if (!accept) {
+                available = false;
+                return false;
+            }
+            if (changed) {
+                uploads++;
+                this.pixels = new int[width * height];
+                for (int row = 0; row < height; row++) System.arraycopy(pixels, row * stride, this.pixels, row * width, width);
+            }
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+            visible = true;
+            return true;
+        }
+
+        @Override
+        public void hide() {
+            hides++;
+            visible = false;
+        }
     }
 
     /** Records draw lists (as quads) and texture uploads. */

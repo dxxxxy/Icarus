@@ -21,6 +21,12 @@ public final class FrameRenderer {
     }
 
     public void render(Renderer renderer, FontAtlas atlas, double scale, int framebufferWidth, int framebufferHeight, Runnable paint) {
+        paint(renderer, atlas, scale, framebufferWidth, framebufferHeight, paint);
+        if (!list.isEmpty()) renderer.render(list);
+    }
+
+    /** Runs the paint pass (syncing the atlas) without handing the list to the renderer; returns the list. */
+    public DrawList paint(Renderer renderer, FontAtlas atlas, double scale, int framebufferWidth, int framebufferHeight, Runnable paint) {
         for (int attempt = 0; attempt < 2; attempt++) {
             Texture texture = atlas.sync(renderer);
             int size = atlas.getSize(), generation = atlas.getGeneration();
@@ -29,6 +35,6 @@ public final class FrameRenderer {
             if (atlas.getSize() == size && atlas.getGeneration() == generation) break;
         }
         atlas.sync(renderer);
-        if (!list.isEmpty()) renderer.render(list);
+        return list;
     }
 }

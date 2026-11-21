@@ -24,6 +24,7 @@ GUI and config library for Minecraft mods. A Minecraft-free core plus one thin a
   - Fabric 1.16.5–1.21.1: `testmodRunClient`.
   - Fabric 26.3: `runTestmodClient`.
   - `ICARUS_TEST_THEME=fatality` picks the fatality theme; `ICARUS_TEST_OPEN=1` opens the menu on the title screen with a test toast.
+  - `ICARUS_TEST_HIDE=1` turns on "Hide from recorders"; the setting is saved in the testmod's `icarus.json`.
 
 ## Traps
 

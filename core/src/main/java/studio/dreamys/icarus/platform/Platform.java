@@ -45,4 +45,12 @@ public interface Platform {
     String getClipboard();
 
     void setClipboard(String text);
+
+    /**
+     * The window that hides the menu from recorders ({@link RecorderShield#UNAVAILABLE} by default). Called once, on
+     * the render thread. Adapters on Windows return {@link studio.dreamys.icarus.platform.win32.Win32RecorderShield#create()}.
+     */
+    default RecorderShield createRecorderShield() {
+        return RecorderShield.UNAVAILABLE;
+    }
 }

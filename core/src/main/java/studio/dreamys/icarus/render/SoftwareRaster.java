@@ -12,6 +12,7 @@ import studio.dreamys.icarus.platform.Texture;
 public final class SoftwareRaster {
     private int[] target = new int[0];
     private int originX, originY, width, height;
+    private float alphaCutoff;
 
     /** Starts a frame covering framebuffer pixels [x, x + w) × [y, y + h), filled with {@code premultipliedArgb}. */
     public void begin(int x, int y, int w, int h, int premultipliedArgb) {
@@ -22,6 +23,11 @@ public final class SoftwareRaster {
         height = h;
         if (target.length < w * h) target = new int[w * h];
         java.util.Arrays.fill(target, 0, w * h, premultipliedArgb);
+    }
+
+    /** Drops fragments whose alpha is below {@code cutoff}, like a shader that discards them (0 by default). */
+    public void setAlphaCutoff(float cutoff) {
+        alphaCutoff = cutoff;
     }
 
     /** Premultiplied ARGB pixels, row by row ({@link #getWidth()} per row); only the first width × height are used. */
@@ -123,7 +129,7 @@ public final class SoftwareRaster {
             if (solid && !horizontal) {
                 int texel = texels[texRow + columnTexels[0]];
                 float alpha = ca * (texel >>> 24) / (255f * 255f);
-                if (alpha <= 0) continue;
+                if (alpha <= 0 || alpha < alphaCutoff) continue;
                 float r = cr * (texel >> 16 & 255) / 255f, g = cg * (texel >> 8 & 255) / 255f, b = cb * (texel & 255) / 255f;
                 if (alpha >= 1) {
                     java.util.Arrays.fill(target, row + minX, row + maxX, 0xFF000000 | Math.round(r) << 16 | Math.round(g) << 8 | Math.round(b));
@@ -142,7 +148,7 @@ public final class SoftwareRaster {
                 }
                 int texel = texels[texRow + columnTexels[px - minX]];
                 float alpha = ca * (texel >>> 24) / (255f * 255f);
-                if (alpha <= 0) continue;
+                if (alpha <= 0 || alpha < alphaCutoff) continue;
                 blend(row + px, alpha, cr * (texel >> 16 & 255) / 255f, cg * (texel >> 8 & 255) / 255f, cb * (texel & 255) / 255f);
             }
         }
@@ -216,7 +222,7 @@ public final class SoftwareRaster {
                 float mg = mix(ca >> 8 & 255, cb >> 8 & 255, cc >> 8 & 255, w0, w1, w2);
                 float mb = mix(ca & 255, cb & 255, cc & 255, w0, w1, w2);
                 float alpha = ma * (texel >>> 24) / (255f * 255f);
-                if (alpha <= 0) continue;
+                if (alpha <= 0 || alpha < alphaCutoff) continue;
                 float r = mr * (texel >> 16 & 255) / 255f;
                 float g = mg * (texel >> 8 & 255) / 255f;
                 float bl = mb * (texel & 255) / 255f;

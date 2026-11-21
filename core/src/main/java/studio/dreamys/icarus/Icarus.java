@@ -4,7 +4,9 @@ import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.annotation.type.IPage;
 import studio.dreamys.icarus.config.ClassScanner;
 import studio.dreamys.icarus.platform.Platform;
+import studio.dreamys.icarus.platform.RecorderShield;
 import studio.dreamys.icarus.render.FontAtlas;
+import studio.dreamys.icarus.render.RecorderOverlay;
 import studio.dreamys.icarus.theme.Theme;
 
 import java.nio.file.Path;
@@ -20,6 +22,8 @@ public final class Icarus {
     private static Platform platform;
     private static boolean installed;
     private static FontAtlas atlas;
+    private static RecorderShield shield;
+    private static final RecorderOverlay overlay = new RecorderOverlay();
     private static final List<IcarusMod> mods = new CopyOnWriteArrayList<>();
 
     private Icarus() {
@@ -71,6 +75,35 @@ public final class Icarus {
     /** Supplies the platform explicitly instead of looking it up (tests, custom environments). */
     public static void setPlatform(Platform platform) {
         Icarus.platform = platform;
+        if (shield != null) overlay.hide(shield);
+        overlay.reset();
+        shield = null;
+    }
+
+    /**
+     * Whether the menu can be hidden from recorders and screen sharing here (Windows 10 2004 or later). Call it on the
+     * render thread.
+     */
+    public static boolean canHideFromRecorders() {
+        return getRecorderShield().isAvailable();
+    }
+
+    /** The platform's {@link RecorderShield} (created on first use). */
+    public static RecorderShield getRecorderShield() {
+        if (shield == null) {
+            try {
+                shield = getPlatform().createRecorderShield();
+            } catch (LinkageError e) { //JNA missing (Minecraft 1.7.10 doesn't ship it)
+                java.util.logging.Logger.getLogger("Icarus").warning("[Icarus] Can't hide the menu from recorders: " + e);
+                shield = RecorderShield.UNAVAILABLE;
+            }
+        }
+        return shield;
+    }
+
+    /** Draws menus into the {@link RecorderShield} while they're hidden from recorders. */
+    public static RecorderOverlay getRecorderOverlay() {
+        return overlay;
     }
 
     /** The texture atlas shared by every mod (fonts and generated images). */
@@ -114,5 +147,6 @@ public final class Icarus {
     /** Start of a client tick. */
     public static void clientTick() {
         for (IcarusMod mod : mods) mod.tick();
+        if (shield != null) overlay.hideIfStale(shield);
     }
 }

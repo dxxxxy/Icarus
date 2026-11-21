@@ -9,6 +9,7 @@ import cpw.mods.fml.common.ModContainer;
 import studio.dreamys.icarus.platform.forge1710.ForgeHooks;
 import studio.dreamys.icarus.platform.forge1710.IcarusScreen;
 import studio.dreamys.icarus.platform.forge1710.LegacyRenderer;
+import studio.dreamys.icarus.platform.win32.Win32RecorderShield;
 import studio.dreamys.icarus.ui.MenuController;
 
 import java.io.File;
@@ -81,6 +82,11 @@ public class PlatformImpl implements Platform {
     @Override
     public void setClipboard(String text) {
         GuiScreen.setClipboardString(text);
+    }
+
+    @Override
+    public RecorderShield createRecorderShield() {
+        return Win32RecorderShield.create();
     }
 
     private static ModContainer container(String modid) {

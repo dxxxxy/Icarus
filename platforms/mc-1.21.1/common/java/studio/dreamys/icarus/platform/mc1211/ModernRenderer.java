@@ -66,6 +66,12 @@ public class ModernRenderer implements Renderer {
         TextureUtil.releaseTextureId(((GlTexture) texture).id);
     }
 
+    /** position_tex_color discards {@code color.a < 0.1}. */
+    @Override
+    public float getAlphaCutoff() {
+        return 0.1f;
+    }
+
     @Override
     public void render(DrawList list) {
         graphics.flush(); //draw whatever vanilla batched so far underneath us

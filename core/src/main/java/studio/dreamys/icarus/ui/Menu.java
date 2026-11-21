@@ -6,6 +6,7 @@ import studio.dreamys.icarus.config.UiPrefs;
 import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.platform.Platform;
 import studio.dreamys.icarus.render.Canvas;
+import studio.dreamys.icarus.render.DrawList;
 import studio.dreamys.icarus.render.FrameRenderer;
 import studio.dreamys.icarus.settings.GroupNode;
 import studio.dreamys.icarus.settings.PageNode;
@@ -598,7 +599,15 @@ public final class Menu implements MenuController {
             popup.animate(dt);
         }
 
-        //4. paint, then the toasts on top
+        //4. paint, then the toasts on top: in game, or in the window recorders can't see
+        if (mod.isHiddenFromRecorders() && Icarus.canHideFromRecorders()) {
+            DrawList menuList = frame.paint(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, paintPass);
+            DrawList toastList = mod.paintOverMenu(partialTick);
+            if (Icarus.getRecorderOverlay().present(Icarus.getRecorderShield(), Icarus.getAtlas(), platform.getRenderer().getAlphaCutoff(), fbWidth, fbHeight, menuList, toastList)) return;
+            if (!menuList.isEmpty()) platform.getRenderer().render(menuList);
+            if (toastList != null && !toastList.isEmpty()) platform.getRenderer().render(toastList);
+            return;
+        }
         frame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, paintPass);
         mod.renderOverMenu(partialTick);
     }
@@ -828,6 +837,7 @@ public final class Menu implements MenuController {
     @Override
     public void closed() {
         mod.setMenuOpen(false);
+        Icarus.getRecorderOverlay().hide(Icarus.getRecorderShield());
         fadeStart = 0; //the next open fades in again
         closing = false;
         closePopup();

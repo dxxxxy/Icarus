@@ -45,4 +45,6 @@ dependencies {
     val lombok = "org.projectlombok:lombok:${providers.gradleProperty("lombok_version").get()}"
     compileOnly(lombok)
     annotationProcessor(lombok)
+    // 1.7.10 doesn't ship JNA; without it at runtime "hide from recorders" is simply unavailable
+    compileOnly("net.java.dev.jna:jna:3.4.0")
 }

@@ -9,6 +9,7 @@ public final class UiPrefs {
     private double x = Double.NaN, y = Double.NaN;
     private String page, subPage;
     private String profile;
+    private boolean hideFromRecorders;
 
     public String getTheme() {
         return theme;
@@ -36,6 +37,15 @@ public final class UiPrefs {
 
     public String getProfile() {
         return profile;
+    }
+
+    /** Whether the menu is drawn in a window that recorders and screen sharing can't see. */
+    public boolean isHideFromRecorders() {
+        return hideFromRecorders;
+    }
+
+    void setHideFromRecorders(boolean hide) {
+        hideFromRecorders = hide;
     }
 
     void setTheme(String theme) {
@@ -67,6 +77,7 @@ public final class UiPrefs {
         if (page != null) json.addProperty("page", page);
         if (subPage != null) json.addProperty("subPage", subPage);
         if (profile != null) json.addProperty("profile", profile);
+        if (hideFromRecorders) json.addProperty("hideFromRecorders", true);
         return json;
     }
 
@@ -75,6 +86,8 @@ public final class UiPrefs {
         page = string(json, "page");
         subPage = string(json, "subPage");
         profile = string(json, "profile");
+        JsonElement hide = json.get("hideFromRecorders");
+        hideFromRecorders = hide != null && hide.isJsonPrimitive() && hide.getAsJsonPrimitive().isBoolean() && hide.getAsBoolean();
         Double px = number(json, "x"), py = number(json, "y");
         if (px != null && py != null) setPosition(px, py);
     }

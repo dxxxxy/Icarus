@@ -6,6 +6,7 @@ import studio.dreamys.icarus.hud.HudElement;
 import studio.dreamys.icarus.hud.Toasts;
 import studio.dreamys.icarus.input.Keys;
 import studio.dreamys.icarus.platform.Platform;
+import studio.dreamys.icarus.render.DrawList;
 import studio.dreamys.icarus.render.FrameRenderer;
 import studio.dreamys.icarus.settings.KeybindMode;
 import studio.dreamys.icarus.settings.Keybinds;
@@ -85,7 +86,10 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     private Menu menu() {
         if (menu == null) {
-            if (options.configUi || options.themeSelector) configPanel = new ConfigPanel(this, options.configUi, options.themeSelector);
+            boolean recorderToggle = options.recorderToggle && Icarus.canHideFromRecorders();
+            if (options.configUi || options.themeSelector || recorderToggle) {
+                configPanel = new ConfigPanel(this, options.configUi, options.themeSelector, recorderToggle);
+            }
             menu = new Menu(this, theme, configPanel);
         }
         return menu;
@@ -122,6 +126,20 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
         this.theme = theme;
         if (menu != null) menu.setTheme(theme);
         store.setTheme(theme.getId());
+    }
+
+    /**
+     * Whether the menu is drawn in a separate window that recorders and screen sharing (OBS, Discord, Snipping Tool)
+     * can't see, laid over the game so it looks the same to the player. Saved in {@code icarus.json}. Has no effect
+     * where {@link Icarus#canHideFromRecorders()} is false.
+     */
+    public boolean isHiddenFromRecorders() {
+        return store.getPrefs().isHideFromRecorders();
+    }
+
+    public void setHiddenFromRecorders(boolean hidden) {
+        store.setHideFromRecorders(hidden);
+        if (!hidden) Icarus.getRecorderOverlay().hide(Icarus.getRecorderShield());
     }
 
     /** Accent colour (ARGB): the one from the options, or the theme's. */
@@ -348,12 +366,18 @@ public final class IcarusMod implements SettingListener, Keybinds.Listener {
 
     /** Draws the toasts over the open menu (called by the menu after it paints). */
     public void renderOverMenu(float partialTick) {
-        if (!toasts.hasActive()) return;
+        DrawList list = paintOverMenu(partialTick);
+        if (list != null && !list.isEmpty()) Icarus.getPlatform().getRenderer().render(list);
+    }
+
+    /** Paints the toasts over the open menu without drawing them; null when there are none. */
+    public DrawList paintOverMenu(float partialTick) {
+        if (!toasts.hasActive()) return null;
         Platform platform = Icarus.getPlatform();
         double scale = renderScale(platform.getGuiScale());
         int fbWidth = platform.getFramebufferWidth(), fbHeight = platform.getFramebufferHeight();
         hudContext.set(theme, getAccent(), fbWidth / scale, fbHeight / scale, partialTick);
-        overlayFrame.render(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, overlayPaint);
+        return overlayFrame.paint(platform.getRenderer(), Icarus.getAtlas(), scale, fbWidth, fbHeight, overlayPaint);
     }
 
     /** Whether this mod's menu is on screen (set by the menu). */

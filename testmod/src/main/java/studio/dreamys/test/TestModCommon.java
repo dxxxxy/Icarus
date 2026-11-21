@@ -45,6 +45,9 @@ public class TestModCommon {
         mod.toasts().setOffsetY(32);
         mod.addKeyListener(TestModCommon::key);
 
+        //dev aid: draw the menu in the window recorders can't see (also a checkbox on the config page)
+        if (System.getenv("ICARUS_TEST_HIDE") != null) mod.setHiddenFromRecorders(true);
+
         //dev aid: open the menu on the title screen so every platform can be checked without a world
         if (System.getenv("ICARUS_TEST_OPEN") != null) {
             mod.addHud(new HudElement() {
