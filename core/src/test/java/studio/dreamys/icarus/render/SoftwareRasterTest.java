@@ -89,6 +89,59 @@ class SoftwareRasterTest {
         }
     }
 
+    /** The quad fast path covers the same pixels with the same colours as drawing the quad's two triangles. */
+    @Test
+    void quadFastPathMatchesTriangles() {
+        java.util.Random random = new java.util.Random(7);
+        int size = 16;
+        int[] texels = new int[size * size];
+        for (int i = 0; i < texels.length; i++) texels[i] = random.nextInt();
+        texels[0] = 0xFFFFFFFF;
+        studio.dreamys.icarus.platform.Texture texture = new FakePlatform.RecordingRenderer().createTexture(size, size);
+        float[] edges = {0, 0.5f, 1, 2.25f, 3.5f, 7, 10.75f};
+        SoftwareRaster fast = new SoftwareRaster(), slow = new SoftwareRaster();
+        slow.quads = false;
+        DrawList list = new DrawList();
+        for (int n = 0; n < 600; n++) {
+            float x0 = edges[random.nextInt(edges.length)] + random.nextInt(30), y0 = edges[random.nextInt(edges.length)] + random.nextInt(30);
+            float x1 = x0 + edges[random.nextInt(edges.length)] + random.nextInt(20), y1 = y0 + edges[random.nextInt(edges.length)] + random.nextInt(20);
+            int color = random.nextInt(), other = random.nextInt();
+            if (n % 5 == 4) color |= 0xFF000000; //opaque, filled directly
+            //one colour, a vertical gradient or a horizontal one (the cases the fast path takes)
+            int tl = color, tr = n % 3 == 2 ? other : color, bl = n % 3 == 1 ? other : color, br = n % 3 == 0 ? color : other;
+            list.reset(64, 64);
+            list.setTexture(texture);
+            //texel coordinates a little off the texel grid: exact ties may round either way, on the GPU too
+            float u0 = (random.nextInt(size - 4) + offset(random)) / size, v0 = (random.nextInt(size - 4) + offset(random)) / size;
+            float u1 = u0 + (1 + random.nextInt(3) - offset(random)) / size, v1 = v0 + (1 + random.nextInt(3) - offset(random)) / size;
+            if (random.nextBoolean()) { //mirrored
+                float t = u0;
+                u0 = u1;
+                u1 = t;
+            }
+            if (n % 2 == 0) u0 = v0 = u1 = v1 = 0.1f / size; //solid
+            list.quad(x0, y0, x1, y1, u0, v0, u1, v1, tl, tr, br, bl);
+            fast.begin(3, 2, 60, 58, 0x80102030);
+            slow.begin(3, 2, 60, 58, 0x80102030);
+            fast.drawCommand(list, 0, texels, size, size);
+            slow.drawCommand(list, 0, texels, size, size);
+            for (int i = 0; i < 60 * 58; i++) {
+                int a = fast.getPixels()[i], b = slow.getPixels()[i];
+                for (int shift = 0; shift < 32; shift += 8) {
+                    int diff = Math.abs((a >>> shift & 255) - (b >>> shift & 255));
+                    assertTrue(diff <= 1, "quad " + x0 + "," + y0 + " - " + x1 + "," + y1 + " uv " + u0 * size + "," + v0 * size + " - " + u1 * size + "," + v1 * size
+                            + " colours " + Integer.toHexString(tl) + " " + Integer.toHexString(tr) + " " + Integer.toHexString(br) + " " + Integer.toHexString(bl)
+                            + ": pixel " + (3 + i % 60) + "," + (2 + i / 60) + " " + Integer.toHexString(a) + " vs " + Integer.toHexString(b));
+                }
+            }
+        }
+    }
+
+    /** A random fraction of a texel, so sample points practically never land exactly on a texel edge. */
+    private static float offset(java.util.Random random) {
+        return 0.005f + random.nextFloat() * 0.02f;
+    }
+
     @Test
     void boundsUnionAndClamp() {
         DrawList a = new DrawList(), b = new DrawList();
