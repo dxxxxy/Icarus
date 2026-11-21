@@ -26,10 +26,7 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
-      # basic: the MIT-licensed cache (the default "enhanced" one is proprietary since v6)
       - uses: gradle/actions/setup-gradle@v6
-        with:
-          cache-provider: basic
       - name: Build and test
         run: ./gradlew build --stacktrace
       - uses: actions/upload-artifact@v7
