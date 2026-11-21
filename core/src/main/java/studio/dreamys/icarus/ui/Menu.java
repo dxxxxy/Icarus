@@ -391,13 +391,15 @@ public final class Menu implements MenuController {
         columns = Math.max(1, columns);
         double columnWidth = (area.w - gap * (columns - 1)) / columns;
 
-        @SuppressWarnings("unchecked")
-        List<GroupView>[] perColumn = new List[columns];
-        double[] used = new double[columns];
-        for (int c = 0; c < columns; c++) perColumn[c] = new ArrayList<>();
+        //scratch reused across frames, so a steady frame doesn't allocate
+        while (perColumn.size() < columns) perColumn.add(new ArrayList<GroupView>());
+        for (int c = 0; c < columns; c++) perColumn.get(c).clear();
+        if (used.length < columns) used = new double[columns];
+        java.util.Arrays.fill(used, 0, columns, 0);
 
         double innerWidth = columnWidth - metrics.padLeft - metrics.padRight;
-        for (GroupView g : groups) {
+        for (int i = 0; i < groups.size(); i++) {
+            GroupView g = groups.get(i);
             g.contentHeight = metrics.rowOffset + measureRows(canvas, g, innerWidth, metrics.rowGap);
             g.slack = metrics.rowOffset; //rows start that far down but also end that far above their height
             g.clipBelow = metrics.clipBelow;
@@ -409,16 +411,19 @@ public final class Menu implements MenuController {
                 column = 0;
                 for (int c = 1; c < columns; c++) if (used[c] < used[column]) column = c;
             }
-            perColumn[column].add(g);
+            perColumn.get(column).add(g);
             used[column] += natural(g, metrics) + gap;
         }
 
         for (int c = 0; c < columns; c++) {
             double x = area.x + c * (columnWidth + gap);
             double offset = topOffsets != null && c < topOffsets.length ? topOffsets[c] : 0;
-            placeColumn(canvas, perColumn[c], x, area.y + offset, columnWidth, area.h - offset, metrics.stackGap >= 0 ? metrics.stackGap : gap, metrics);
+            placeColumn(canvas, perColumn.get(c), x, area.y + offset, columnWidth, area.h - offset, metrics.stackGap >= 0 ? metrics.stackGap : gap, metrics);
         }
     }
+
+    private final List<List<GroupView>> perColumn = new ArrayList<>();
+    private double[] used = new double[0], heights = new double[0];
 
     private double natural(GroupView g, GroupMetrics m) {
         double fixed = g.getGroup().getHeight();
@@ -432,19 +437,16 @@ public final class Menu implements MenuController {
 
     private void placeColumn(Canvas canvas, List<GroupView> column, double x, double y, double width, double height, double gap, GroupMetrics m) {
         if (column.isEmpty()) return;
-        List<GroupView> top = new ArrayList<>(), bottom = new ArrayList<>();
-        for (GroupView g : column) (g.getGroup().isPinBottom() ? bottom : top).add(g);
-
         double gaps = gap * (column.size() - 1);
         double total = 0;
-        for (GroupView g : column) total += natural(g, m);
+        for (int i = 0; i < column.size(); i++) total += natural(column.get(i), m);
         double available = height - gaps;
 
-        double[] heights = new double[column.size()];
+        if (heights.length < column.size()) heights = new double[column.size()];
         if (total <= available) {
             double extra = available - total;
             int growers = 0;
-            for (GroupView g : column) if (grows(g)) growers++;
+            for (int i = 0; i < column.size(); i++) if (grows(column.get(i))) growers++;
             for (int i = 0; i < column.size(); i++) {
                 GroupView g = column.get(i);
                 double h = natural(g, m);
@@ -454,7 +456,8 @@ public final class Menu implements MenuController {
         } else {
             //fixed-height groups keep their size; the others share what's left in proportion and scroll
             double fixedTotal = 0, flexTotal = 0;
-            for (GroupView g : column) {
+            for (int i = 0; i < column.size(); i++) {
+                GroupView g = column.get(i);
                 if (g.getGroup().getHeight() > 0) fixedTotal += g.getGroup().getHeight();
                 else flexTotal += natural(g, m);
             }
@@ -482,7 +485,8 @@ public final class Menu implements MenuController {
             bottomCursor -= gap;
         }
 
-        for (GroupView g : column) {
+        for (int i = 0; i < column.size(); i++) {
+            GroupView g = column.get(i);
             g.content.set(g.frame.x + m.padLeft, g.frame.y + m.padTop, g.frame.w - m.padLeft - m.padRight, g.frame.h - m.padTop - m.padBottom);
             g.scrollBy(0); //clamp to the new size
             positionRows(canvas, g, m);
@@ -586,8 +590,11 @@ public final class Menu implements MenuController {
             hovered = hit;
             if (hovered != null) hovered.setHovered(true);
         }
-        for (GroupView g : getCurrentSubTab().groups) {
-            for (Widget w : g.getWidgets()) {
+        List<GroupView> groups = getCurrentSubTab().groups;
+        for (int gi = 0; gi < groups.size(); gi++) { //indexed: a steady frame doesn't allocate
+            List<Widget> widgets = groups.get(gi).getWidgets();
+            for (int wi = 0; wi < widgets.size(); wi++) {
+                Widget w = widgets.get(wi);
                 w.animate(dt);
                 if (w.getKeybind() != null) w.getKeybind().animate(dt);
                 if (w instanceof ListWidget) ((ListWidget) w).hover(mouseX, mouseY);
@@ -639,11 +646,15 @@ public final class Menu implements MenuController {
         Canvas canvas = frame.getCanvas();
         canvas.setAlpha(fadeAlpha());
         theme.paintWindow(canvas, this);
-        for (GroupView g : getCurrentSubTab().groups) {
+        List<GroupView> groups = getCurrentSubTab().groups;
+        for (int gi = 0; gi < groups.size(); gi++) {
+            GroupView g = groups.get(gi);
             if (g.frame.isEmpty()) continue;
             theme.paintGroup(canvas, this, g);
             canvas.pushClip(g.content.x, g.content.y, g.content.w, g.content.h + g.clipBelow);
-            for (Widget w : g.getWidgets()) {
+            List<Widget> widgets = g.getWidgets();
+            for (int wi = 0; wi < widgets.size(); wi++) {
+                Widget w = widgets.get(wi);
                 if (w.hidden || w.bounds.bottom() < g.content.y || w.bounds.y > g.content.bottom() + g.clipBelow) continue;
                 w.paint(theme, canvas);
                 if (w.getKeybind() != null) w.getKeybind().paint(theme, canvas);
@@ -700,7 +711,9 @@ public final class Menu implements MenuController {
     }
 
     private Widget hitWidget(double x, double y) {
-        for (GroupView g : getCurrentSubTab().groups) {
+        List<GroupView> groups = getCurrentSubTab().groups;
+        for (int gi = 0; gi < groups.size(); gi++) {
+            GroupView g = groups.get(gi);
             if (!g.content.contains(x, y)) continue;
             //last first: a swatch attached to a row sits on top of that row's widget
             List<Widget> widgets = g.getWidgets();
