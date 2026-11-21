@@ -95,6 +95,8 @@ public final class FakePlatform implements Platform {
         public final List<float[]> lastQuads = new ArrayList<>();
         public boolean recordQuads = true;
         public int uploads;
+        /** Called with each list before it's recorded (e.g. to rasterise it). */
+        public java.util.function.Consumer<DrawList> onRender;
 
         @Override
         public Texture createTexture(int width, int height) {
@@ -123,6 +125,7 @@ public final class FakePlatform implements Platform {
         @Override
         public void render(DrawList list) {
             renders++;
+            if (onRender != null) onRender.accept(list);
             lastCommandCount = list.getCommandCount();
             lastIndexCount = 0;
             for (int i = 0; i < list.getCommandCount(); i++) lastIndexCount += list.getCommandIndexCount(i);

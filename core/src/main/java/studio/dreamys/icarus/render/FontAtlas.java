@@ -174,6 +174,11 @@ public final class FontAtlas {
         return face;
     }
 
+    /** The CPU copy, {@link #getSize()} pixels square, ARGB (for software rendering; don't modify). */
+    int[] pixels() {
+        return pixels;
+    }
+
     /** Pixel at (x, y) of the CPU copy (tests). */
     int pixel(int x, int y) {
         return pixels[y * size + x];
